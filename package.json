@@ -1,38 +1,41 @@
 {
   "name": "minota-ui",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit",
-    "test:raw": "node node_modules/mocha/bin/mocha **/*.test.js --watch",
-    "build:electron": "vue-cli-service build:electron",
-    "serve:electron": "vue-cli-service serve:electron"
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "register-service-worker": "^1.0.0",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.0-rc.12",
-    "@vue/cli-plugin-eslint": "^3.0.0-rc.12",
-    "@vue/cli-plugin-unit-mocha": "^3.0.0-rc.12",
-    "@vue/cli-service": "^3.0.0-rc.12",
-    "@vue/eslint-config-airbnb": "^3.0.0-rc.12",
+    "@vue/cli-plugin-babel": "^3.1.0",
+    "@vue/cli-plugin-eslint": "^3.1.0",
+    "@vue/cli-plugin-pwa": "^3.1.0",
+    "@vue/cli-plugin-unit-mocha": "^3.1.0",
+    "@vue/cli-service": "^3.1.0",
+    "@vue/eslint-config-airbnb": "^4.0.0",
     "@vue/test-utils": "^1.0.0-beta.20",
+    "babel-eslint": "^10.0.1",
     "chai": "^4.1.2",
-    "electron": "^2.0.2",
-    "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.2",
-    "vue-cli-plugin-electron-builder": "^1.0.0-beta.6",
+    "electron": "^3.0.0",
+    "eslint": "^5.8.0",
+    "eslint-plugin-vue": "^5.0.0-0",
+    "vue-cli-plugin-electron-builder": "^1.0.0-rc.7",
     "vue-template-compiler": "^2.5.17"
   },
   "eslintConfig": {
     "root": true,
     "env": {
-      "browser": true,
       "node": true
     },
     "extends": [
@@ -54,9 +57,5 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "repository": "https://github.com/abimbolas/minota-ui.git",
-  "author": "Vitaly Kuleshin <antivitla@gmail.com>",
-  "description": "Browser and Electron application for Minotá",
-  "main": "dist_electron/bundled/background.js",
-  "license": "MIT"
+  "main": "background.js"
 }

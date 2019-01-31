@@ -1,38 +1,42 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import Vue from 'vue'
+import Router from 'vue-router'
+// import NoteView from "./views/NoteView.vue";
+// import NotesView from "./views/NotesView.vue";
+import Table from './components/Table.vue'
+// import Config from "./components/Config.vue";
 // import Home from './views/Home.vue';
-import NewView from './views/NewView.vue';
-import ConfigView from './views/ConfigView.vue';
-import NotesView from './views/NotesView.vue';
-import NoteView from './views/NoteView.vue';
+// import NewNote from "./views/new.vue";
+// import Notes from "./views/notes.vue";
 
-Vue.use(Router);
+Vue.use(Router)
 
 export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/new',
-    },
-    {
-      path: '/config',
-      name: 'config-view',
-      component: ConfigView,
-    },
-    {
-      path: '/new',
-      name: 'new-view',
-      component: NewView,
-    },
-    {
-      path: '/notes',
-      name: 'notes-view',
-      component: NotesView,
-    },
-    {
-      path: '/notes/:id',
-      name: 'note-view',
-      component: NoteView,
-    },
-  ],
-});
+      name: 'home',
+      component: Table
+      // redirect: "/notes/new"
+    }
+    // {
+    //   path: "/config",
+    //   name: "config",
+    //   component: Config
+    // },
+    // {
+    //   path: "/table",
+    //   name: "table",
+    //   component: Table
+    // },
+    // {
+    //   path: "/notes",
+    //   name: "notes",
+    //   component: NotesView
+    // },
+    // {
+    //   path: "/notes/:id",
+    //   name: "note",
+    //   component: NoteView
+    // }
+  ]
+})

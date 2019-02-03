@@ -29,6 +29,7 @@ const mutations = {
 
 const actions = {
   loadArchiveAction (context, payload) {
+    console.log('load archive')
     return Backend.getAllNotes()
       .then(notes => {
         context.commit('clearArchive')

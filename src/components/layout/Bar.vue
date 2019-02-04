@@ -1,15 +1,16 @@
 <template lang="pug">
-  .minota-app-bar(v-scroll="scrollHandler" v-bind:class="classes")
-    div 
-      i.material-icons(style="vertical-align: bottom") menu
-      span &nbsp; Hello, world! I am App Bar
+  .minota-bar-shadow
+    .minota-bar(v-scroll="handleScroll" v-bind:class="classes")
+      div 
+        i.material-icons(style="vertical-align: bottom") menu
+        span &nbsp; Hello, world! I am App Bar
 </template>
 
 <script>
 import Scroll from '@/directives/scroll'
 
 export default {
-  name: 'AppBar',
+  name: 'Bar',
 
   directives: {
     Scroll
@@ -28,7 +29,7 @@ export default {
   },
 
   methods: {
-    scrollHandler (event) {
+    handleScroll (event) {
       if (
         event.scrollTop > this.breakpoint && 
         event.scrollTop - event.delta <= this.breakpoint
@@ -62,7 +63,10 @@ export default {
 </script>
 
 <style lang="stylus"> 
-.minota-app-bar
+
+.minota-bar-shadow
+  height 56px
+.minota-bar
   box-sizing border-box
   transition transform 0.25s, box-shadow 0.25s
   padding 16px
@@ -76,16 +80,10 @@ export default {
     top 0px
     right 0px
     transform translateY(0)
-    
     &.hidden
       transform translateY(-100%)
-    
   &.switch
     transition none !important
-  
   &.no-shadow
     box-shadow 0px 2px 10px 0px alpha(black, 0.0) !important
-    
-  &.sticky + *
-    padding-top 56px
 </style>

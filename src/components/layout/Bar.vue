@@ -1,9 +1,8 @@
 <template lang="pug">
-  .minota-bar-shadow
+  .minota-bar-placeholder
     .minota-bar(v-scroll="handleScroll" v-bind:class="classes")
-      div 
-        i.material-icons(style="vertical-align: bottom") menu
-        span &nbsp; Hello, world! I am App Bar
+      slot
+        i.material-icons menu
 </template>
 
 <script>
@@ -64,15 +63,19 @@ export default {
 
 <style lang="stylus"> 
 
-.minota-bar-shadow
+.minota-bar-placeholder
   height 56px
 .minota-bar
   box-sizing border-box
   transition transform 0.25s, box-shadow 0.25s
-  padding 16px
+  // padding 0px 16px
   min-height 56px
   background-color ghostwhite
   box-shadow 0px 2px 10px 0px alpha(black, 0.0)
+  display flex
+  align-items center
+  z-index 100
+  
   &.sticky
     box-shadow 0px 2px 10px 0px alpha(black, 0.25)
     position fixed
@@ -86,4 +89,24 @@ export default {
     transition none !important
   &.no-shadow
     box-shadow 0px 2px 10px 0px alpha(black, 0.0) !important
+
+  .title
+    flex-grow 1
+    padding-left 16px
+  .action
+  .navigation
+    height 48px
+    width 48px
+    line-height 48px
+    text-align center
+    flex-basis 48px
+    flex-shrink 0
+    cursor pointer
+    & 
+    &:visited
+      color inherit
+    .material-icons
+      line-height inherit
+    
+
 </style>

@@ -1,5 +1,5 @@
 <template lang="pug">
-  .minota-archive-note(v-on:click="openNote()" theme="light")
+  .minota-archive-note(v-on:click="$emit('open')" theme="light")
     //- .date.text-overline {{ config.date | date }}
     .topic.text-overline(v-if="config.topic") {{ config.topic }}
     .title.text-subtitle(v-if="title") {{ title }}
@@ -94,7 +94,7 @@ export default {
 @import '~@/assets/styles/variables'
 
 .minota-archive-note
-  padding 1rem
+  padding 1rem 0
   line-height 1.25rem
   min-height 3rem
   overflow hidden
@@ -107,8 +107,8 @@ export default {
     // margin 0px 1rem
     position absolute
     bottom 0
-    left 1rem
-    right 1rem
+    left 0
+    right 0
     background-color alpha(white, 0.1)
   &:last-child:after
     content none

@@ -4,7 +4,8 @@
 		v-scroll="handleScroll"
 		v-bind:class="classes"
 	)
-		i.material-icons add
+		slot
+			i.material-icons add
 </template>
 
 <script>

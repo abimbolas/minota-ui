@@ -60,20 +60,20 @@ export default {
       }, this.delay)
     })
 
-    // Bind special events
-    this.unsubscribe = this.$store.subscribe(mutation => {
-      if (mutation.type === 'toggleEditorFullscreen') {
-        setTimeout(() => {
-          this.simplemde.codemirror.refresh()
-        }, 200)
-      }
-    })
+    // // Bind special events
+    // this.unsubscribe = this.$store.subscribe(mutation => {
+    //   if (mutation.type === 'toggleEditorFullscreen') {
+    //     setTimeout(() => {
+    //       this.simplemde.codemirror.refresh()
+    //     }, 200)
+    //   }
+    // })
   },
 
   beforeDestroy () {
     this.simplemde.toTextArea()
     this.simplemde = null
-    this.unsubscribe()
+    // this.unsubscribe()
     clearTimeout(this.changeTimeout)
   }
 }

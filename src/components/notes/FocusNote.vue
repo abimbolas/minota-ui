@@ -1,5 +1,5 @@
 <template lang="pug">
-  .minota-focused-note(style-elevation="2")
+  .minota-focus-note(style-elevation="2")
     //- header
       .left {{ config.topic }}
     main
@@ -16,7 +16,7 @@ import { time } from '@/utils/time'
 import Editor from '@/components/Editor'
 
 export default {
-  name: 'FocusedNote',
+  name: 'FocusNote',
 
   components: {
     Editor
@@ -62,7 +62,7 @@ export default {
 <style lang="stylus">
 @import '~@/assets/styles/variables'
 
-.minota-focused-note
+.minota-focus-note
   background-color white
   box-sizing border-box
   padding 0 1rem

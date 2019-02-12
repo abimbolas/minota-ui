@@ -4,7 +4,7 @@ import Note from '@/models/note'
 class Backend {
   constructor () {
     this.resource = axios.create({
-      baseURL: 'http://localhost:7777',
+      baseURL: 'http://192.168.1.101:7654',
       headers: {
         'Content-Type': 'application/json; charset=UTF-8'
       }

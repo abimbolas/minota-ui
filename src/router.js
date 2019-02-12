@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 // import NoteView from "./views/NoteView.vue";
 // import NotesView from "./views/NotesView.vue";
-import Table from './components/Table.vue'
+import TableComponent from './components/screens/Table.vue'
+import DrawerComponent from './components/screens/Drawer.vue'
 // import Config from "./components/Config.vue";
 // import Home from './views/Home.vue';
 // import NewNote from "./views/new.vue";
@@ -15,8 +16,18 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Table
-      // redirect: "/notes/new"
+      // component: TableComponent
+      redirect: "/table"
+    },
+    {
+      path: '/table',
+      name: 'table',
+      component: TableComponent
+    },
+    {
+      path: '/drawer',
+      name: 'drawer',
+      component: DrawerComponent
     }
     // {
     //   path: "/config",

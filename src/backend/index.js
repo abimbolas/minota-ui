@@ -4,7 +4,7 @@ import Note from '@/models/note'
 class Backend {
   constructor () {
     this.resource = axios.create({
-      baseURL: 'http://192.168.1.101:7654',
+      baseURL: 'http://localhost:7654',
       headers: {
         'Content-Type': 'application/json; charset=UTF-8'
       }
@@ -23,23 +23,28 @@ class Backend {
 
   saveNote (note) {
     return this.resource.post(`/notes/${note.config.id}`, note)
-      .then(this.parseNote)
-  }
-
-  saveNotes (notes) {
-    return this.resource.post(`/notes`, notes)
       .then(this.parseNotes)
   }
+
+  // saveNotes (notes) {
+  //   return this.resource.post(`/notes`, notes)
+  //     .then(this.parseNotes)
+  // }
+
+  // updateNote (note) {
+  //   return this.resource.put(`/notes`, note)
+  //     .then(this.parseNotes)
+  // }
 
   deleteNote (note) {
     return this.resource.delete(`/notes/${note.config.id}`)
       .then(this.parseSuccessResponse)
   }
 
-  deleteNotes (notes) {
-    return this.resource.delete(`/notes`, { data: notes })
-      .then(this.parseSuccessResponse)
-  }
+  // deleteNotes (notes) {
+  //   return this.resource.delete(`/notes`, { data: notes })
+  //     .then(this.parseSuccessResponse)
+  // }
 
   parseSuccessResponse (response) {
     return response.data
@@ -50,7 +55,7 @@ class Backend {
   }
 
   parseNote (response) {
-    return new Note(response.data[0])
+    return Promise.resolve(new Note(response.data[0]))
   }
 }
 

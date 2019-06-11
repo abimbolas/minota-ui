@@ -48,7 +48,7 @@ export default {
       return this.computedNote.content
     },
     title () {
-      const match = this.computedNote.content.match(/^#.+\n/g)
+      const match = this.computedNote.content.match(/^#.*($|\n)/g)
       return match ? match[0].replace(/^#+/, '').trim() : ''
     },
     description () {

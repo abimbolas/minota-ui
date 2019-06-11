@@ -1,9 +1,12 @@
 <template lang="pug">
-  .minota-viewer(v-html="content")
+  .minota-viewer(
+    v-html="content"
+    v-on:click="onClick($event)")
 </template>
 
 <script>
 import marked from 'marked'
+import { previousBlockElementsCount } from '@/utils/dom'
 
 export default {
   name: 'Viewer',
@@ -20,12 +23,34 @@ export default {
     content () {
       return marked(this.value)
     }
+  },
+
+  methods: {
+    onClick ($event) {
+      this.$emit('click', {
+        cursor: this.getSelectionCursorPosition(),
+        originalEvent: $event
+      })
+    },
+    getSelectionCursorPosition () {
+      const selection = getSelection()
+      const matchedText = selection.anchorNode.textContent
+      const position = selection.anchorOffset
+      const lines = this.value
+        .substr(0, this.value.indexOf(matchedText) + position)
+        .split(/\r?\n/)
+      return {
+        ch: lines[lines.length - 1].length,
+        line: lines.length - 1
+      }
+    }
   }
 }
 </script>
 
 <style lang="stylus">
 .minota-viewer
+.editor-preview
   font-size 14px
   padding-top 4px
   padding-bottom 4px
@@ -47,6 +72,7 @@ export default {
     font-weight 500
   a
     word-break break-word
+    color inherit
     
   h6
   h5
@@ -71,6 +97,8 @@ export default {
   h1
     font-size 1.5em
     line-height 1.375
-    
+
+.editor-preview
+  background-color ghostwhite
     
 </style>

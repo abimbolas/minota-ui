@@ -1,14 +1,19 @@
 const state = {
-  view: 'table'
+  focusMode: 'edit'
 }
 
 const getters = {
-  getView: state => state.view
+  getFocusMode: state => state.focusMode,
+  isFocusEdit: state => state.focusMode === 'edit',
+  isFocusView: state => state.focusMode === 'view'
 }
 
 const mutations = {
-  setView (state, payload) {
-    state.view = payload.view
+  setFocusView (state) {
+    state.focusMode = 'view'
+  },
+  setFocusEdit (state) {
+    state.focusMode = 'edit'
   }
 }
 

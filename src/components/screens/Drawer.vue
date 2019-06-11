@@ -1,21 +1,20 @@
 <template lang="pug">
-	.minota-drawer.minota-screen
-		bar-component
-			router-link(to="/table").navigation
-				i.material-icons(v-on:click) close
-			h6.title
-				span Архив
+  .minota-drawer.minota-screen
+    bar-component
+      router-link(to="/table").navigation.action
+        i.material-icons(v-on:click) arrow_back
+      h6.title
 
-		fab-component
-			.action(v-on:click="newNote()")
-				i.material-icons add
+    fab-component
+      .fab-action(v-on:click="newNote()")
+        i.material-icons add
 
-		main
-			archive-note-component(
-				v-for="noteId in orderedByDate"
-				v-bind:key="noteId"
-				v-bind:note="noteId"
-				v-on:open="openNote(noteId)")
+    main
+      archive-note-component(
+        v-for="noteId in orderedByDate"
+        v-bind:key="noteId"
+        v-bind:note="noteId"
+        v-on:open="openNote(noteId)")
 </template>
 
 <script>
@@ -27,46 +26,48 @@ import BarComponent from '@/components/layout/Bar'
 import { Reference } from '@/store/reference'
 
 export default {
-	name: 'Drawer',
+  name: 'Drawer',
 
-	components: {
-		ArchiveNoteComponent,
-		// ScreenComponent,
-		FabComponent,
-		BarComponent
-	},
+  components: {
+    ArchiveNoteComponent,
+    // ScreenComponent,
+    FabComponent,
+    BarComponent
+  },
 
-	computed: {
-		orderedByDate () {
-			return this.getArchive.slice(0).sort((a, b) => {
-				return Reference[a].config.date - Reference[b].config.date
-			})
-		},
-		...mapGetters([
-			'getArchive'
-		])
-	},
+  computed: {
+    orderedByDate () {
+      return this.getArchive.slice(0).sort((a, b) => {
+        return Reference[b].config.date - Reference[a].config.date
+      })
+    },
+    ...mapGetters([
+      'getArchive'
+    ])
+  },
 
-	created () {
-		this.loadArchiveAction()
-	},
+  created () {
+    this.loadArchiveAction()
+  },
 
-	methods: {
-		getId (note) {
-			return Reference[note].config.id
-		},
-		newNote () {
-			console.log('New Note created')
-		},
-		openNote (id) {
-			this.focusNoteAction({ note: Reference[id] })
-			this.$router.push('/table')
-		},
-		...mapActions([
-			'loadArchiveAction',
-			'focusNoteAction'
-		])
-	}
+  methods: {
+    getId (note) {
+      return Reference[note].config.id
+    },
+    newNote () {
+      this.$router.push('/table')
+      this.newNoteAction()
+    },
+    openNote (id) {
+      this.focusNoteAction({ note: Reference[id] })
+      this.$router.push('/table')
+    },
+    ...mapActions([
+      'loadArchiveAction',
+      'focusNoteAction',
+      'newNoteAction'
+    ])
+  }
 }
 </script>
 
@@ -74,6 +75,6 @@ export default {
 @import '~@/assets/styles/screen'
 
 .minota-drawer
-	.minota-archive-note
-		cursor pointer
+  .minota-archive-note
+    cursor pointer
 </style>

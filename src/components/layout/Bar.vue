@@ -30,7 +30,7 @@ export default {
   methods: {
     handleScroll (event) {
       if (
-        event.scrollTop > this.breakpoint && 
+        event.scrollTop > this.breakpoint &&
         event.scrollTop - event.delta <= this.breakpoint
       ) {
         this.classes['sticky'] = true
@@ -61,7 +61,8 @@ export default {
 }
 </script>
 
-<style lang="stylus"> 
+<style lang="stylus">
+@import '~@/assets/styles/variables'
 
 .minota-bar-placeholder
   height 56px
@@ -69,6 +70,8 @@ export default {
   box-sizing border-box
   transition transform 0.25s, box-shadow 0.25s
   // padding 0px 16px
+  padding-left 4px
+  padding-right 4px
   min-height 56px
   background-color ghostwhite
   box-shadow 0px 2px 10px 0px alpha(black, 0.0)
@@ -95,18 +98,17 @@ export default {
     padding-left 16px
   .action
   .navigation
-    height 48px
-    width 48px
-    line-height 48px
-    text-align center
     flex-basis 48px
     flex-shrink 0
     cursor pointer
-    & 
-    &:visited
-      color inherit
-    .material-icons
-      line-height inherit
+  .action
+    margin-right 0
+    &:hover
+      background-color gainsboro
+      border-radius 50%
     
+  .minota-input-text
+    margin-left -16px
+    width calc(100% + 16px)
 
 </style>

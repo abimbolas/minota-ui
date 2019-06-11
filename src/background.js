@@ -8,11 +8,27 @@ strict */
 import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib'
 
+const MinotaServer = require('minota-server')
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+
+// Server instance
+let server
+
+function createServer () {
+  server = MinotaServer.init().listen(7654, function () {
+    console.log('Server listening on localhost:7654')
+  })
+}
+
+function destroyServer () {
+  server.close()
+  server = null
+}
 
 // Standard scheme must be registered before the app is ready
 protocol.registerStandardSchemes(['app'], { secure: true })
@@ -44,7 +60,14 @@ app.on('window-all-closed', () => {
   }
 })
 
+app.on('quit', () => {
+  destroyServer()
+})
+
 app.on('activate', () => {
+  if (!server) {
+    createServer()
+  }
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (win === null) {
@@ -60,6 +83,7 @@ app.on('ready', async () => {
     // Install Vue Devtools
     await installVueDevtools()
   }
+  createServer()
   createWindow()
 })
 

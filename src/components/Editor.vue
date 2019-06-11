@@ -19,6 +19,16 @@ export default {
       type: Number,
       required: false,
       default: 250
+    },
+    autofocus: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    cursor: {
+      type: Object,
+      required: false,
+      default: {line: 0, ch: 0}
     }
   },
 
@@ -29,7 +39,6 @@ export default {
   },
 
   watch: {
-    // Update editor on model changes
     value (val) {
       if (val !== this.simplemde.value()) {
         this.simplemde.value(val)
@@ -38,17 +47,28 @@ export default {
   },
 
   mounted () {
-    // Init DOM elements
+    // Init DOM
     this.simplemde = new SimpleMDE({
       element: this.$el.querySelector('textarea'),
+      autofocus: this.autofocus,
       spellChecker: false,
       toolbar: false,
       status: false,
-      autofocus: true,
       initialValue: this.value,
       placeholder: this.placeholder,
       renderingConfig: {
         codeSyntaxHighlighting: true
+      }
+    })
+
+    // set cursor position
+    this.simplemde.codemirror.setCursor(this.cursor)
+    this.simplemde.codemirror.focus()
+
+    // export Esc key event
+    this.simplemde.codemirror.on('keyHandled', (instance, name) => {
+      if (name.toLowerCase() === 'esc') {
+        this.$emit('editor-esc')
       }
     })
 
@@ -59,21 +79,11 @@ export default {
         this.$emit('input', this.simplemde.value())
       }, this.delay)
     })
-
-    // // Bind special events
-    // this.unsubscribe = this.$store.subscribe(mutation => {
-    //   if (mutation.type === 'toggleEditorFullscreen') {
-    //     setTimeout(() => {
-    //       this.simplemde.codemirror.refresh()
-    //     }, 200)
-    //   }
-    // })
   },
 
   beforeDestroy () {
     this.simplemde.toTextArea()
     this.simplemde = null
-    // this.unsubscribe()
     clearTimeout(this.changeTimeout)
   }
 }
@@ -106,6 +116,7 @@ export default {
         font-weight 400
       .cm-link
         word-break break-word
+        color inherit
       .cm-header-6
         font-size 1em
       .cm-header-5

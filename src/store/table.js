@@ -5,10 +5,12 @@ import Note from '@/models/note'
 // import { Reference } from './reference'
 
 const state = {
-  workspace: new Workspace()
+  workspace: new Workspace(),
+  mode: 'view'
 }
 
 const getters = {
+  isFocusEmpty: state => state.workspace.focus.length === 0,
   getFocus: state => state.workspace.focus,
   getBlur: state => state.workspace.blur
 }
@@ -60,6 +62,7 @@ const actions = {
     const note = new Note()
     context.commit('addToFocus', { note })
     context.commit('addToArchive', { notes: [ note ] })
+    context.commit('setFocusEdit')
     return Promise.resolve(note)
   },
 
@@ -80,8 +83,19 @@ const actions = {
     return lastPromise({
       type: `saveNote${payload.note.config.id}`,
       promise: Backend.saveNote(payload.note)
+    }).then((notes) => {
+      console.log(notes)
+      context.commit('addToArchive', { notes })
+      return Promise.resolve(notes)
     })
   },
+
+  // updateNoteContentAction (context, payload) {
+  //   return lastPromise({
+  //     type: `updateContent${payload.note.config.id}`,
+  //     promise: Backend.updateNote(payload.note)
+  //   })
+  // },
 
   deleteNoteAction (context, payload) {
     context.commit('removeFromFocus', payload)

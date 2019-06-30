@@ -17,7 +17,10 @@
 export default {
   props: {
     value: Boolean,
-    id: String,
+    id: {
+      type: String,
+      default: 'id' + Math.random() * 100000
+    },
     mark: Boolean,
     offBox: Boolean
   },

@@ -78,7 +78,7 @@ export default {
   display flex
   align-items center
   z-index 100
-  
+
   &.sticky
     box-shadow 0px 2px 10px 0px alpha(black, 0.25)
     position fixed
@@ -95,7 +95,8 @@ export default {
 
   .title
     flex-grow 1
-    padding-left 16px
+    padding 0 16px
+    text-align center
   .action
   .navigation
     flex-basis 48px
@@ -104,9 +105,8 @@ export default {
   .action
     margin-right 0
     &:hover
-      background-color gainsboro
       border-radius 50%
-    
+
   .minota-input-text
     margin-left -16px
     width calc(100% + 16px)

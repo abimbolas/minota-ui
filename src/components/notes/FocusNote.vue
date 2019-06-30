@@ -1,5 +1,5 @@
 <template lang="pug">
-  .minota-focus-note(style-elevation="2")
+  .minota-focus-note(elevation="2")
     //- header
       .left {{ config.topic }}
     main
@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { Reference } from '@/store/reference'
+import { NoteReference } from '@/store/reference'
 import Note from '@/models/note'
 import { time } from '@/utils/time'
 import Editor from '@/components/Editor'
@@ -41,7 +41,7 @@ export default {
 
   computed: {
     computedNote () {
-      return typeof this.note === 'string' ? Reference[this.note] : this.note
+      return typeof this.note === 'string' ? NoteReference[this.note] : this.note
     },
 
     content () {
@@ -54,7 +54,7 @@ export default {
   },
 
   created () {
-    console.log(Reference[this.note])
+    console.log(NoteReference[this.note])
   }
 }
 </script>

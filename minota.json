@@ -1,9 +1,6 @@
 {
   "storage": {
-    "type": "file",
-    "file": {
-      "path": "/Users/antivitla/Dropbox/Notes"
-    }
+  	"url": "file:///d:/Dropbox/Notes"
   },
   "topic": "Minota / UI"
 }

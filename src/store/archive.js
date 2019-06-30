@@ -1,6 +1,9 @@
-import Backend from '@/backend'
 import Workspace from '@/models/workspace'
-import { Reference } from './reference'
+import { NoteReference, BackendReference } from '@/store/reference'
+
+function Backend ({ getters }) {
+  return BackendReference[getters.getCurrentStorageConfig.id]
+}
 
 const state = {
   workspace: new Workspace()
@@ -14,7 +17,7 @@ const mutations = {
   addToArchive (state, payload) {
     payload.notes.forEach(note => {
       state.workspace.addToBlur(note.config.id)
-      Reference[note.config.id] = note
+      NoteReference[note.config.id] = note
     })
   },
 
@@ -29,12 +32,11 @@ const mutations = {
 
 const actions = {
   loadArchiveAction (context, payload) {
-    return Backend.getAllNotes()
-      .then(notes => {
-        context.commit('clearArchive')
-        context.commit('addToArchive', { notes })
-        return notes
-      })
+    return Backend(context).getNotes().then(notes => {
+      context.commit('clearArchive')
+      context.commit('addToArchive', { notes })
+      return notes
+    })
   }
 }
 

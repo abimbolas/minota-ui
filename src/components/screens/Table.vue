@@ -1,11 +1,11 @@
 <template lang="pug">
-  .minota-table.minota-screen
+  screen-component.minota-table
     bar-component
       //- Empty table (no matter view or edit mode)
       template(v-if="isFocusEmpty")
-        h6.title 
+        h6.title
         router-link(to="/drawer").action
-          i.material-icons folder_open
+          i.material-icons arrow_forward
 
       //- View note mode
       template(v-if="isFocusView && !isFocusEmpty")
@@ -24,7 +24,7 @@
       template(v-if="isFocusEdit && !isFocusEmpty")
         .navigation.action(v-on:click="setFocusView()")
           i.material-icons done
-        .title.text-overline 
+        .title.text-overline
           //- span {{ getFocusNote.config.topic }}
           input-text-component.text-overline(
             v-bind:value="getFocusNote.config.topic"
@@ -51,25 +51,18 @@
           i.material-icons add
 
     menu-component(v-if="isMoreOpened()" v-on:close="closeMore()")
-      .menu-header 
+      .menu-header
         .action(v-on:click="closeMore()")
           i.material-icons close
       .menu-item
-          .text-body Change topic
-      .menu-item(v-on:click="deleteNote()") 
+        .text-body Change topic
+      .menu-item(v-on:click="deleteNote()")
         .action
           i.material-icons delete
         .text-body Delete note
 
     main
-      //- Placeholder
-      template(v-if="isFocusEmpty")
-        .empty-focus-placeholder.text-overline(
-          v-bind:placeholder="placeholderKey"
-          v-if="isFocusEmpty")
-          div {{ quotes[placeholderKey] }}
-      //- Note
-      template(v-else)
+      template(v-if="!isFocusEmpty")
         note-component(
           v-for="noteId in getFocus"
           v-bind:key="noteId"
@@ -78,39 +71,43 @@
           v-on:update="onUpdate($event)"
           v-on:viewer-click="onViewerClick()"
           v-on:editor-esc="onEditorEsc()")
+
+      template(v-else)
+        screen-placeholder-component(
+          v-if="isFocusEmpty && placeholderItem"
+          v-bind:text="placeholderItem.text"
+          v-bind:image="placeholderItem.image")
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import { Reference } from '@/store/reference'
-import { previousBlockElementsCount } from '@/utils/dom'
-import NoteComponent from '@/components/Note'
-import FabComponent from '@/components/layout/Fab'
+
+import { NoteReference } from '@/store/reference'
+
 import BarComponent from '@/components/layout/Bar'
+import FabComponent from '@/components/layout/Fab'
 import MenuComponent from '@/components/layout/Menu'
-import InputTextComponent from '@/components/other/InputText'
+import ScreenComponent from '@/components/layout/Screen'
+
+import NoteComponent from '@/components/Note'
+
+import ScreenPlaceholderComponent from '@/components/other/ScreenPlaceholder'
 
 export default {
   name: 'Table',
 
   components: {
-    NoteComponent,
-    FabComponent,
     BarComponent,
+    FabComponent,
     MenuComponent,
-    InputTextComponent
+    ScreenComponent,
+    NoteComponent,
+    ScreenPlaceholderComponent
   },
 
   data () {
     return {
-      placeholderKey: parseInt(Math.random() * 5, 10),
-      quotes: [
-        'Раскольников грохнул бабку',
-        'Революция это архиважно',
-        'Сюртуки эксплуатировали, эксплуатировали, да не выэксплуатировали',
-        'Мой дядя самых честных грабил',
-        'Безухов тр&хнул Наташу Ростову'
-      ],
+      placeholderItem: null,
       pendingSave: false,
       more: false
     }
@@ -118,15 +115,21 @@ export default {
 
   computed: {
     getFocusNote () {
-      return Reference[this.getFocus[0]]
+      return NoteReference[this.getFocus[0]]
     },
     ...mapGetters([
       'getFocus',
       'getFocusMode',
+      'getPlaceholderQuotes',
       'isFocusEmpty',
       'isFocusView',
       'isFocusEdit'
     ])
+  },
+
+  created () {
+    // create placeholder
+    this.placeholderItem = this.getPlaceholderQuotes[parseInt(Math.random() * this.getPlaceholderQuotes.length, 10)]
   },
 
   mounted () {
@@ -155,7 +158,7 @@ export default {
     deleteNote () {
       console.log('DELETE NOTE')
       // this.deleteNoteAction({
-      //   note: Reference[this.getFocus[0]]
+      //   note: NoteReference[this.getFocus[0]]
       // }).then(() => {
       //   this.closeMore()
       // })
@@ -186,45 +189,12 @@ export default {
 <style lang="stylus">
 @import '~@/assets/styles/variables'
 @import '~@/assets/styles/animation'
-@import '~@/assets/styles/screen'
 
 .minota-table
-  .empty-focus-placeholder
-    position absolute
-    left 50%
-    top 50%
-    width 80%
-    transform translate3D(-50%, -50%, 0)
-    text-align center
-    color alpha(black, low-emphasis)
-    width 100%
-    box-sizing border-box
-    padding 16px
-    height 160px
-    background-position center center
-    background-size auto 110px
-    background-repeat no-repeat
-    opacity 0.375
-    z-index 0
-    div
-      max-width 30em
-      margin-left auto
-      margin-right auto
-    &[placeholder="0"]
-      background-image url('~@/assets/images/signature-dostoevsky.png')
-    &[placeholder="1"]
-      background-image url('~@/assets/images/signature-lenin.png')
-    &[placeholder="2"]
-      background-image url('~@/assets/images/signature-marx.png')
-    &[placeholder="3"]
-      background-image url('~@/assets/images/signature-pushkin.png')
-    &[placeholder="4"]
-      background-image url('~@/assets/images/signature-tolstoy.png')
-      
   .minota-focus-note
     z-index 1
     position relative
-    
+
   .minota-pending-request
     animation rotate360 0.75s linear infinite
     opacity low-emphasis

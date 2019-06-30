@@ -28,7 +28,9 @@ export default {
     cursor: {
       type: Object,
       required: false,
-      default: {line: 0, ch: 0}
+      default () {
+        return { line: 0, ch: 0 }
+      }
     }
   },
 

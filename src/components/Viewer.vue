@@ -6,7 +6,6 @@
 
 <script>
 import marked from 'marked'
-import { previousBlockElementsCount } from '@/utils/dom'
 
 export default {
   name: 'Viewer',
@@ -73,7 +72,7 @@ export default {
   a
     word-break break-word
     color inherit
-    
+
   h6
   h5
   h4
@@ -82,7 +81,7 @@ export default {
   h1
     font-weight 400
     line-height 1.5
-    
+
   h6
     font-size 1em
   h5
@@ -100,5 +99,5 @@ export default {
 
 .editor-preview
   background-color ghostwhite
-    
+
 </style>

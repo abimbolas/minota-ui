@@ -1,48 +1,37 @@
 <template lang="pug">
-  .minota-archive-note(v-on:click="$emit('open')" theme="light")
-    //- .date.text-overline {{ config.date | date }}
-    .topic.text-overline(v-if="config.topic") {{ config.topic }}
-    .title.text-subtitle(v-if="title") {{ title }}
-    .description.text-caption(
-      v-if="description"
-      v-bind:class="descriptionClass"
-    ) {{ description }}
-    //- .actions Actions
+  list-item-component(v-on:primary-action="$emit('primary-action')")
+    div(slot="overline") {{ config.topic}}
+    div(slot="title") {{ title }}
+    div(slot="description" v-bind:class="descriptionClass")
+      | {{ description }}
 </template>
 
 <script>
 import { mapMutations, mapActions } from 'vuex'
-import Note from '@/models/note'
-import { Reference } from '@/store/reference'
-import { time } from '@/utils/time'
 import bus from '@/event-bus'
+import { NoteReference } from '@/store/reference'
+import ListItemComponent from '@/components/layout/ListItem'
 
 export default {
   name: 'ArchiveNote',
 
-  filters: {
-    date (input) {
-      return time(input).format('l', 'ru')
-    }
+  components: {
+    ListItemComponent
   },
 
   props: {
     note: {
-      type: [ String, Object ],
-      required: true,
-      default: new Note({
-        content: 'I am loading...',
-        config: {
-          id: 'loading',
-          date: new Date()
-        }
-      })
+      type: [String, Object],
+      required: true
     }
   },
 
   computed: {
     computedNote () {
-      return typeof this.note === 'string' ? Reference[this.note] : this.note
+      return typeof this.note === 'string' ? NoteReference[this.note] : this.note
+    },
+    config () {
+      return this.computedNote.config
     },
     content () {
       return this.computedNote.content
@@ -64,12 +53,9 @@ export default {
       const title = this.title
       return {
         'one-line': topic && title,
-        'two-line': (topic && !title) || (!topic && title),
-        'three-line': !topic && !title
+        'two-lines': (topic && !title) || (!topic && title),
+        'three-lines': !topic && !title
       }
-    },
-    config () {
-      return this.computedNote.config
     }
   },
 
@@ -89,79 +75,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus">
-@import '~@/assets/styles/variables'
-
-.minota-archive-note
-  padding 1rem 0
-  line-height 1.25rem
-  min-height 3rem
-  overflow hidden
-  position relative
-
-  &:after
-    content ''
-    display block
-    height 1px
-    // margin 0px 1rem
-    position absolute
-    bottom 0
-    left 0
-    right 0
-    background-color alpha(white, 0.1)
-  &:last-child:after
-    content none
-
-  .title
-    position relative
-    top -1px
-    color alpha(white, high-emphasis)
-    white-space nowrap
-    overflow hidden
-    text-overflow ellipsis
-
-  .topic
-    color alpha(white, low-emphasis)
-    white-space nowrap
-    overflow hidden
-    text-overflow ellipsis
-
-  .date
-    color alpha(white, low-emphasis)
-    float right
-    margin-left 1rem
-    margin-bottom 1rem
-
-  .description
-    overflow hidden
-    color alpha(white, medium-emphasis)
-    &.one-line
-      white-space nowrap
-      text-overflow ellipsis
-    &.two-line
-      display -webkit-box
-      -webkit-line-clamp 2
-      -webkit-box-orient vertical
-      height 2.5rem
-    &.three-line
-      display -webkit-box
-      -webkit-line-clamp 3
-      -webkit-box-orient vertical
-      height 3.75rem
-
-  &[theme="light"]
-    &:after
-      background-color gainsboro
-    .title
-      color alpha(black, medium-emphasis)
-      font-weight 500
-    .topic
-      color alpha(black, low-emphasis)
-    .date
-      color alpha(black, low-emphasis)
-    .description
-      color alpha(black, medium-emphasis)
-      font-weight 400
-
-</style>

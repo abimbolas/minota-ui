@@ -1,7 +1,7 @@
 <template lang="pug">
   .minota-menu
     .backdrop(v-on:click="$emit('close')")
-    ul.menu(style-elevation="4")
+    ul.menu(elevation="4")
       slot
 </template>
 
@@ -19,7 +19,7 @@ export default {
   position fixed
   top 0
   right 0
-  bottom 0 
+  bottom 0
   left 0
   z-index 200
   display flex

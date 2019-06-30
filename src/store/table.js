@@ -1,8 +1,12 @@
-import Backend from '@/backend'
-import { lastPromise } from '@/utils/last-promise'
+// import Backend from '@/backend'
 import Workspace from '@/models/workspace'
 import Note from '@/models/note'
-// import { Reference } from './reference'
+import { lastPromise } from '@/utils/last-promise'
+import { BackendReference } from './reference'
+
+function Backend ({ getters }) {
+  return BackendReference[getters.getCurrentStorageConfig.id]
+}
 
 const state = {
   workspace: new Workspace(),
@@ -82,7 +86,7 @@ const actions = {
   saveNoteAction (context, payload) {
     return lastPromise({
       type: `saveNote${payload.note.config.id}`,
-      promise: Backend.saveNote(payload.note)
+      promise: Backend(context).saveNote(payload.note)
     }).then((notes) => {
       console.log(notes)
       context.commit('addToArchive', { notes })
@@ -101,7 +105,7 @@ const actions = {
     context.commit('removeFromFocus', payload)
     context.commit('removeFromBlur', payload)
     context.commit('removeFromArchive', payload)
-    return Backend.deleteNote(payload.note)
+    return Backend(context).deleteNote(payload.note)
   },
 
   closeNoteAction (context, payload) {

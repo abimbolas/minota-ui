@@ -1,6 +1,6 @@
 <template lang="pug">
   button.minota-fab.bottom-right(
-    style-elevation="8"
+    elevation="8"
     v-scroll="handleScroll"
     v-bind:class="classes"
   )

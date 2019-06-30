@@ -1,65 +1,79 @@
 <template lang="pug">
-  .minota-drawer.minota-screen
+  screen-component.minota-drawer
     bar-component
       router-link(to="/table").navigation.action
-        i.material-icons(v-on:click) arrow_back
+        i.material-icons arrow_back
       h6.title
+        span {{ currentStorage && currentStorage.topic }}
+      router-link(to="/config").action
+        i.material-icons arrow_forward
 
     fab-component
       .fab-action(v-on:click="newNote()")
         i.material-icons add
 
     main
-      archive-note-component(
-        v-for="noteId in orderedByDate"
-        v-bind:key="noteId"
-        v-bind:note="noteId"
-        v-on:open="openNote(noteId)")
+      template(v-if="orderedByDate.length")
+        archive-note-component(
+          v-for="noteId in orderedByDate"
+          v-bind:key="noteId"
+          v-bind:note="noteId"
+          v-on:open="openNote(noteId)")
+
+      template(v-else)
+        screen-placeholder-component(v-bind:text="'Пустой ящик'")
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import ArchiveNoteComponent from '@/components/notes/ArchiveNote'
-// import ScreenComponent from '@/components/layout/Screen'
-import FabComponent from '@/components/layout/Fab'
+import { BackendReference, NoteReference } from '@/store/reference'
+
 import BarComponent from '@/components/layout/Bar'
-import { Reference } from '@/store/reference'
+import FabComponent from '@/components/layout/Fab'
+import ScreenComponent from '@/components/layout/Screen'
+import ArchiveNoteComponent from '@/components/notes/ArchiveNote'
+import ScreenPlaceholderComponent from '@/components/other/ScreenPlaceholder'
 
 export default {
   name: 'Drawer',
 
   components: {
-    ArchiveNoteComponent,
-    // ScreenComponent,
+    BarComponent,
     FabComponent,
-    BarComponent
+    ScreenComponent,
+    ArchiveNoteComponent,
+    ScreenPlaceholderComponent
   },
 
   computed: {
+    backend () {
+      return BackendReference[this.currentStorage.id]
+    },
     orderedByDate () {
-      return this.getArchive.slice(0).sort((a, b) => {
-        return Reference[b].config.date - Reference[a].config.date
+      return this.archive.slice(0).sort((a, b) => {
+        return NoteReference[b].config.date - NoteReference[a].config.date
       })
     },
-    ...mapGetters([
-      'getArchive'
-    ])
+    ...mapGetters({
+      'currentStorage': 'getCurrentStorageConfig',
+      'archive': 'getArchive'
+    })
   },
 
-  created () {
-    this.loadArchiveAction()
+  mounted () {
+    this.backend.onReady(() => {
+      console.log('Backend for Drawer ready')
+      this.loadArchiveAction()
+    })
   },
 
   methods: {
-    getId (note) {
-      return Reference[note].config.id
-    },
     newNote () {
       this.$router.push('/table')
       this.newNoteAction()
     },
     openNote (id) {
-      this.focusNoteAction({ note: Reference[id] })
+      this.focusNoteAction({ note: NoteReference[id] })
       this.$router.push('/table')
     },
     ...mapActions([
@@ -72,8 +86,6 @@ export default {
 </script>
 
 <style lang="stylus">
-@import '~@/assets/styles/screen'
-
 .minota-drawer
   .minota-archive-note
     cursor pointer

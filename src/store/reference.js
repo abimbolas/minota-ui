@@ -1,1 +1,2 @@
-export const Reference = {}
+export const NoteReference = {}
+export const BackendReference = {}

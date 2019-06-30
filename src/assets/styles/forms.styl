@@ -1,3 +1,7 @@
+@import 'variables'
+@import 'typography'
+@import 'material'
+
 button
   cursor pointer
   font-size inherit
@@ -12,3 +16,64 @@ button
     outline none
     *
       vertical-align middle
+
+button
+.button
+  cursor pointer
+  min-height 36px
+  box-sizing border-box
+  display inline-block
+  border-radius 3px
+  line-height 20px
+  padding 9px 8px 0px 8px
+  &[disabled]
+    pointer-events none
+    opacity low-emphasis
+
+  & + .button
+  & + button
+    margin-left 8px
+
+  &.contained-button
+    background-color primary-dark-color
+    color alpha(white, high-emphasis)
+    padding 9px 16px 0px 16px
+    text-align center
+    min-width 64px
+    @extend .elevation-2
+
+  &.text-button
+    background-color transparent
+    color alpha(black, high-emphasis)
+    &:hover
+      background-color gainsboro
+
+  &.outlined-button
+    border solid gainsboro 1px
+    background-color transparent
+    padding 8px 16px 0px 16px
+    text-align center
+    min-width 64px
+    color alpha(black, high-emphasis)
+    &:hover
+      background-color gainsboro
+
+  &.icon-button
+    min-height 48px
+    border-radius 50%
+    line-height 48px
+    width 48px
+    height 48px
+    text-align center
+    padding 0
+    &:hover
+      background-color gainsboro
+    i.material-icons
+      line-height inherit
+      display block
+
+// Form fields
+.form-field + .form-field
+.form-field:not(:first-child)
+  margin-top 1.5rem
+

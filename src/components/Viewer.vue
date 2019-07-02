@@ -98,6 +98,6 @@ export default {
     line-height 1.375
 
 .editor-preview
-  background-color ghostwhite
+  background-color background-color
 
 </style>

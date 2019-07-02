@@ -86,6 +86,6 @@ body
   overflow hidden
   display flex
   flex-direction column
-  background-color ghostwhite
+  background-color background-color
   color alpha(black, high-emphasis)
 </style>

@@ -54,6 +54,7 @@ export default {
   width 100%
   border-radius 3px
   z-index 201
+  background-color background-color
 
 .minota-modal-header
   padding 0 24px 8px 24px

@@ -42,12 +42,6 @@ $mdc-theme-secondary: #424242;
 $mdc-theme-on-primary: rgba(255, 255, 255, 0.87);
 $mdc-theme-on-secondary: rgba(255, 255, 255, 0.87);
 
-.mdc-form-field {
-  label {
-    cursor: pointer;
-  }
-}
-
 @import "material-components-vue/dist/theme/styles";
 @import "material-components-vue/dist/text-field/styles";
 @import "material-components-vue/dist/floating-label/styles";
@@ -61,4 +55,19 @@ $mdc-theme-on-secondary: rgba(255, 255, 255, 0.87);
 @import "material-components-vue/dist/checkbox/styles";
 @import "material-components-vue/dist/radio/styles";
 // @import "material-components-vue/dist/elevation/styles";
+
+.mdc-form-field {
+  label {
+    cursor: pointer;
+  }
+}
+
+.mdc-text-field:not(.mdc-text-field--disabled) {
+  background-color: transparent;
+}
+
+.mdc-text-field::before,
+.mdc-text-field::after {
+  background-color: var(--mdc-theme-primary, $mdc-theme-primary);
+}
 </style>

@@ -73,7 +73,7 @@ export default {
   padding-left 4px
   padding-right 4px
   min-height 56px
-  background-color ghostwhite
+  background-color background-color
   box-shadow 0px 2px 10px 0px alpha(black, 0.0)
   display flex
   align-items center

@@ -80,6 +80,7 @@ export default {
   .body
     margin 1rem
     flex-grow 1
+    min-width 0
 
   .left
   .right

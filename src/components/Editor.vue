@@ -100,6 +100,7 @@ export default {
   margin 0 auto
   cursor text
   font-size 14px
+  font-weight 400
 
   .CodeMirror
     border none
@@ -112,10 +113,14 @@ export default {
     .CodeMirror-scroll
       min-height 3rem
 
+    .CodeMirror-line
+      color alpha(black, medium-emphasis)
+
     .CodeMirror-code
       .cm-header
         line-height 1.5
         font-weight 400
+        color alpha(black, high-emphasis)
       .cm-link
         word-break break-word
         color inherit

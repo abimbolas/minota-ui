@@ -18,7 +18,7 @@
           v-for="noteId in orderedByDate"
           v-bind:key="noteId"
           v-bind:note="noteId"
-          v-on:open="openNote(noteId)")
+          v-on:primary-action="openNote(noteId)")
 
       template(v-else)
         screen-placeholder-component(v-bind:text="'Пустой ящик'")

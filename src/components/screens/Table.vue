@@ -22,11 +22,11 @@
 
       //- Edit note mode
       template(v-if="isFocusEdit && !isFocusEmpty")
-        .navigation.action(v-on:click="setFocusView()")
+        //- .navigation.action(v-on:click="setFocusView()")
           i.material-icons done
         .title.text-overline
-          //- span {{ getFocusNote.config.topic }}
-          input-text-component.text-overline(
+          span {{ getFocusNote.config.topic }}
+          //- input-text-component.text-overline(
             v-bind:value="getFocusNote.config.topic"
             v-on:update="onTopicUpdate(topic)")
 
@@ -133,7 +133,8 @@ export default {
   },
 
   mounted () {
-    this.setFocusView()
+    // this.setFocusView()
+    this.setFocusEdit()
   },
 
   methods: {
@@ -194,6 +195,7 @@ export default {
   .minota-focus-note
     z-index 1
     position relative
+    font-weight 300
 
   .minota-pending-request
     animation rotate360 0.75s linear infinite

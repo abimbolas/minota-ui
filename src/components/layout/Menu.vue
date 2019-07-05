@@ -13,7 +13,6 @@ export default {
 
 <style lang="stylus">
 @import '~@/assets/styles/variables'
-@import '~@/assets/styles/action'
 
 .minota-menu
   position fixed

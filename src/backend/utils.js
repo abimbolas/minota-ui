@@ -21,7 +21,7 @@ export function createBackend (config) {
 }
 
 export function destroyBackend (config) {
-  return BackendReference[config.id].destory().then(() => {
+  return BackendReference[config.id].destroy().then(() => {
     delete BackendReference[config.id]
   })
 }

@@ -14,7 +14,7 @@ export default class BackendAPI {
       resolve()
     })
   }
-  destory () {
+  destroy () {
     return new Promise(resolve => {
       console.log('Destroy Backend')
       resolve()

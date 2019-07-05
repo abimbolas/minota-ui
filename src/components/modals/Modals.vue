@@ -46,19 +46,23 @@ export default {
 .minota-modal
   position fixed
   left 50%
-  top 10vh
   transform translateX(-50%)
-  min-width 300px
-  max-width 420px
+  width calc(100% - 8px)
+  top 4px
+  max-height calc(100vh - 8px)
   box-sizing border-box
-  width 100%
+  overflow auto
+  -webkit-overflow-scroll touch
   border-radius 3px
   z-index 201
   background-color background-color
 
 .minota-modal-header
-  padding 0 24px 8px 24px
+  padding 0 16px 8px 16px
   border-bottom solid 1px transparent
+  @media (min-width 768px)
+    padding 0 24px 8px 24px
+
   &.with-divider
     border-color gainsboro
   &:before
@@ -72,12 +76,18 @@ export default {
 
 .minota-modal-body
   @extend .text-body
-  padding 20px 24px
+  padding 20px 16px
+  @media (min-width 768px)
+    padding 20px 24px
 
   .form-field.tab-bar
     position relative
-    margin-left -1.5rem
-    margin-right -1.5rem
+    margin-left -1rem
+    margin-right -1rem
+    @media (min-width 768px)
+     margin-left -1.5rem
+     margin-right -1.5rem
+
     &:first-child
       margin-top 0rem
     &:after

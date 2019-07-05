@@ -12,6 +12,14 @@ export default function (store) {
       destroyBackend(config).then(() => {
         console.log(`Backend ${config.id} successfully destroyed`)
       })
+    },
+
+    updateStorageConfig ({ config }) {
+      destroyBackend(config)
+        .then(() => createBackend(config))
+        .then(() => {
+          console.log(`Backend ${config.id} successfully updated`)
+        })
     }
   }
 

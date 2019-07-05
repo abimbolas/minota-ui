@@ -3,11 +3,17 @@
     v-bind:disabled="disabled"
     v-on:click="handlePrimaryAction($event)"
   )
-    .left
-      .primary-activation
-        slot(name="primary-activation")
-      .primary-action
-        slot(name="primary-action")
+
+    .left.primary-activation
+      slot(name="primary-activation")
+    .left.primary-action
+      slot(name="primary-action")
+
+    .right.meta.text-caption.medium-emphasis
+      slot(name="meta")
+    .right.secondary-action
+      slot(name="secondary-action")
+
     .body
       .overline.text-overline
         slot(name="overline")
@@ -15,11 +21,7 @@
         slot(name="title")
       .description.text-caption
         slot(name="description")
-    .right
-      .meta.text-caption.medium-emphasis
-        slot(name="meta")
-      .secondary-action
-        slot(name="secondary-action")
+
 </template>
 
 <script>
@@ -46,25 +48,35 @@ export default {
 
 .minota-list-item
   line-height 1.25rem
-  overflow hidden
   position relative
   display flex
-  width 100%
+  width calc(100% + 2rem)
   align-items top
+  margin-left -1rem
+  margin-right -1rem
+  padding-left 1rem
+  padding-right 1rem
+  box-sizing border-box
 
-  &:not([disabled])
-    cursor pointer
+  @media (min-width 768px)
+    margin-left 0rem
+    margin-right 0rem
+    padding-left 0rem
+    padding-right 0rem
+    width 100%
+
+  // &:not([disabled])
+  //   cursor pointer
 
   // &:hover:not([disabled])
     // background-color alpha(gainsboro, low-emphasis)
 
-  &[disabled]
-    pointer-events none
+  // &[disabled]
+  //   pointer-events none
 
-  &[disabled] > *
-    opacity low-emphasis
+  // &[disabled] > *
+  //   opacity low-emphasis
 
-  // divider
   &:after
     content ''
     display block
@@ -77,14 +89,25 @@ export default {
   &:last-child:after
     content none
 
-  .body
-    margin 1rem
-    flex-grow 1
-    min-width 0
+  .left:empty
+  .right:empty
+    display none
 
   .left
+    order 1
+    &:not(:empty)
+      margin-left -0.75rem
+      & ~ .body
+        margin-left 0.25rem
+
   .right
-    display flex
+    order 3
+
+  .body
+    order 2
+    margin 1rem 0
+    flex-grow 1
+    min-width 0
 
   .primary-action:not(:empty)
     align-self center
@@ -120,12 +143,8 @@ export default {
     overflow hidden
     color alpha(black, medium-emphasis)
     font-weight 400
-    [class*="-line"]
+    & > [class*="-line"]
       overflow hidden
-      // display -webkit-box
-      // -webkit-line-clamp 2
-      // -webkit-box-orient vertical
-      // max-height 2.5rem
     .one-line
       white-space nowrap
       text-overflow ellipsis

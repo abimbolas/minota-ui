@@ -97,18 +97,10 @@ export default {
     flex-grow 1
     padding 0 16px
     text-align center
-  .action
-  .navigation
+
+  .icon-button
     flex-basis 48px
     flex-shrink 0
     cursor pointer
-  .action
-    margin-right 0
-    &:hover
-      border-radius 50%
-
-  .minota-input-text
-    margin-left -16px
-    width calc(100% + 16px)
 
 </style>

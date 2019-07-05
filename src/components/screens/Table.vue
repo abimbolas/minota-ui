@@ -4,7 +4,7 @@
       //- Empty table (no matter view or edit mode)
       template(v-if="isFocusEmpty")
         h6.title
-        router-link(to="/drawer").action
+        router-link(to="/drawer").button.icon-button
           i.material-icons arrow_forward
 
       //- View note mode
@@ -15,9 +15,9 @@
         //- .title
           input-text-component.text-overline(
             v-bind:value="getFocusNote.config.topic")
-        .action(v-on:click="clearTableAction()")
+        .button.icon-button(v-on:click="clearTableAction()")
           i.material-icons done
-        router-link(to="/drawer").action
+        router-link(to="/drawer").button.icon-button
           i.material-icons folder_open
 
       //- Edit note mode
@@ -30,11 +30,15 @@
             v-bind:value="getFocusNote.config.topic"
             v-on:update="onTopicUpdate(topic)")
 
-        .action.minota-pending-request(v-if="pendingSave")
+        .button.icon-button.minota-pending-request(
+          v-if="pendingSave"
+        )
           i.material-icons autorenew
         //- router-link(to="/drawer").action
           i.material-icons folder_open
-        .action(v-on:click="deleteNote()")
+        .button.icon-button(
+          v-on:click="deleteNote()"
+        )
           i.material-icons delete
         //- .action(v-on:click="openMore()")
           i.material-icons more_vert

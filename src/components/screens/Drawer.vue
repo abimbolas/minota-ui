@@ -1,11 +1,11 @@
 <template lang="pug">
   screen-component.minota-drawer
     bar-component
-      router-link(to="/table").navigation.action
+      router-link(to="/table").navigation.button.icon-button
         i.material-icons arrow_back
       h6.title
         span {{ currentStorage && currentStorage.topic }}
-      router-link(to="/config").action
+      router-link(to="/config").button.icon-button
         i.material-icons arrow_forward
 
     fab-component
@@ -85,8 +85,4 @@ export default {
 }
 </script>
 
-<style lang="stylus">
-.minota-drawer
-  .minota-archive-note
-    cursor pointer
-</style>
+<style lang="stylus"></style>

@@ -1,7 +1,7 @@
 <template lang="pug">
   screen-component.minota-config
     bar-component
-      router-link(to="/drawer").navigation.action
+      router-link(to="/drawer").navigation.button.icon-button
         i.material-icons arrow_back
 
     fab-component

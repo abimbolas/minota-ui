@@ -62,12 +62,31 @@ $mdc-theme-on-secondary: rgba(255, 255, 255, 0.87);
   }
 }
 
+.mdc-tab {
+  padding-left: 16px;
+  padding-right: 16px;
+  @media (min-width: 768px) {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
 .mdc-text-field:not(.mdc-text-field--disabled) {
   background-color: transparent;
 }
 
 .mdc-text-field::before,
-.mdc-text-field::after {
+.mdc-tab__ripple::before {
   background-color: var(--mdc-theme-primary, $mdc-theme-primary);
+}
+
+.mdc-text-field:hover::before,
+.mdc-tab__ripple:hover::before {
+  opacity: 0.085;
+}
+
+.mdc-text-field.mdc-ripple-upgraded--background-focused::before,
+.mdc-tab__ripple.mdc-ripple-upgraded--background-focused::before {
+  opacity: 0.085;
 }
 </style>

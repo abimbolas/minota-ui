@@ -1,5 +1,7 @@
 <template lang="pug">
-  list-item-component(v-on:primary-action="$emit('primary-action')")
+  list-item-component.archive-note-list-item(
+    v-on:primary-action="$emit('primary-action')"
+  )
     div(slot="overline") {{ config.topic}}
     div(slot="title") {{ title }}
     div(slot="description" v-bind:class="descriptionClass")
@@ -75,3 +77,8 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.archive-note-list-item
+  cursor pointer
+</style>

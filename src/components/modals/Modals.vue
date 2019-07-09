@@ -1,7 +1,10 @@
 <template lang="pug">
   .minota-modals(v-if="lastModal")
     .minota-modal-backdrop
-    component(v-bind:is="lastModal.component || 'SimpleModal'" v-bind:modal="lastModal")
+      component(
+        v-bind:is="lastModal.component || 'SimpleModal'"
+        v-bind:modal="lastModal"
+      )
 </template>
 
 <script>
@@ -34,25 +37,28 @@ export default {
 @import '~@/assets/styles/variables'
 @import '~@/assets/styles/typography'
 
+.minota-modals
+
+
 .minota-modal-backdrop
   position fixed
   left 0px
   top 0px
-  width 100%
-  height 100%
+  width 100vw
+  height 100vh
+  overflow auto
+  -webkit-overflow-scroll touch
   background-color alpha(gainsboro, high-emphasis)
   z-index 200
 
 .minota-modal
-  position fixed
+  position absolute
   left 50%
   transform translateX(-50%)
   width calc(100% - 8px)
-  top 4px
-  max-height calc(100vh - 8px)
+  margin-top 4px
+  margin-bottom 4px
   box-sizing border-box
-  overflow auto
-  -webkit-overflow-scroll touch
   border-radius 3px
   z-index 201
   background-color background-color

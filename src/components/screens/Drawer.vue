@@ -2,11 +2,11 @@
   screen-component.minota-drawer
     bar-component
       router-link(to="/table").navigation.button.icon-button
-        i.material-icons arrow_back
+        i.material-icons developer_board
       h6.title
         span {{ currentStorage && currentStorage.topic }}
       router-link(to="/config").button.icon-button
-        i.material-icons arrow_forward
+        i.material-icons cloud_queue
 
     fab-component
       .fab-action(v-on:click="newNote()")

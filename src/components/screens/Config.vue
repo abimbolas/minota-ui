@@ -2,7 +2,7 @@
   screen-component.minota-config
     bar-component
       router-link(to="/drawer").navigation.button.icon-button
-        i.material-icons arrow_back
+        i.material-icons folder_open
 
     fab-component
       .fab-action(v-on:click="addStorage()")

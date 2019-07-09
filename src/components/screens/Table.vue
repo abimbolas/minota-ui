@@ -5,7 +5,7 @@
       template(v-if="isFocusEmpty")
         h6.title
         router-link(to="/drawer").button.icon-button
-          i.material-icons arrow_forward
+          i.material-icons folder_open
 
       //- View note mode
       template(v-if="isFocusView && !isFocusEmpty")
@@ -30,17 +30,15 @@
             v-bind:value="getFocusNote.config.topic"
             v-on:update="onTopicUpdate(topic)")
 
-        .button.icon-button.minota-pending-request(
-          v-if="pendingSave"
-        )
+        .button.icon-button.minota-pending-request(v-if="pendingSave")
           i.material-icons autorenew
-        //- router-link(to="/drawer").action
+        //- .button.icon-button(v-on:click="deleteNote()")
+        //-   i.material-icons delete
+        .button.icon-button(v-on:click="clearTableAction()")
+          i.material-icons done
+        router-link(to="/drawer").button.icon-button
           i.material-icons folder_open
-        .button.icon-button(
-          v-on:click="deleteNote()"
-        )
-          i.material-icons delete
-        //- .action(v-on:click="openMore()")
+        .button.icon-button(v-on:click="openMore()")
           i.material-icons more_vert
 
     fab-component

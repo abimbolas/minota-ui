@@ -96,11 +96,13 @@ export default {
   .title
     flex-grow 1
     padding 0 16px
-    text-align center
+    // text-align center
 
   .icon-button
     flex-basis 48px
     flex-shrink 0
     cursor pointer
+    & + .icon-button
+      margin-left 0
 
 </style>

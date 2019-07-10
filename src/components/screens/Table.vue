@@ -32,14 +32,14 @@
 
         .button.icon-button.minota-pending-request(v-if="pendingSave")
           i.material-icons autorenew
-        //- .button.icon-button(v-on:click="deleteNote()")
-        //-   i.material-icons delete
-        .button.icon-button(v-on:click="clearTableAction()")
-          i.material-icons done
+        .button.icon-button(v-on:click="openDeleteNoteDialog()")
+          i.material-icons delete
+        //- .button.icon-button(v-on:click="clearTableAction()")
+        //-   i.material-icons done
         router-link(to="/drawer").button.icon-button
           i.material-icons folder_open
-        .button.icon-button(v-on:click="openMore()")
-          i.material-icons more_vert
+        //- .button.icon-button(v-on:click="openMore()")
+        //-   i.material-icons more_vert
 
     fab-component
       //- Edit note
@@ -49,7 +49,7 @@
 
       //- New note
       template
-        .fab-action(v-on:click="newNoteAction()")
+        .fab-action(v-on:click="newNote()")
           i.material-icons add
 
     menu-component(v-if="isMoreOpened()" v-on:close="closeMore()")
@@ -58,7 +58,7 @@
           i.material-icons close
       .menu-item
         .text-body Change topic
-      .menu-item(v-on:click="deleteNote()")
+      .menu-item(v-on:click="openDeleteNoteDialog()")
         .action
           i.material-icons delete
         .text-body Delete note
@@ -107,6 +107,14 @@ export default {
     ScreenPlaceholderComponent
   },
 
+  props: {
+    noteId: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
+
   data () {
     return {
       placeholderItem: null,
@@ -135,14 +143,28 @@ export default {
   },
 
   mounted () {
-    // this.setFocusView()
     this.setFocusEdit()
+    if (this.noteId) {
+      this.getNote({ id: this.noteId }).then(note => {
+        this.focusNote({ note })
+      }).catch(error => {
+        this.openModal({
+          modal: {
+            header: error.statusText,
+            body: error.data,
+            cancel: false
+          }
+        }).then(() => {
+          this.$router.push('/table')
+        })
+      })
+    }
   },
 
   methods: {
     onUpdate ($event) {
       this.pendingSave = true
-      this.saveNoteAction({ note: $event })
+      this.saveNote({ note: $event })
         .then(() => {
           this.pendingSave = false
         })
@@ -158,13 +180,21 @@ export default {
     onEditorEsc () {
       this.setFocusView()
     },
-    deleteNote () {
-      console.log('DELETE NOTE')
-      // this.deleteNoteAction({
-      //   note: NoteReference[this.getFocus[0]]
-      // }).then(() => {
-      //   this.closeMore()
-      // })
+    openDeleteNoteDialog () {
+      this.openModal({
+        modal: {
+          // header: 'Delete',
+          body: 'Are you sure to delete this note?',
+          ok: {
+            label: 'Delete'
+          }
+        }
+      }).then(() => {
+        this.deleteNote({ note: NoteReference[this.getFocus[0]] })
+          .then(() => {
+            this.closeMore()
+          })
+      })
     },
     openMore () {
       this.more = true
@@ -179,11 +209,17 @@ export default {
       'setFocusView',
       'setFocusEdit'
     ]),
+    ...mapActions({
+      'openModal': 'openModalAction',
+      'deleteNote': 'deleteNoteAction',
+      'newNote': 'newNoteAction',
+      'saveNote': 'saveNoteAction',
+      'focusNote': 'focusNoteAction',
+      'getNote': 'getNoteAction'
+    }),
     ...mapActions([
-      'saveNoteAction',
       'clearTableAction',
-      'newNoteAction',
-      'deleteNoteAction'
+      'getNoteAction'
     ])
   }
 }

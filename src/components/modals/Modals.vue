@@ -37,14 +37,11 @@ export default {
 @import '~@/assets/styles/variables'
 @import '~@/assets/styles/typography'
 
-.minota-modals
-
-
 .minota-modal-backdrop
   position fixed
   left 0px
   top 0px
-  width 100vw
+  width 100%
   height 100vh
   overflow auto
   -webkit-overflow-scroll touch
@@ -62,12 +59,14 @@ export default {
   border-radius 3px
   z-index 201
   background-color background-color
+  @media (min-width 480px)
+    max-width 480px
 
 .minota-modal-header
-  padding 0 16px 8px 16px
+  padding 0 16px 15px 16px
   border-bottom solid 1px transparent
   @media (min-width 768px)
-    padding 0 24px 8px 24px
+    padding 0 24px 15px 24px
 
   &.with-divider
     border-color gainsboro
@@ -79,6 +78,10 @@ export default {
     vertical-align baseline
   & > :first-child
     display inline-block
+
+  &:not(:empty) ~ .minota-modal-body:not(:empty)
+    padding-top 0px
+    margin-top -8px
 
 .minota-modal-body
   @extend .text-body

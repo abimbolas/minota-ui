@@ -101,6 +101,7 @@ export default {
   cursor text
   font-size 14px
   font-weight 400
+  line-height: 1.75
 
   .CodeMirror
     border none

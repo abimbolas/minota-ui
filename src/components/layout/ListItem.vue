@@ -3,17 +3,19 @@
     v-bind:disabled="disabled"
     v-on:click="handlePrimaryAction($event)"
   )
-
+    //- Left
     .left.primary-activation
       slot(name="primary-activation")
     .left.primary-action
       slot(name="primary-action")
 
+    //- Right
     .right.meta.text-caption.medium-emphasis
       slot(name="meta")
     .right.secondary-action
       slot(name="secondary-action")
 
+    //- Body
     .body
       .overline.text-overline
         slot(name="overline")
@@ -21,7 +23,6 @@
         slot(name="title")
       .description.text-caption
         slot(name="description")
-
 </template>
 
 <script>
@@ -134,7 +135,7 @@ export default {
     position relative
     top -1px
     color alpha(black, high-emphasis)
-    font-weight 500
+    font-weight 400
     white-space nowrap
     overflow hidden
     text-overflow ellipsis

@@ -1,7 +1,7 @@
 <template lang="pug">
   screen-component.minota-drawer
     bar-component
-      router-link(to="/table").navigation.button.icon-button
+      router-link(v-bind:to="backToFocusedNote").navigation.button.icon-button
         i.material-icons developer_board
       h6.title
         span {{ currentStorage && currentStorage.topic }}
@@ -46,6 +46,9 @@ export default {
   },
 
   computed: {
+    backToFocusedNote () {
+      return `/table/${NoteReference[this.focus[0]].config.id}`
+    },
     backend () {
       return BackendReference[this.currentStorage.id]
     },
@@ -56,7 +59,8 @@ export default {
     },
     ...mapGetters({
       'currentStorage': 'getCurrentStorageConfig',
-      'archive': 'getArchive'
+      'archive': 'getArchive',
+      'focus': 'getFocus'
     })
   },
 
@@ -73,8 +77,8 @@ export default {
       this.newNoteAction()
     },
     openNote (id) {
-      this.focusNoteAction({ note: NoteReference[id] })
-      this.$router.push('/table')
+      // this.focusNoteAction({ note: NoteReference[id] })
+      this.$router.push(`/table/${id}`)
     },
     ...mapActions([
       'loadArchiveAction',

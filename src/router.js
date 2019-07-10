@@ -7,6 +7,7 @@ import ConfigComponent from './components/screens/Config.vue'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -14,9 +15,10 @@ export default new Router({
       redirect: '/table'
     },
     {
-      path: '/table',
+      path: '/table/:noteId?',
       name: 'table',
-      component: TableComponent
+      component: TableComponent,
+      props: true
     },
     {
       path: '/drawer',

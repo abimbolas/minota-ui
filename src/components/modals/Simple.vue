@@ -6,10 +6,12 @@
       span {{ modal.body }}
     .minota-modal-footer
       .button(
+        v-if="isCancelPresent"
         v-bind:class="cancelClass"
         v-on:click="rejectModalAction({ modal })"
       ) {{ cancelLabel }}
       .button(
+        v-if="isOkPresent"
         v-bind:class="okClass"
         v-on:click="resolveModalAction({ modal })"
       ) {{ okLabel }}
@@ -30,6 +32,12 @@ export default {
   },
 
   computed: {
+    isOkPresent () {
+      return this.modal.ok !== false
+    },
+    isCancelPresent () {
+      return this.modal.cancel !== false
+    },
     okLabel () {
       return (
         this.modal.ok &&

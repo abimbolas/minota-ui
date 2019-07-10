@@ -70,6 +70,16 @@ const actions = {
     return Promise.resolve(note)
   },
 
+  getNoteAction (context, payload) {
+    return lastPromise({
+      type: `getNote${payload.id}`,
+      promise: Backend(context).getNote(payload.id)
+    }).then(note => {
+      context.commit('addToArchive', { notes: [note] })
+      return Promise.resolve(note)
+    })
+  },
+
   focusNoteAction (context, payload) {
     context.commit('addToFocus', payload)
   },
@@ -86,11 +96,10 @@ const actions = {
   saveNoteAction (context, payload) {
     return lastPromise({
       type: `saveNote${payload.note.config.id}`,
-      promise: Backend(context).saveNote(payload.note)
-    }).then((notes) => {
-      console.log(notes)
-      context.commit('addToArchive', { notes })
-      return Promise.resolve(notes)
+      promise: Backend(context).postNote(payload.note)
+    }).then(note => {
+      context.commit('addToArchive', { notes: [note] })
+      return Promise.resolve(note)
     })
   },
 

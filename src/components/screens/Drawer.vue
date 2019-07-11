@@ -47,7 +47,11 @@ export default {
 
   computed: {
     backToFocusedNote () {
-      return `/table/${NoteReference[this.focus[0]].config.id}`
+      if (this.focus[0]) {
+        return `/table/${NoteReference[this.focus[0]].config.id}`
+      } else {
+        return '/table'
+      }
     },
     backend () {
       return BackendReference[this.currentStorage.id]

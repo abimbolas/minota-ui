@@ -1,10 +1,9 @@
 <template lang="pug">
   screen-component.minota-drawer
     bar-component
-      router-link(v-bind:to="backToFocusedNote").navigation.button.icon-button
-        i.material-icons developer_board
-      h6.title
-        span {{ currentStorage && currentStorage.topic }}
+      //- router-link(v-bind:to="backToFocusedNote").button.icon-button
+        i.material-icons close
+      h6.title {{ currentStorage && currentStorage.topic }}
       router-link(to="/config").button.icon-button
         i.material-icons cloud_queue
 

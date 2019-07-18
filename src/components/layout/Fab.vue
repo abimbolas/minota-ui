@@ -69,6 +69,7 @@ export default {
   &.hidden
     opacity 0
     transform translateY(50%)
+    pointer-events none
   .material-icons
     line-height 56px
     display block

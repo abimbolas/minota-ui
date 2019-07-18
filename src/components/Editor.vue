@@ -99,8 +99,8 @@ export default {
   display block
   margin 0 auto
   cursor text
-  font-size 14px
-  font-weight 400
+  font-size 18px
+  font-weight 300
   line-height: 1.75
 
   .CodeMirror

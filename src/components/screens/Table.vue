@@ -3,12 +3,12 @@
     bar-component
       //- Empty table (no matter view or edit mode)
       template(v-if="isFocusEmpty")
-        h6.title
+        h6.title {{ currentStorage && currentStorage.topic }}
         router-link(to="/drawer").button.icon-button
           i.material-icons folder_open
 
       //- View note mode
-      template(v-if="isFocusView && !isFocusEmpty")
+      //- template(v-if="isFocusView && !isFocusEmpty")
         .title.text-overline(
           v-on:click="setFocusEdit()"
         ) {{ getFocusNote.config.topic || '' }}
@@ -22,8 +22,9 @@
 
       //- Edit note mode
       template(v-if="isFocusEdit && !isFocusEmpty")
-        //- .navigation.action(v-on:click="setFocusView()")
-          i.material-icons done
+        //- .button.icon-button(v-on:click="clearTable()")
+          i.material-icons close
+        h6.title {{ currentStorage && currentStorage.topic }}
         .title.text-overline
           span {{ getFocusNote.config.topic }}
           //- input-text-component.text-overline(
@@ -32,18 +33,20 @@
 
         .button.icon-button.minota-pending-request(v-if="pendingSave")
           i.material-icons autorenew
-        .button.icon-button(v-on:click="openDeleteNoteDialog()")
+
+        //- .button.icon-button(v-on:click="openDeleteNoteDialog()")
           i.material-icons delete
         //- .button.icon-button(v-on:click="clearTableAction()")
         //-   i.material-icons done
+
         router-link(to="/drawer").button.icon-button
           i.material-icons folder_open
         //- .button.icon-button(v-on:click="openMore()")
         //-   i.material-icons more_vert
 
-    fab-component
+    fab-component(v-if="!isFocusEdit")
       //- Edit note
-      template(v-if="isFocusView && !isFocusEmpty")
+      //- template(v-if="isFocusView && !isFocusEmpty")
         .fab-action(v-on:click="setFocusEdit()")
           i.material-icons edit
 
@@ -127,6 +130,9 @@ export default {
     getFocusNote () {
       return NoteReference[this.getFocus[0]]
     },
+    ...mapGetters({
+      'currentStorage': 'getCurrentStorageConfig'
+    }),
     ...mapGetters([
       'getFocus',
       'getFocusMode',
@@ -215,12 +221,9 @@ export default {
       'newNote': 'newNoteAction',
       'saveNote': 'saveNoteAction',
       'focusNote': 'focusNoteAction',
-      'getNote': 'getNoteAction'
-    }),
-    ...mapActions([
-      'clearTableAction',
-      'getNoteAction'
-    ])
+      'getNote': 'getNoteAction',
+      'clearTable': 'clearTableAction'
+    })
   }
 }
 </script>

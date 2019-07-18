@@ -15,6 +15,14 @@ export default {
     Scroll
   },
 
+  props: {
+    toggle: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
+
   data () {
     return {
       classes: {
@@ -24,6 +32,12 @@ export default {
         'switch': false
       },
       breakpoint: 56
+    }
+  },
+
+  watch: {
+    toggle () {
+      this.classes['hidden'] = !this.classes['hidden']
     }
   },
 
@@ -46,7 +60,7 @@ export default {
         this.classes['hidden'] = false
       }
 
-      if (event.scrollTop < 2) {
+      if (event.scrollTop < 2 && event.delta < 0) {
         this.classes['sticky'] = false
         this.classes['hidden'] = false
       }
@@ -86,8 +100,8 @@ export default {
     top 0px
     right 0px
     transform translateY(0)
-    &.hidden
-      transform translateY(-100%)
+  &.hidden
+    transform translateY(-100%)
   &.switch
     transition none !important
   &.no-shadow

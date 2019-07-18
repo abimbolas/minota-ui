@@ -18,11 +18,25 @@ export default {
     Scroll
   },
 
+  props: {
+    toggle: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
+
   data () {
     return {
       classes: {
         'hidden': false
       }
+    }
+  },
+
+  watch: {
+    toggle () {
+      this.classes['hidden'] = !this.classes['hidden']
     }
   },
 
@@ -34,7 +48,7 @@ export default {
         this.classes['hidden'] = false
       }
 
-      if (event.scrollTop < 2) {
+      if (event.scrollTop < 2 && event.delta < 0) {
         this.classes['hidden'] = false
       }
     }

@@ -1,9 +1,9 @@
 <template lang="pug">
-  screen-component.minota-table
-    bar-component
+  screen-component.minota-table(v-on:click.native="onTableClick()")
+    bar-component(v-bind:toggle="toggleOverlayUI")
       //- Empty table (no matter view or edit mode)
       template(v-if="isFocusEmpty")
-        h6.title {{ currentStorage && currentStorage.topic }}
+        .text-overline.title {{ currentStorage && currentStorage.topic }}
         router-link(to="/drawer").button.icon-button
           i.material-icons folder_open
 
@@ -24,7 +24,6 @@
       template(v-if="isFocusEdit && !isFocusEmpty")
         //- .button.icon-button(v-on:click="clearTable()")
           i.material-icons close
-        h6.title {{ currentStorage && currentStorage.topic }}
         .title.text-overline
           span {{ getFocusNote.config.topic }}
           //- input-text-component.text-overline(
@@ -44,7 +43,7 @@
         //- .button.icon-button(v-on:click="openMore()")
         //-   i.material-icons more_vert
 
-    fab-component(v-if="!isFocusEdit")
+    fab-component(v-bind:toggle="toggleOverlayUI")
       //- Edit note
       //- template(v-if="isFocusView && !isFocusEmpty")
         .fab-action(v-on:click="setFocusEdit()")
@@ -75,6 +74,7 @@
           v-bind:mode="getFocusMode"
           v-on:update="onUpdate($event)"
           v-on:viewer-click="onViewerClick()"
+          v-on:editor-click="onEditorClick()"
           v-on:editor-esc="onEditorEsc()")
 
       template(v-else)
@@ -122,7 +122,8 @@ export default {
     return {
       placeholderItem: null,
       pendingSave: false,
-      more: false
+      more: false,
+      toggleOverlayUI: false
     }
   },
 
@@ -182,6 +183,9 @@ export default {
       setTimeout(() => {
         document.scrollingElement.scrollTop = scrollTop
       })
+    },
+    onTableClick () {
+      this.toggleOverlayUI = !this.toggleOverlayUI
     },
     onEditorEsc () {
       this.setFocusView()

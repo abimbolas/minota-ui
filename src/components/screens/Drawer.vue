@@ -3,7 +3,7 @@
     bar-component
       //- router-link(v-bind:to="backToFocusedNote").button.icon-button
         i.material-icons close
-      h6.title {{ currentStorage && currentStorage.topic }}
+      .title.text-overline
       router-link(to="/config").button.icon-button
         i.material-icons cloud_queue
 

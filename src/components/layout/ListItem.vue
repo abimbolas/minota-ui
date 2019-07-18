@@ -19,9 +19,9 @@
     .body
       .overline.text-overline
         slot(name="overline")
-      .title.text-subtitle
+      .title.text-h6
         slot(name="title")
-      .description.text-caption
+      .description.text-body-smaller
         slot(name="description")
 </template>
 
@@ -48,7 +48,7 @@ export default {
 @import "~@/assets/styles/variables"
 
 .minota-list-item
-  line-height 1.25rem
+  // line-height 1.25rem
   position relative
   display flex
   width calc(100% + 2rem)
@@ -139,6 +139,9 @@ export default {
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
+    // margin-bottom 0.25rem
+    &:empty
+      display none
 
   .description
     overflow hidden

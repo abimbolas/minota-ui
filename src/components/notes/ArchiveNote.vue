@@ -2,8 +2,8 @@
   list-item-component.archive-note-list-item(
     v-on:primary-action="$emit('primary-action')"
   )
-    div(slot="overline") {{ config.topic}}
-    div(slot="title") {{ title }}
+    div(slot="overline" v-if="config.topic") {{ config.topic}}
+    div(slot="title" v-if="title") {{ title }}
     div(slot="description" v-bind:class="descriptionClass")
       | {{ description }}
 </template>

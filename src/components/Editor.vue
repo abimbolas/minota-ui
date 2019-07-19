@@ -99,8 +99,8 @@ export default {
   display block
   margin 0 auto
   cursor text
-  font-size 18px
-  font-weight 300
+  font-weight 400
+  font-size 17px
   line-height: 1.75
 
   .CodeMirror
@@ -120,8 +120,9 @@ export default {
     .CodeMirror-code
       .cm-header
         line-height 1.5
-        font-weight 400
+        font-weight 500
         color alpha(black, high-emphasis)
+        font-family 'IBM Plex Sans'
       .cm-link
         word-break break-word
         color inherit
@@ -137,12 +138,13 @@ export default {
         font-size 1.25em
         line-height 1.375
       .cm-header-1
-        font-size 1.5em
+        font-size 1.75em
         line-height 1.375
       .cm-formatting-header
         color gainsboro
         font-weight 300
 
       .cm-strong
-        font-weight 500
+        font-weight 600
+        color alpha(black, high-emphasis - 0.1)
 </style>

@@ -48,7 +48,7 @@ export default {
 @import "~@/assets/styles/variables"
 
 .minota-list-item
-  // line-height 1.25rem
+  line-height 1.375rem
   position relative
   display flex
   width calc(100% + 2rem)
@@ -130,16 +130,22 @@ export default {
   .overline
     color alpha(black, low-emphasis)
     font-weight 500
+    &:empty
+      display none
 
   .title
     position relative
     top -1px
     color alpha(black, high-emphasis)
-    font-weight 400
+    font-weight 500
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
-    // margin-bottom 0.25rem
+    line-height 1.5em
+    margin-bottom 0.25rem
+    & > div
+      overflow hidden
+      text-overflow ellipsis
     &:empty
       display none
 
@@ -147,6 +153,7 @@ export default {
     overflow hidden
     color alpha(black, medium-emphasis)
     font-weight 400
+    line-height 1.5em
     & > [class*="-line"]
       overflow hidden
     .one-line
@@ -156,10 +163,10 @@ export default {
       display -webkit-box
       -webkit-line-clamp 2
       -webkit-box-orient vertical
-      max-height 2.5rem
+      max-height 3em
     .three-lines
       display -webkit-box
       -webkit-line-clamp 3
       -webkit-box-orient vertical
-      max-height 3.75rem
+      max-height 4.5em
 </style>

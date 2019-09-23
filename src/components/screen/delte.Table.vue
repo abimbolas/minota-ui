@@ -4,6 +4,8 @@
       //- Empty table (no matter view or edit mode)
       template(v-if="isFocusEmpty")
         .text-overline.title {{ currentStorage && currentStorage.topic }}
+        .button.icon-button(v-on:click="newNote()")
+          i.material-icons add
         router-link(to="/drawer").button.icon-button
           i.material-icons folder_open
 
@@ -22,8 +24,9 @@
 
       //- Edit note mode
       template(v-if="isFocusEdit && !isFocusEmpty")
-        //- .button.icon-button(v-on:click="clearTable()")
-          i.material-icons close
+        .button.icon-button
+          i.material-icons menu
+
         .title.text-overline
           span {{ getFocusNote.config.topic }}
           //- input-text-component.text-overline(
@@ -38,12 +41,15 @@
         //- .button.icon-button(v-on:click="clearTableAction()")
         //-   i.material-icons done
 
+        .button.icon-button(v-on:click="newNote()")
+          i.material-icons add
+
         router-link(to="/drawer").button.icon-button
           i.material-icons folder_open
         //- .button.icon-button(v-on:click="openMore()")
         //-   i.material-icons more_vert
 
-    fab-component(v-bind:toggle="toggleOverlayUI")
+    //- fab-component(v-bind:toggle="toggleOverlayUI")
       //- Edit note
       //- template(v-if="isFocusView && !isFocusEmpty")
         .fab-action(v-on:click="setFocusEdit()")
@@ -76,27 +82,19 @@
           v-on:viewer-click="onViewerClick()"
           v-on:editor-click="onEditorClick()"
           v-on:editor-esc="onEditorEsc()")
-
-      template(v-else)
-        screen-placeholder-component(
-          v-if="isFocusEmpty && placeholderItem"
-          v-bind:text="placeholderItem.text"
-          v-bind:image="placeholderItem.image")
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
-import { NoteReference } from '@/store/reference'
+import { NoteReference } from '@/reference'
 
-import BarComponent from '@/components/layout/Bar'
-import FabComponent from '@/components/layout/Fab'
-import MenuComponent from '@/components/layout/Menu'
-import ScreenComponent from '@/components/layout/Screen'
+import BarComponent from '@/components/Bar'
+import FabComponent from '@/components/Fab'
+import MenuComponent from '@/components/Menu'
+import ScreenComponent from '@/components/Screen'
 
 import NoteComponent from '@/components/Note'
-
-import ScreenPlaceholderComponent from '@/components/other/ScreenPlaceholder'
 
 export default {
   name: 'Table',
@@ -106,8 +104,7 @@ export default {
     FabComponent,
     MenuComponent,
     ScreenComponent,
-    NoteComponent,
-    ScreenPlaceholderComponent
+    NoteComponent
   },
 
   props: {
@@ -137,23 +134,17 @@ export default {
     ...mapGetters([
       'getFocus',
       'getFocusMode',
-      'getPlaceholderQuotes',
       'isFocusEmpty',
       'isFocusView',
       'isFocusEdit'
     ])
   },
 
-  created () {
-    // create placeholder
-    this.placeholderItem = this.getPlaceholderQuotes[parseInt(Math.random() * this.getPlaceholderQuotes.length, 10)]
-  },
-
   mounted () {
     this.setFocusEdit()
     if (this.noteId) {
       this.getNote({ id: this.noteId }).then(note => {
-        this.focusNote({ note })
+        this.addToFocus({ note })
       }).catch(error => {
         this.openModal({
           modal: {
@@ -170,11 +161,11 @@ export default {
 
   methods: {
     onUpdate ($event) {
-      this.pendingSave = true
-      this.saveNote({ note: $event })
-        .then(() => {
-          this.pendingSave = false
-        })
+      // this.pendingSave = true
+      // this.saveNote({ note: $event })
+      //   .then(() => {
+      //     this.pendingSave = false
+      //   })
     },
     onViewerClick () {
       this.setFocusEdit()
@@ -217,14 +208,15 @@ export default {
     },
     ...mapMutations([
       'setFocusView',
-      'setFocusEdit'
+      'setFocusEdit',
+      'addToFocus'
     ]),
     ...mapActions({
       'openModal': 'openModalAction',
       'deleteNote': 'deleteNoteAction',
       'newNote': 'newNoteAction',
       'saveNote': 'saveNoteAction',
-      'focusNote': 'focusNoteAction',
+      // 'focusNote': 'focusNoteAction',
       'getNote': 'getNoteAction',
       'clearTable': 'clearTableAction'
     })

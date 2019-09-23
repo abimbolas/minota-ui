@@ -31,18 +31,22 @@ export default {
         'hidden': false,
         'switch': false
       },
-      breakpoint: 56
+      breakpoint: 56,
+      lastScroll: 0
     }
   },
 
   watch: {
     toggle () {
-      this.classes['hidden'] = !this.classes['hidden']
+      if (this.lastScroll > this.breakpoint) {
+        this.classes['hidden'] = !this.classes['hidden']
+      }
     }
   },
 
   methods: {
     handleScroll (event) {
+      this.lastScroll = event.scrollTop
       if (
         event.scrollTop > this.breakpoint &&
         event.scrollTop - event.delta <= this.breakpoint

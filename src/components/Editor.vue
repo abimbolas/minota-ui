@@ -5,6 +5,7 @@
 
 <script>
 import SimpleMDE from 'simplemde'
+import bus from '@/event-bus'
 
 export default {
   name: 'Editor',
@@ -31,6 +32,11 @@ export default {
       default () {
         return { line: 0, ch: 0 }
       }
+    },
+    focusOn: {
+      type: String,
+      required: false,
+      default: ''
     }
   },
 
@@ -45,6 +51,13 @@ export default {
       if (val !== this.simplemde.value()) {
         this.simplemde.value(val)
       }
+    }
+  },
+
+  created () {
+    // Bind manual programmatic focus
+    if (this.focusOn) {
+      bus.$on(this.focusOn, this.focusEditor)
     }
   },
 
@@ -84,9 +97,18 @@ export default {
   },
 
   beforeDestroy () {
+    if (this.focusOn) {
+      bus.$off(this.focusOn, this.focusEditor)
+    }
     this.simplemde.toTextArea()
     this.simplemde = null
     clearTimeout(this.changeTimeout)
+  },
+
+  methods: {
+    focusEditor () {
+      this.simplemde.codemirror.focus()
+    }
   }
 }
 </script>

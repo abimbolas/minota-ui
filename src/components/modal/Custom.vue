@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import SimpleModal from '@/components/modals/Simple'
+import SimpleModal from '@/components/modal/Simple'
 
 export default {
   name: 'CustomModal',

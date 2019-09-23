@@ -9,9 +9,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import SimpleModal from '@/components/modals/Simple'
-import CustomModal from '@/components/modals/Custom'
-import StorageModal from '@/components/modals/Storage'
+import SimpleModal from '@/components/modal/Simple'
+import CustomModal from '@/components/modal/Custom'
+import StorageModal from '@/components/modal/Storage'
 
 export default {
   name: 'Modal',

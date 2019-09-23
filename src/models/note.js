@@ -10,6 +10,10 @@ export default class Note {
     this.merge({ config })
   }
 
+  get topic () {
+    return this.config.topic || ''
+  }
+
   clone () {
     const note = JSON.parse(JSON.stringify({
       content: this.content,

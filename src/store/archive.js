@@ -1,5 +1,5 @@
 import Workspace from '@/models/workspace'
-import { NoteReference, BackendReference } from '@/store/reference'
+import { NoteReference, BackendReference } from '@/reference'
 
 function Backend ({ getters }) {
   return BackendReference[getters.getCurrentStorageConfig.id]

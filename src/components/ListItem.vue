@@ -51,10 +51,10 @@ export default {
   line-height 1.375rem
   position relative
   display flex
-  width calc(100% + 2rem)
+  // width calc(100% + 2rem)
   align-items top
-  margin-left -1rem
-  margin-right -1rem
+  margin-left -0.5rem
+  margin-right -0.5rem
   padding-left 1rem
   padding-right 1rem
   box-sizing border-box

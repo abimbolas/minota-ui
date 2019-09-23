@@ -11,7 +11,6 @@ export default class ServerBackend extends BackendAPI {
         'Content-Type': 'application/json; charset=UTF-8'
       }
     })
-    console.log(baseURL)
   }
 
   onReady (callback) {
@@ -57,7 +56,6 @@ export default class ServerBackend extends BackendAPI {
 
   init () {
     this._onReady = new Promise(resolve => {
-      console.log('Server Backend resolved init')
       resolve()
     })
     return this._onReady

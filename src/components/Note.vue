@@ -1,87 +1,65 @@
 <template lang="pug">
-  .minota-note
+  .minota-note(elevation="2" v-on:click="onNoteClick($event)")
     editor-component(
-      v-if="mode === 'edit'"
-      v-bind:value="content"
-      v-on:input="updateContent($event)"
-      v-bind:autofocus="autofocus"
-      v-bind:cursor="editCursor"
-      v-on:editor-esc="onEditorEsc($event)")
-    viewer-component(
-      v-else
-      v-model="content"
-      v-on:click="onViewerClick($event)")
+      v-model="note.content"
+      v-bind:focus-on="focusEventName")
 </template>
 
 <script>
-import { NoteReference } from '@/store/reference'
-import Note from '@/models/note'
+import { mapActions } from 'vuex'
 import EditorComponent from '@/components/Editor'
-import ViewerComponent from '@/components/Viewer'
+import bus from '@/event-bus'
 
 export default {
   name: 'Note',
 
   components: {
-    EditorComponent,
-    ViewerComponent
+    EditorComponent
   },
 
   props: {
-    mode: {
-      type: String,
+    note: {
+      type: Object,
       required: false,
-      default: 'edit'
-    },
-
-    noteId: {
-      type: String,
-      required: true
+      default () {
+        return null
+      }
     }
   },
 
   data () {
     return {
-      autofocus: true,
-      content: '(Write down your mind)',
-      editCursor: { line: 0, ch: 0 }
-    }
-  },
-
-  computed: {
-    note () {
-      return NoteReference[this.noteId]
+      focusEventName: 'focus' + parseInt(Math.random() * 10000, 10)
     }
   },
 
   watch: {
-    mode (val) {
-      this.autofocus = (val === 'edit')
-      // reset cursor position after finishing editing
-      if (val === 'view') {
-        this.editCursor = { line: 0, ch: 0 }
-      }
+    'note.content' () {
+      this.saveNoteAction({ note: this.note })
     }
-  },
-
-  created () {
-    this.content = this.note.content
   },
 
   methods: {
-    updateContent (content) {
-      this.content = content
-      const note = new Note(this.note)
-      note.content = content
-      this.$emit('update', note)
+    onNoteClick (event) {
+      bus.$emit(this.focusEventName)
     },
-    onViewerClick ($event) {
-      this.editCursor = $event.cursor
-      this.$emit('viewer-click')
-    },
-    onEditorEsc () {
-      this.$emit('editor-esc')
-    }
+    ...mapActions([
+      'saveNoteAction'
+    ])
   }
 }
 </script>
+
+<style lang="stylus">
+@import '~@/assets/styles/variables'
+
+.minota-note
+  background-color white
+  border-radius 3px
+  max-width 52rem
+  z-index 1
+  position relative
+  box-sizing border-box
+  padding 3rem
+  cursor text
+</style>

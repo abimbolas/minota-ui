@@ -5,67 +5,26 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
-import { createBackend } from '@/backend/utils'
-import ModalsComponent from '@/components/modals/Modals'
-import TableComponent from '@/components/screens/Table'
+import ModalsComponent from '@/components/Modals'
+import InitialCheckCreateStorage from '@/mixins/initial-check-create-storage'
 
 export default {
   name: 'App',
 
   components: {
-    ModalsComponent,
-    TableComponent
+    ModalsComponent
   },
 
-  computed: {
-    ...mapGetters({
-      'currentStorage': 'getCurrentStorageConfig',
-      'storageList': 'getStorageConfigList'
-    })
-  },
+  mixins: [
+    InitialCheckCreateStorage
+  ],
 
   created () {
     console.log('Minota App created!')
-    // Create corresponding Backends for all storage configs
-    this.storageList.forEach(config => {
-      createBackend(config).then(() => {
-        console.log(`Backend ${config.id} for ${config.storage.url} successfully created`)
-      })
-    })
-  },
-
-  mounted () {
-    // If we have not storage config at startup,
-    // warn about it and send to create one to.
-    if (!this.storageList.length) {
-      this.pleaseCreateStorage()
-    }
   },
 
   beforeDestroy () {
     console.log('Minota App destroyed...')
-  },
-
-  methods: {
-    pleaseCreateStorage () {
-      this.openModal({
-        modal: {
-          body: 'Please add storage to start working',
-          ok: {
-            label: 'Add storage'
-          }
-        }
-      }).then(() => {
-        this.$router.push('config')
-      })
-    },
-    ...mapMutations({
-      'setStorage': 'setCurrentStorageConfig'
-    }),
-    ...mapActions({
-      'openModal': 'openModalAction'
-    })
   }
 }
 </script>
@@ -84,8 +43,6 @@ body
   position relative
   min-height 100%
   overflow hidden
-  display flex
-  flex-direction column
   background-color background-color
   color alpha(black, high-emphasis)
 </style>

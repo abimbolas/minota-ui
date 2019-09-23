@@ -1,5 +1,5 @@
 import { parseStorageUrl } from '@/utils/url'
-import { BackendReference } from '@/store/reference'
+import { BackendReference } from '@/reference'
 import ServerBackend from '@/backend/server'
 import LocalStorageBackend from '@/backend/localstorage'
 

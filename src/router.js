@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import TableComponent from './components/screens/Table.vue'
-import DrawerComponent from './components/screens/Drawer.vue'
-import ConfigComponent from './components/screens/Config.vue'
+
+import ConfigComponent from './components/screen/Config'
+import PoolComponent from '@/components/screen/Pool'
+import TableComponent from './components/screen/Table'
 
 Vue.use(Router)
 
@@ -12,18 +13,37 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      redirect: '/table'
+      redirect: '/note/'
+    },
+    //
+    // Actions
+    //
+    {
+      path: '/new',
+      name: 'new',
+      redirect: '/note/new'
     },
     {
-      path: '/table/:noteId?',
+      path: '/table',
       name: 'table',
-      component: TableComponent,
-      props: true
+      redirect: '/note'
+    },
+    //
+    // Core
+    //
+    {
+      path: '/note/:noteId?',
+      name: 'note',
+      props: true,
+      component: TableComponent
     },
     {
-      path: '/drawer',
-      name: 'drawer',
-      component: DrawerComponent
+      path: '/notes',
+      name: 'notes',
+      props: route => ({
+        topic: route.query.topic
+      }),
+      component: PoolComponent
     },
     {
       path: '/config',

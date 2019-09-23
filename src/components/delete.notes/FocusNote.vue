@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { NoteReference } from '@/store/reference'
+import { NoteReference } from '@/reference'
 import Note from '@/models/note'
 import { time } from '@/utils/time'
 import Editor from '@/components/Editor'

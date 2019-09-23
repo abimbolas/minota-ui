@@ -64,7 +64,7 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { parseStorageUrl } from '@/utils/url'
-import SimpleModal from '@/components/modals/Simple'
+import SimpleModal from '@/components/modal/Simple'
 
 export default {
   name: 'StorageModal',

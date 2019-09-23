@@ -3,21 +3,25 @@
     bar-component
       //- router-link(v-bind:to="backToFocusedNote").button.icon-button
         i.material-icons close
+      .button.icon-button
+        i.material-icons menu
       .title.text-overline
+      .button.icon-button(v-on:click="newNote()")
+        i.material-icons add
       router-link(to="/config").button.icon-button
         i.material-icons cloud_queue
 
-    fab-component
+    //- fab-component
       .fab-action(v-on:click="newNote()")
         i.material-icons add
 
     main
       template(v-if="orderedByDate.length")
         archive-note-component(
-          v-for="noteId in orderedByDate"
-          v-bind:key="noteId"
-          v-bind:note="noteId"
-          v-on:primary-action="openNote(noteId)")
+          v-for="note in orderedByDate"
+          v-bind:key="note.config.id"
+          v-bind:note="note"
+          v-on:primary-action="openNote(note.config.id)")
 
       template(v-else)
         screen-placeholder-component(v-bind:text="'Пустой ящик'")
@@ -25,13 +29,13 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { BackendReference, NoteReference } from '@/store/reference'
+import { BackendReference, NoteReference } from '@/reference'
 
-import BarComponent from '@/components/layout/Bar'
-import FabComponent from '@/components/layout/Fab'
-import ScreenComponent from '@/components/layout/Screen'
-import ArchiveNoteComponent from '@/components/notes/ArchiveNote'
-import ScreenPlaceholderComponent from '@/components/other/ScreenPlaceholder'
+import BarComponent from '@/components/Bar'
+import FabComponent from '@/components/Fab'
+import ScreenComponent from '@/components/Screen'
+import ArchiveNoteComponent from '@/components/NoteListItem'
+import ScreenPlaceholderComponent from '@/components/ScreenPlaceholder'
 
 export default {
   name: 'Drawer',
@@ -58,7 +62,7 @@ export default {
     orderedByDate () {
       return this.archive.slice(0).sort((a, b) => {
         return NoteReference[b].config.date - NoteReference[a].config.date
-      })
+      }).map(id => NoteReference[id])
     },
     ...mapGetters({
       'currentStorage': 'getCurrentStorageConfig',

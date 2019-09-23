@@ -1,12 +1,12 @@
 // import Backend from '@/backend'
 import Workspace from '@/models/workspace'
-import Note from '@/models/note'
-import { lastPromise } from '@/utils/last-promise'
-import { BackendReference } from './reference'
+// import Note from '@/models/note'
+// import { lastPromise } from '@/utils/last-promise'
+// import { BackendReference } from '@/reference'
 
-function Backend ({ getters }) {
-  return BackendReference[getters.getCurrentStorageConfig.id]
-}
+// function Backend ({ getters }) {
+//   return BackendReference[getters.getCurrentStorageConfig.id]
+// }
 
 const state = {
   workspace: new Workspace(),
@@ -62,46 +62,46 @@ const mutations = {
 }
 
 const actions = {
-  newNoteAction (context) {
-    const note = new Note()
-    context.commit('addToFocus', { note })
-    context.commit('addToArchive', { notes: [ note ] })
-    context.commit('setFocusEdit')
-    return Promise.resolve(note)
-  },
+  // newNoteAction (context) {
+  //   const note = new Note()
+  //   context.commit('addToFocus', { note })
+  //   context.commit('addToArchive', { notes: [ note ] })
+  //   context.commit('setFocusEdit')
+  //   return Promise.resolve(note)
+  // },
 
-  getNoteAction (context, payload) {
-    return lastPromise({
-      type: `getNote${payload.id}`,
-      promise: Backend(context).getNote(payload.id)
-    }).then(note => {
-      context.commit('addToArchive', { notes: [note] })
-      return Promise.resolve(note)
-    })
-  },
+  // getNoteAction (context, payload) {
+  //   return lastPromise({
+  //     type: `getNote${payload.id}`,
+  //     promise: Backend(context).getNote(payload.id)
+  //   }).then(note => {
+  //     context.commit('addToArchive', { notes: [note] })
+  //     return Promise.resolve(note)
+  //   })
+  // },
 
-  focusNoteAction (context, payload) {
-    context.commit('addToFocus', payload)
-  },
+  // focusNoteAction (context, payload) {
+  //   context.commit('addToFocus', payload)
+  // },
 
-  blurNoteAction (context, payload) {
-    context.commit('addToBlur', payload)
-  },
-
-  clearTableAction (context) {
-    context.commit('clearFocus')
-    context.commit('clearBlur')
-  },
-
-  saveNoteAction (context, payload) {
-    return lastPromise({
-      type: `saveNote${payload.note.config.id}`,
-      promise: Backend(context).postNote(payload.note)
-    }).then(note => {
-      context.commit('addToArchive', { notes: [note] })
-      return Promise.resolve(note)
-    })
-  },
+  // blurNoteAction (context, payload) {
+  //   context.commit('addToBlur', payload)
+  // },
+  //
+  // clearTableAction (context) {
+  //   context.commit('clearFocus')
+  //   context.commit('clearBlur')
+  // },
+  //
+  // saveNoteAction (context, payload) {
+  //   return lastPromise({
+  //     type: `saveNote${payload.note.config.id}`,
+  //     promise: Backend(context).postNote(payload.note)
+  //   }).then(note => {
+  //     context.commit('addToArchive', { notes: [note] })
+  //     return Promise.resolve(note)
+  //   })
+  // },
 
   // updateNoteContentAction (context, payload) {
   //   return lastPromise({
@@ -110,25 +110,25 @@ const actions = {
   //   })
   // },
 
-  deleteNoteAction (context, payload) {
-    context.commit('removeFromFocus', payload)
-    context.commit('removeFromBlur', payload)
-    context.commit('removeFromArchive', payload)
-    return Backend(context).deleteNote(payload.note)
-  },
-
-  closeNoteAction (context, payload) {
-    context.commit('removeFromFocus', payload)
-    context.commit('removeFromBlur', payload)
-  },
-
-  blurTableAction (context) {
-    context.commit('blurFocus')
-  },
-
-  focusBlurAction (context) {
-    context.commit('focusBlur')
-  }
+  // deleteNoteAction (context, payload) {
+  //   context.commit('removeFromFocus', payload)
+  //   context.commit('removeFromBlur', payload)
+  //   context.commit('removeFromArchive', payload)
+  //   return Backend(context).deleteNote(payload.note)
+  // },
+  //
+  // closeNoteAction (context, payload) {
+  //   context.commit('removeFromFocus', payload)
+  //   context.commit('removeFromBlur', payload)
+  // },
+  //
+  // blurTableAction (context) {
+  //   context.commit('blurFocus')
+  // },
+  //
+  // focusBlurAction (context) {
+  //   context.commit('focusBlur')
+  // }
 }
 
 export default {

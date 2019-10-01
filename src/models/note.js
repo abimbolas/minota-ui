@@ -4,7 +4,8 @@ export default class Note {
   constructor ({ content = '', config = {} } = {}) {
     this.config = {
       id: uuid(),
-      date: new Date()
+      date: new Date(),
+      topic: ''
     }
     this.editableContent = content // initially parses content with topic
     this.merge({ config }) // overwrites topic, if present
@@ -32,14 +33,12 @@ export default class Note {
 
   set editableContent (content) {
     const lines = content.split('\n')
-    // Extract topic from first line
-    const topic = lines[0].trim().split(/^#\s*/)[1]
-    if (topic) {
-      this.topic = topic
-      this.content = lines.slice(1).join('\n').trim()
-    } else {
-      this.content = content
-    }
+    const topic = lines[0].trim().split(/^#\s+/)[1]
+    this.topic = topic || ''
+    this.content = lines
+      .slice(topic ? 1 : 0)
+      .join('\n')
+      .replace(/^\s+/, '')
   }
 
   clone () {

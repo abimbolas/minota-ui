@@ -31,4 +31,29 @@ describe('Note', () => {
     expect(n.content).to.equal('Hello, world!')
     expect(n.editableContent).to.equal('# Hey everyone\n\nHello, world!')
   })
+
+  it('should parse only first level title', () => {
+    const n = new Note()
+    n.editableContent = [
+      '### Hey title',
+      '',
+      'Hello, world'
+    ].join('\n')
+    expect(n.topic).to.equal('')
+    expect(n.content).to.equal(n.editableContent)
+  })
+
+  it('should clear topic', () => {
+    const n = new Note({
+      content: 'Hello, world!',
+      config: {
+        topic: 'Hey everyone'
+      }
+    })
+    n.editableContent = [
+      '# ',
+      ' Hello world'
+    ].join('\n')
+    expect(n.topic).not.to.be.ok
+  })
 })

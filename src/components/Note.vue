@@ -1,7 +1,7 @@
 <template lang="pug">
   .minota-note(elevation="2" v-on:click="onNoteClick($event)")
     editor-component(
-      v-model="note.editableContent"
+      v-model="content"
       v-bind:focus-on="focusEventName")
 </template>
 
@@ -29,14 +29,20 @@ export default {
 
   data () {
     return {
-      focusEventName: 'focus' + parseInt(Math.random() * 10000, 10)
+      focusEventName: 'focus' + parseInt(Math.random() * 10000, 10),
+      content: ''
     }
   },
 
   watch: {
-    'note.editableContent' () {
+    'content' (value) {
+      this.note.editableContent = value
       this.saveNoteAction({ note: this.note })
     }
+  },
+
+  mounted () {
+    this.content = this.note.editableContent
   },
 
   methods: {

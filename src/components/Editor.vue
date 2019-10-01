@@ -47,10 +47,13 @@ export default {
   },
 
   watch: {
-    value (val) {
+    'value' (val) {
       if (val !== this.simplemde.value()) {
         this.simplemde.value(val)
       }
+    },
+    'cursor' (val) {
+      this.simplemde.codemirror.setCursor(val)
     }
   },
 
@@ -122,8 +125,10 @@ export default {
   margin 0 auto
   cursor text
   font-weight 400
-  font-size 17px
+  font-size 15px
   line-height: 1.75
+  @media (min-width screen-sm)
+    font-size 17px
 
   .CodeMirror
     border none

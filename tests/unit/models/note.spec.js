@@ -56,4 +56,11 @@ describe('Note', () => {
     ].join('\n')
     expect(n.topic).not.to.be.ok
   })
+
+  it('should extract topic with leading spaces', () => {
+    const n = new Note()
+    n.editableContent = '\n\n\n    # Hey man\nHello woman'
+    expect(n.topic).to.equal('Hey man')
+    expect(n.content).to.equal('Hello woman')
+  })
 })

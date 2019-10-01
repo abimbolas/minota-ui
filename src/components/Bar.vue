@@ -87,7 +87,6 @@ export default {
 .minota-bar
   box-sizing border-box
   transition transform 0.25s, box-shadow 0.25s
-  // padding 0px 16px
   padding-left 4px
   padding-right 4px
   min-height 56px
@@ -114,7 +113,8 @@ export default {
   .title
     flex-grow 1
     padding 0 16px
-    // text-align center
+    &:first-child
+      padding-left 12px
 
   .icon-button
     flex-basis 48px

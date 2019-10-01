@@ -32,7 +32,7 @@ export default class Note {
   }
 
   set editableContent (content) {
-    const lines = content.split('\n')
+    const lines = content.replace(/^\s+/, '').split('\n')
     const topic = lines[0].trim().split(/^#\s+/)[1]
     this.topic = topic || ''
     this.content = lines

@@ -2,7 +2,8 @@
   .minota-note(elevation="2" v-on:click="onNoteClick($event)")
     editor-component(
       v-model="content"
-      v-bind:focus-on="focusEventName")
+      v-bind:focus-on="focusEventName"
+      v-bind:cursor="cursor")
 </template>
 
 <script>
@@ -30,7 +31,11 @@ export default {
   data () {
     return {
       focusEventName: 'focus' + parseInt(Math.random() * 10000, 10),
-      content: ''
+      content: '',
+      cursor: {
+        line: 0,
+        ch: 0
+      }
     }
   },
 
@@ -43,6 +48,13 @@ export default {
 
   mounted () {
     this.content = this.note.editableContent
+    // Set cursor to edit content (2nd line), not topic
+    if (this.note.topic) {
+      this.cursor = {
+        line: 2,
+        ch: 0
+      }
+    }
   },
 
   methods: {
@@ -63,9 +75,14 @@ export default {
   background-color white
   border-radius 3px
   max-width 52rem
+  min-width: 320px
   z-index 1
   position relative
   box-sizing border-box
-  padding 3rem
+  padding 1rem
   cursor text
+  @media (min-width screen-sm)
+    padding 2rem
+  @media (min-width screen-md)
+    padding 3rem
 </style>

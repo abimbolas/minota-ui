@@ -2,7 +2,7 @@
   screen-component.minota-pool
     //- Bar
     template(slot="bar")
-      .title {{ topic }}
+      .title.text-overline {{ topic }}
       router-link(to="/new" title="Add note").button.icon-button
         i.material-icons add
       router-link(to="/config" title="Setup storages").button.icon-button

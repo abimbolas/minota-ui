@@ -2,9 +2,7 @@ export default class Workspace {
   constructor ({ focusCapacity = 1 } = {}) {
     this.blur = []
     this.focus = []
-    if (focusCapacity) {
-      this.focusCapacity = focusCapacity
-    }
+    this.focusCapacity = focusCapacity
   }
 
   // Focus
@@ -45,9 +43,9 @@ export default class Workspace {
     this.focusCapacity = parseInt(size, 10)
   }
 
-  removeFocusCapacity () {
-    delete this.focusCapacity
-  }
+  // removeFocusCapacity () {
+  //   delete this.focusCapacity
+  // }
 
   // Blur
 

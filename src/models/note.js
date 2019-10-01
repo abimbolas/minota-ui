@@ -2,16 +2,44 @@ import uuid from 'uuid/v1'
 
 export default class Note {
   constructor ({ content = '', config = {} } = {}) {
-    this.content = content
     this.config = {
       id: uuid(),
       date: new Date()
     }
-    this.merge({ config })
+    this.editableContent = content // initially parses content with topic
+    this.merge({ config }) // overwrites topic, if present
+  }
+
+  set topic (topic) {
+    this.config.topic = topic
   }
 
   get topic () {
-    return this.config.topic || ''
+    return this.config.topic
+  }
+
+  get editableContent () {
+    if (this.topic) {
+      return [
+        `# ${this.topic}`,
+        '',
+        this.content
+      ].join('\n')
+    } else {
+      return this.content
+    }
+  }
+
+  set editableContent (content) {
+    const lines = content.split('\n')
+    // Extract topic from first line
+    const topic = lines[0].trim().split(/^#\s*/)[1]
+    if (topic) {
+      this.topic = topic
+      this.content = lines.slice(1).join('\n').trim()
+    } else {
+      this.content = content
+    }
   }
 
   clone () {

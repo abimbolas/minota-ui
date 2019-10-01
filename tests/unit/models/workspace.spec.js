@@ -66,6 +66,7 @@ describe('Workspace', () => {
     expect(w.isInFocus(obj)).to.be.true
 
     const obj2 = createObj()
+    w.setFocusCapacity(2)
     w.addToFocus(obj2)
     expect(w.isInFocus(obj)).to.be.true
     expect(w.isInFocus(obj2)).to.be.true
@@ -89,6 +90,7 @@ describe('Workspace', () => {
   it('Move focus content to blur and vice versa', () => {
     const obj2 = createObj()
     const obj3 = createObj()
+    w.setFocusCapacity(3)
     w.addToFocus(obj)
     w.addToFocus(obj2)
     w.addToFocus(obj3)
@@ -111,14 +113,13 @@ describe('Workspace', () => {
   })
 
   describe('Focus capacity', () => {
-    it('Can be not set', () => {
-      const w2 = new Workspace()
-      expect(w2.focusCapacity).to.be.undefined
-      w2.setFocusCapacity(1)
-      expect(w2.focusCapacity).to.equal(1)
-      w2.removeFocusCapacity()
-      expect(w2.focusCapacity).to.be.undefined
-    })
+    // it('Can be removed', () => {
+    //   const w2 = new Workspace()
+    //   w2.setFocusCapacity(1)
+    //   expect(w2.focusCapacity).to.equal(1)
+    //   w2.removeFocusCapacity()
+    //   expect(w2.focusCapacity).to.be.undefined
+    // })
 
     it('Can be initially set', () => {
       const w2 = new Workspace({

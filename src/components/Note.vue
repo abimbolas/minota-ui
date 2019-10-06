@@ -7,7 +7,8 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { topicDelimiter } from '@/store/ui'
 import EditorComponent from '@/components/Editor'
 import bus from '@/event-bus'
 
@@ -39,15 +40,20 @@ export default {
     }
   },
 
+  computed: {
+    ...mapGetters([
+      'getContext'
+    ])
+  },
+
   watch: {
     'content' (value) {
-      this.note.editableContent = value
-      this.saveNoteAction({ note: this.note })
+      this.setContentToNote(value)
     }
   },
 
   mounted () {
-    this.content = this.note.editableContent
+    this.content = this.getContentFromNote()
     // Set cursor to edit content (2nd line), not topic
     if (this.note.topic) {
       this.cursor = {
@@ -58,6 +64,29 @@ export default {
   },
 
   methods: {
+    getContentFromNote () {
+      if (this.getContext) {
+        const clone = this.note.clone()
+        clone.topic = clone.topic.replace(
+          new RegExp(`^${this.getContext}(${topicDelimiter})?`),
+          ''
+        )
+        return clone.editableContent
+      } else {
+        return this.note.editableContent
+      }
+    },
+    setContentToNote (value) {
+      if (this.getContext) {
+        const clone = this.note.clone()
+        clone.editableContent = value
+        clone.topic = `${this.getContext}${clone.topic ? topicDelimiter + clone.topic : ''}`
+        this.note.editableContent = clone.editableContent
+      } else {
+        this.note.editableContent = value
+      }
+      this.saveNoteAction({ note: this.note })
+    },
     onNoteClick (event) {
       bus.$emit(this.focusEventName)
     },

@@ -45,10 +45,10 @@ export default class Note extends GroupItemInterface {
   }
 
   clone () {
-    const note = JSON.parse(JSON.stringify({
+    const note = new Note(JSON.parse(JSON.stringify({
       content: this.content,
       config: this.config
-    }))
+    })))
     note.config.date = new Date(note.config.date)
     return note
   }

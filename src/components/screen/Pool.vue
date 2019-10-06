@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
 import ScreenComponent from '@/components/Screen'
 import NoteListLoaderComponent from '@/components/NoteListLoader'
 
@@ -31,6 +32,37 @@ export default {
       required: false,
       default: ''
     }
+  },
+
+  computed: {
+    ...mapGetters([
+      'getContext'
+    ])
+  },
+
+  watch: {
+    'topic' (topic) {
+      if (topic !== this.getContext) {
+        if (topic) {
+          this.setContext({ context: this.topic })
+        } else {
+          this.clearContext()
+        }
+      }
+    }
+  },
+
+  created () {
+    if (this.topic && this.getContext !== this.topic) {
+      this.setContext({ context: this.topic })
+    }
+  },
+
+  methods: {
+    ...mapMutations([
+      'setContext',
+      'clearContext'
+    ])
   }
 }
 </script>

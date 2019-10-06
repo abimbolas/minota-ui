@@ -41,7 +41,7 @@ export default new Router({
       path: '/notes',
       name: 'notes',
       props: route => ({
-        topic: route.query.topics
+        topic: route.query.topic
         // search: route.query.search,
         // orderBy: route.query.orderBy,
         // orderDirection: route.query.orderDirection

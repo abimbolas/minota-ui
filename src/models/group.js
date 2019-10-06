@@ -26,7 +26,8 @@ export default class Group extends GroupItemInterface {
     key = '',
     getPath = defaultGetPath,
     getOrderedPosition = defaultGetOrderedPosition,
-    orderDirection = 1
+    orderDirection = 1,
+    parent = null
   } = {}) {
     super()
     this.id = uuid()
@@ -36,6 +37,17 @@ export default class Group extends GroupItemInterface {
       getPath: getPath,
       getOrderedPosition: getOrderedPosition,
       orderDirection
+    }
+    this.parent = parent
+  }
+
+  get fullGroup () {
+    if (!this.leaf) {
+      if (this.children.length === 1) {
+        return this.children[0].fullGroup
+      } else {
+        return this
+      }
     }
   }
 
@@ -50,7 +62,10 @@ export default class Group extends GroupItemInterface {
   }
 
   get path () {
-    let path = [this.key]
+    let path = []
+    if (this.key) {
+      path = path.concat(this.key)
+    }
     if (this.parent) {
       path = this.parent.path.concat(path)
     }

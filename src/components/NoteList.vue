@@ -61,7 +61,7 @@ export default {
       }
       // 2. Else it is group, enter it's context
       else {
-        this.openContextAction({ context: item.path.join(topicDelimiter) })
+        this.openContextAction({ context: item.fullGroup.path.join(topicDelimiter) })
       }
     },
     ...mapActions([

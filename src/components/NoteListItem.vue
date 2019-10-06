@@ -4,14 +4,14 @@
     template(v-if="note")
       div(
         slot="title"
-        v-if="note.topic") {{ noteTopic }}
+        v-if="noteTopic") {{ noteTopic }}
       div(
         slot="description"
         v-if="note.content"
         v-bind:class="contentClass") {{ note.content }}
     //- Group item
     template(v-if="group")
-      div(slot="overline") {{ item.key }} ({{ item.children.length }})
+      div(slot="overline") {{ groupTopic }} ({{ group.children.length }})
 </template>
 
 <script>
@@ -50,7 +50,12 @@ export default {
     },
     group () {
       if (!this.item.leaf) {
-        return this.item
+        return this.item.fullGroup
+      }
+    },
+    groupTopic () {
+      if (this.group) {
+        return this.group.path.join(topicDelimiter)
       }
     },
     contentClass () {

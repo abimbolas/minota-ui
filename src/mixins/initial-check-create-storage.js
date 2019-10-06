@@ -1,4 +1,4 @@
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { createBackend } from '@/backend/utils'
 
 export default {

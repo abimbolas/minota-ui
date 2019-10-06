@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+
 export const regexp = {
   id: '[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}'
 }

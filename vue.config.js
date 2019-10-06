@@ -3,8 +3,8 @@ module.exports = {
     loaderOptions: {
       sass: {
         includePaths: ['./node_modules/'],
-        implementation: require("sass"),
-        fiber: require("fibers")
+        implementation: require('sass'),
+        fiber: require('fibers')
       }
     }
   }

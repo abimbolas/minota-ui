@@ -43,7 +43,8 @@ export default class ServerBackend extends BackendAPI {
   }
 
   parseNote (response) {
-    return Promise.resolve(new Note(response.data))
+    const note = Array.isArray(response.data) ? response.data[0] : response.data
+    return Promise.resolve(new Note(note))
   }
 
   parseSuccessResponse (response) {

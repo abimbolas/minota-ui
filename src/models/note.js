@@ -1,7 +1,10 @@
 import uuid from 'uuid/v1'
+import GroupItemInterface from '@/models/group-item'
+import { topicDelimiter } from '@/store/ui'
 
-export default class Note {
+export default class Note extends GroupItemInterface {
   constructor ({ content = '', config = {} } = {}) {
+    super()
     this.config = {
       id: uuid(),
       date: new Date(),
@@ -66,5 +69,19 @@ export default class Note {
         })
       }
     })
+  }
+
+  // Group Item Interface
+
+  get key () {
+    return this.config.id
+  }
+
+  get leaf () {
+    return this
+  }
+
+  get path () {
+    return this.config.topic.split(topicDelimiter)
   }
 }

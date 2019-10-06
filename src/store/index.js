@@ -4,16 +4,18 @@ import { isElectron } from '@/utils/is-electron'
 import createPersistedState from 'vuex-persistedstate'
 // Store modules
 import actions from './actions'
-import archive from './archive'
+import context from './context'
 import editor from './editor'
 import modal from './modal'
 import mutations from './mutations'
 import placeholder from './placeholder'
+import pool from './pool'
 import storageConfig from './storage-config'
 import table from './table'
 import ui from './ui'
 // Plugins
 import backendPlugin from './plugins/backend-plugin'
+import listPlugin from './plugins/list-plugin'
 
 Vue.use(Vuex)
 
@@ -31,17 +33,19 @@ export default new Vuex.Store({
   strict: true,
   modules: {
     actions,
-    archive,
+    context,
     editor,
     modal,
     mutations,
     placeholder,
+    pool,
     storageConfig,
     table,
     ui
   },
   plugins: [
     backendPlugin,
+    listPlugin,
     createPersistedState({
       key: 'minota-store',
       paths: [

@@ -10,19 +10,18 @@
 
     //- Content
     template(slot="content")
-      note-tree-loader-component(v-bind:topic="topic")
+      note-list-loader-component(v-bind:topic="topic")
 </template>
 
 <script>
-import NoteTreeLoaderComponent from '@/components/NoteTreeLoader'
 import ScreenComponent from '@/components/Screen'
-// import NoteListLoaderComponent from '@/components/NoteListLoader'
+import NoteListLoaderComponent from '@/components/NoteListLoader'
 
 export default {
   name: 'Pool',
 
   components: {
-    NoteTreeLoaderComponent,
+    NoteListLoaderComponent,
     ScreenComponent
   },
 
@@ -32,10 +31,6 @@ export default {
       required: false,
       default: ''
     }
-  },
-
-  created () {
-    console.log('Minota created Pool', this.topic)
   }
 }
 </script>

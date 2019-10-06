@@ -1,3 +1,5 @@
+export const topicDelimiter = ' / '
+
 const state = {
   focusMode: 'edit'
 }

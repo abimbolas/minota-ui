@@ -2,7 +2,7 @@
   screen-component.minota-table
     //- Bar
     template(slot="bar")
-      .title
+      .title.text-overline {{ getContext }}
       router-link(to="/new" title="New note").button.icon-button
         i.material-icons add
       router-link(to="/notes" title="List notes").button.icon-button
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import NoteLoaderComponent from '@/components/NoteLoader'
 import ScreenComponent from '@/components/Screen'
 import ScreenQuotePlaceholderComponent from '@/components/ScreenQuotePlaceholder'
@@ -35,6 +36,12 @@ export default {
       required: false,
       default: ''
     }
+  },
+
+  computed: {
+    ...mapGetters([
+      'getContext'
+    ])
   }
 }
 </script>

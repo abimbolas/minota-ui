@@ -1,13 +1,32 @@
 <template lang="pug">
   .minota-note-list
+    //- //- Not sorted
+    //- note-list-item-component(
+    //-   v-for="item in list.children"
+    //-   v-bind:key="item.id"
+    //-   v-bind:item="item"
+    //-   v-on:primary-action="primaryAction(item)")
+    //- Leaf notes
     note-list-item-component(
-      v-for="note in byDateDsc"
-      v-bind:key="note.config.id"
-      v-bind:note="note"
-      v-on:primary-action="openNote(note.config.id)")
+      v-for="item in leafItems"
+      v-bind:key="item.id"
+      v-bind:item="item"
+      v-on:primary-action="primaryAction(item)")
+
+    //- Group items
+    note-list-item-component(
+      v-for="item in groupItems"
+      v-bind:key="item.id"
+      v-bind:item="item"
+      v-on:primary-action="primaryAction(item)")
 </template>
 
 <script>
+/* eslint-disable brace-style */
+import { mapActions } from 'vuex'
+import Group from '@/models/group'
+// import Note from '@/models/note'
+import { topicDelimiter } from '@/store/ui'
 import NoteListItemComponent from '@/components/NoteListItem'
 
 export default {
@@ -18,32 +37,37 @@ export default {
   },
 
   props: {
-    notes: {
-      type: Array,
+    list: {
+      type: Group,
       required: true
-    },
-    orderBy: {
-      type: String,
-      required: false,
-      default: 'date'
-    },
-    orderDirection: {
-      type: String,
-      required: false,
-      default: 'dsc'
     }
   },
 
   computed: {
-    byDateDsc () {
-      return this.notes.slice(0).sort((a, b) => (b.config.date - a.config.date))
+    leafItems () {
+      return this.list.children.filter(child => child.leaf)
+    },
+
+    groupItems () {
+      return this.list.children.filter(child => !child.leaf)
     }
   },
 
   methods: {
-    openNote (id) {
-      this.$router.push(`/note/${id}`)
-    }
+    primaryAction (item) {
+      // 1. If this is leaf note, open it
+      if (item.leaf) {
+        this.openNoteAction({ note: item.leaf })
+      }
+      // 2. Else it is group, enter it's context
+      else {
+        this.openContextAction({ context: item.path.join(topicDelimiter) })
+      }
+    },
+    ...mapActions([
+      'openNoteAction',
+      'openContextAction'
+    ])
   }
 }
 </script>

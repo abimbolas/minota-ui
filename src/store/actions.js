@@ -1,3 +1,4 @@
+import $router from '@/router'
 import Note from '@/models/note'
 import { BackendReference, NoteReference } from '@/reference'
 import { lastPromise } from '@/utils/last-promise'
@@ -24,7 +25,10 @@ const actions = {
   },
 
   getNotesAction (context, payload) {
-    return Backend(context).getNotes()
+    return Backend(context).getNotes().then(notes => {
+      context.commit('addToReference', { notes })
+      return notes
+    })
   },
 
   getNoteAction (context, payload) {
@@ -48,6 +52,10 @@ const actions = {
       context.commit('addToReference', { notes: [note] })
       return Promise.resolve(note)
     })
+  },
+
+  openNoteAction (context, payload) {
+    $router.push(`/note/${payload.note.config.id}`)
   }
 }
 

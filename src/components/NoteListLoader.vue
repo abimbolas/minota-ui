@@ -1,10 +1,11 @@
 <template lang="pug">
   .minota-note-list-loader
-    note-list-component(v-bind:notes="notes" order-by="'date'" order-direction="'desc'")
+    note-list-component(v-bind:list="list")
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import { NoteGroup } from '@/store/plugins/list-plugin'
 import NoteListComponent from '@/components/NoteList'
 
 export default {
@@ -14,21 +15,33 @@ export default {
     NoteListComponent
   },
 
+  props: {
+    topic: {
+      type: String,
+      required: false,
+      default: ''
+    }
+  },
+
   data () {
     return {
-      notes: []
+      list: NoteGroup
+    }
+  },
+
+  watch: {
+    'topic' (topic) {
+      this.loadPoolAction({ topic })
     }
   },
 
   created () {
-    this.getNotesAction().then(notes => {
-      this.notes = notes
-    })
+    this.loadPoolAction({ topic: this.topic })
   },
 
   methods: {
     ...mapActions([
-      'getNotesAction'
+      'loadPoolAction'
     ])
   }
 }

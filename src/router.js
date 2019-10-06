@@ -41,7 +41,10 @@ export default new Router({
       path: '/notes',
       name: 'notes',
       props: route => ({
-        topic: route.query.topic
+        topic: route.query.topics
+        // search: route.query.search,
+        // orderBy: route.query.orderBy,
+        // orderDirection: route.query.orderDirection
       }),
       component: PoolComponent
     },

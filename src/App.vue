@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
 import ModalsComponent from '@/components/Modals'
 import InitialCheckCreateStorage from '@/mixins/initial-check-create-storage'
 
@@ -19,12 +20,40 @@ export default {
     InitialCheckCreateStorage
   ],
 
+  computed: {
+    ...mapGetters([
+      'getContext'
+    ])
+  },
+
+  watch: {
+    '$route' (to, from) {
+      // Sync context
+      if (to.name === 'notes') {
+        if (this.getContext !== to.query.topic) {
+          if (to.query.topic) {
+            this.setContext({ context: to.query.topic })
+          } else {
+            this.clearContext()
+          }
+        }
+      }
+    }
+  },
+
   created () {
     console.log('Minota App created!')
   },
 
   beforeDestroy () {
     console.log('Minota App destroyed...')
+  },
+
+  methods: {
+    ...mapMutations([
+      'setContext',
+      'clearContext'
+    ])
   }
 }
 </script>

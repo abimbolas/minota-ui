@@ -39,7 +39,6 @@ export default {
   min-height 100vh
   .minota-screen-main
     display flex
-    justify-content center
     min-height calc(100vh - 56px)
     box-sizing border-box
     @media (min-width screen-sm)

@@ -56,12 +56,16 @@ export default {
   padding-right 1rem
   box-sizing border-box
 
-  @media (min-width 768px)
-    margin-left 0rem
-    margin-right 0rem
-    padding-left 0rem
-    padding-right 0rem
-    width 100%
+  @media (min-width screen-sm)
+    padding-left 0.5rem
+    padding-right 0.5rem
+
+  @media (min-width screen-md)
+    margin-left -0.5rem
+    margin-right -0.5rem
+    padding-left 0.5rem
+    padding-right 0.5rem
+    width calc(100% + 1rem)
 
   // &:not([disabled])
   //   cursor pointer
@@ -94,9 +98,7 @@ export default {
   .left
     order 1
     &:not(:empty)
-      margin-left -0.75rem
-      & ~ .body
-        margin-left 0.25rem
+      margin-right 0.5rem
 
   .right
     order 3
@@ -139,12 +141,14 @@ export default {
     overflow hidden
     text-overflow ellipsis
     line-height 1.5em
-    margin-bottom 0.25rem
+    // margin-bottom 0.25rem
     & > div
       overflow hidden
       text-overflow ellipsis
     &:empty
       display none
+    & ~ .description:not(:empty)
+      margin-top 0.25rem
 
   .description
     overflow hidden

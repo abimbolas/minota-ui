@@ -33,9 +33,6 @@ function handleMouseUp (data, event) {
   removeTimerSpinner(data)
   if (data.ready) {
     this.dispatchEvent(new CustomEvent('long-click'))
-    event.preventDefault()
-    event.stopImmediatePropagation()
-    event.stopPropagation()
   }
 }
 

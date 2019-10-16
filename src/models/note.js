@@ -73,6 +73,10 @@ export default class Note extends GroupItemInterface {
 
   // Group Item Interface
 
+  get id () {
+    return this.config.id
+  }
+
   get key () {
     return this.config.id
   }

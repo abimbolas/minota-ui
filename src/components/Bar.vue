@@ -44,6 +44,17 @@ export default {
     }
   },
 
+  created () {
+    // Watch bar toggling
+    this.unwatchClassesHidden = this.$watch(() => this.classes['hidden'], isHidden => {
+      this.$emit('bar-toggle', !isHidden)
+    })
+  },
+
+  beforeDestroy () {
+    this.unwatchClassesHidden()
+  },
+
   methods: {
     handleScroll (event) {
       this.lastScroll = event.scrollTop

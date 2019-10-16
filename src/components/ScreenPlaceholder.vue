@@ -38,7 +38,6 @@ export default {
   color alpha(black, low-emphasis)
   box-sizing border-box
   padding 16px
-  margin-top
   background-position center center
   background-size auto 110px
   background-repeat no-repeat

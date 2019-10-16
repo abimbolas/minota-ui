@@ -29,7 +29,7 @@ export default {
 
   watch: {
     noteId (id) {
-      this.fetchNote(this.noteId)
+      this.fetchNote(id)
     }
   },
 

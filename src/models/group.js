@@ -21,6 +21,19 @@ function defaultGetPath (item) {
   return item.path
 }
 
+// Extract items from list of groups/notes
+export function extractItems (list) {
+  let items = []
+  list.forEach(item => {
+    if (item instanceof Group) {
+      items = items.concat(item.getItems())
+    } else {
+      items.push(item)
+    }
+  })
+  return items
+}
+
 export default class Group extends GroupItemInterface {
   constructor ({
     key = '',
@@ -141,6 +154,45 @@ export default class Group extends GroupItemInterface {
     }
   }
 
+  removeItem (item) {
+    const id = this.children.findIndex(child => {
+      return child.id === item.id
+    })
+    if (id > -1) {
+      this.children.splice(id, 1)
+    } else {
+      // Search through grandchildren. Also delete empty children
+      const empty = this.children.filter(child => {
+        if (child instanceof Group) {
+          child.removeItem(item)
+          if (!child.children.length) {
+            return true // save on empty list
+          }
+        }
+      })
+      // Remove empty
+      empty.forEach(child => child.removeChild(child))
+    }
+  }
+
+  removeChild (child) {
+    const id = this.children.indexOf(child)
+    if (id > -1) {
+      this.children.splice(id, 1)
+    }
+  }
+
+  getItems () {
+    return this.children.reduce((items, child) => {
+      if (child instanceof Group) {
+        return items.concat(child.getItems())
+      } else {
+        items.push(child)
+        return items
+      }
+    }, [])
+  }
+
   getOrderedPosition (child) {
     // We might have note or group. If we have group, calc it's position
     // based on orderDirection.
@@ -153,6 +205,28 @@ export default class Group extends GroupItemInterface {
     else {
       return this.options.orderDirection * this.options.getOrderedPosition(child)
     }
+  }
+
+  calcItemProp (getPropValueFn, lowerBound = false) {
+    return this.children.reduce((propValue, child, index) => {
+      // If child is not Group, extract it's prop value with provided Fn.
+      // If child is Group, extract it's prop value recursively.
+      let childPropValue
+      if (child instanceof Group) {
+        childPropValue = child.calcItemProp(getPropValueFn, lowerBound)
+      } else {
+        childPropValue = getPropValueFn(child)
+      }
+      // Decide, depending on lowerBound, which prop to take
+      if (lowerBound) {
+        return childPropValue > propValue ? propValue : childPropValue
+      } else {
+        return childPropValue < propValue ? propValue : childPropValue
+      }
+    }, this.children[0] instanceof Group
+      ? this.children[0].calcItemProp(getPropValueFn, lowerBound)
+      : getPropValueFn(this.children[0])
+    )
   }
 
   // addChild (child) {

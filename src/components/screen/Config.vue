@@ -1,6 +1,8 @@
 <template lang="pug">
   screen-component.minota-config
     template(slot="bar")
+      router-link.button.icon-button(to="/note" title="Table")
+        i.material-icons home
       router-link(to="/notes" title="List notes").button.icon-button
         i.material-icons folder_open
       .title

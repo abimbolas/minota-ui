@@ -56,6 +56,12 @@ const actions = {
 
   openNoteAction (context, payload) {
     $router.push(`/note/${payload.note.config.id}`)
+  },
+
+  deleteNotesAction (context, payload) {
+    return Promise.all(payload.notes.map(note => {
+      return Backend(context).deleteNote(note)
+    }))
   }
 }
 

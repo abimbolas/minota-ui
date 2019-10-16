@@ -49,6 +49,7 @@ export default new Vuex.Store({
     createPersistedState({
       key: 'minota-store',
       paths: [
+        'pool',
         'storageConfig'
       ],
       storage: appStorage

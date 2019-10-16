@@ -1,7 +1,9 @@
 <template lang="pug">
   .minota-list-item(
     v-bind:disabled="disabled"
-    v-on:click="handlePrimaryAction($event)"
+    v-long-click="375"
+    v-on:normal-click="$emit('primary-action')"
+    v-on:long-click="$emit('menu-action')"
   )
     //- Left
     .left.primary-activation
@@ -26,8 +28,14 @@
 </template>
 
 <script>
+import longClick from '@/directives/long-click'
+
 export default {
   name: 'ListItem',
+
+  directives: {
+    longClick
+  },
 
   props: {
     disabled: {
@@ -39,6 +47,9 @@ export default {
   methods: {
     handlePrimaryAction (event) {
       this.$emit('primary-action')
+    },
+    handleContextAction (event) {
+      this.$emit('context-action')
     }
   }
 }

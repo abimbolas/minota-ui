@@ -3,7 +3,7 @@
     .minota-modal-header(v-if="modal.header")
       .text-h6 {{ modal.header }}
     .minota-modal-body(v-if="modal.body")
-      span {{ modal.body }}
+      span(v-html="modal.body")
     .minota-modal-footer
       .button(
         v-if="isCancelPresent"

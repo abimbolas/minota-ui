@@ -34,7 +34,7 @@ export default {
     position relative
     z-index 2
     background-color white
-    width 80vw
+    width 100%
     max-width 256px
     margin 0 0 0 auto
     padding 0

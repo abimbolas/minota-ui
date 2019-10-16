@@ -28,6 +28,11 @@ const actions = {
   openContextAction (context, payload) {
     context.commit('appendContext', payload)
     $router.push(`/notes?topic=${context.getters.getContext}`)
+  },
+  syncContextAction (context, payload) {
+    if (payload.context !== context.getters.getContext) {
+      context.commit(payload.context ? 'setContext' : 'clearContext', payload)
+    }
   }
 }
 

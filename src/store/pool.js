@@ -1,9 +1,25 @@
 import { topicDelimiter } from '@/store/ui'
-const state = {}
+import { extractItems } from '@/models/group'
+const state = {
+  orderBy: 'date',
+  orderAsc: false
+}
+
+const getters = {
+  getOrderBy: state => state.orderBy,
+  getOrderAsc: state => state.orderAsc
+}
 
 const mutations = {
   addToPool: () => {},
-  clearPool: () => {}
+  clearPool: () => {},
+  removeFromPool: () => {},
+  setOrderBy (state, payload) {
+    state.orderBy = payload.orderBy
+  },
+  setOrderAsc (state, payload) {
+    state.orderAsc = payload.orderAsc
+  }
 }
 
 const actions = {
@@ -17,11 +33,17 @@ const actions = {
         depth: payload.topic.split(topicDelimiter).filter(item => item).length
       })
     })
+  },
+  removeFromPoolAction (context, payload = {}) {
+    context.commit('removeFromPool', payload)
+    const notes = extractItems(payload.items)
+    return context.dispatch('deleteNotesAction', { notes })
   }
 }
 
 export default {
   state,
+  getters,
   mutations,
   actions
 }

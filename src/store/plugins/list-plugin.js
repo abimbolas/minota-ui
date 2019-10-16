@@ -16,6 +16,9 @@ export default function (store) {
     },
     clearPool () {
       NoteGroup.children = []
+    },
+    removeFromPool ({ items }) {
+      NoteGroup.batch('removeItem', items)
     }
   }
 

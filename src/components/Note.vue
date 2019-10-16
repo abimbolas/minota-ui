@@ -1,5 +1,8 @@
 <template lang="pug">
   .minota-note(elevation="2" v-on:click="onNoteClick($event)")
+    //- .minota-note-actions
+      .button.icon-button
+        i.material-icons more_vert
     editor-component(
       v-model="content"
       v-bind:focus-on="focusEventName"
@@ -47,13 +50,16 @@ export default {
   },
 
   watch: {
+    'note' (note) {
+      this.setContentFromNote()
+    },
     'content' (value) {
       this.setContentToNote(value)
     }
   },
 
   mounted () {
-    this.content = this.getContentFromNote()
+    this.setContentFromNote()
     // Set cursor to edit content (2nd line), not topic
     if (this.note.topic) {
       this.cursor = {
@@ -86,6 +92,9 @@ export default {
         this.note.editableContent = value
       }
       this.saveNoteAction({ note: this.note })
+    },
+    setContentFromNote () {
+      this.content = this.getContentFromNote()
     },
     onNoteClick (event) {
       bus.$emit(this.focusEventName)

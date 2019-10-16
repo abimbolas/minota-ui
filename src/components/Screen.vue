@@ -3,7 +3,7 @@
     header.minota-screen-header
       bar-component(v-bind:toggle="isBarVisible")
         slot(name="bar")
-    main.minota-screen-main(v-on:click="onScreenClick()")
+    main.minota-screen-main
       slot(name="content")
 </template>
 

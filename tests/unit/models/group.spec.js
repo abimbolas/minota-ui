@@ -46,6 +46,19 @@ describe.only('Group', () => {
     g.batch('addItem', randomNotes(20, ['Work', 'Personal']))
     expect(g.children.length).to.equal(2)
   })
+
+  it('should remove item', () => {
+    const g = new Group({
+      getPath: item => item.config.topic.split(topicDelimiter)
+    })
+    g.batch('addItem', randomNotes(20, ['Personal', 'Work', 'Zok']))
+    const children = g.children.find(child => child.key === 'Zok').children
+    const lBefore = children.length
+    const items = [children[0]]
+    g.batch('removeItem', items)
+    const lAfter = children.length
+    expect(lBefore - lAfter).to.equal(1)
+  })
 })
 
 function randomTopicPath (pathInfo) {

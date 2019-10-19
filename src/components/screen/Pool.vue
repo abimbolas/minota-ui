@@ -15,8 +15,7 @@
             topic-breadcrumbs-component(v-bind:topic="topic")
           router-link(to="/new" title="Add note").button.icon-button
             i.material-icons add
-          a.button.icon-button(v-on:click="poolMenu = true" title="Additional actions")
-            i.material-icons more_vert
+          toggle-sort-button-component.text-button
 
         //- Menu mode bar
         template(v-else)
@@ -47,10 +46,10 @@
     main.minota-screen-main
       note-list-component(
         v-bind:list="pool"
-        v-bind:mode="mode"
-        v-on:mode-change="onModeChange($event)"
-        v-bind:selection="selection"
-        v-on:selection-change="onSelectionChange($event)"
+        v-bind:mode="mode" v-on:mode="mode = $event"
+        v-bind:selection="selection" v-on:selection="selection = $event"
+        v-on:open-note="onOpenNote($event)"
+        v-on:open-context="onOpenContext($event)"
         v-bind:order-by="getOrderBy"
         v-bind:order-asc="getOrderAsc")
 
@@ -72,13 +71,15 @@
 </template>
 
 <script>
+/* eslint-disable brace-style */
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { NoteGroup } from '@/store/plugins/list-plugin'
 import { extractItems } from '@/models/group'
 import BarComponent from '@/components/Bar'
 import MenuComponent from '@/components/Menu'
 import NoteListComponent from '@/components/NoteList'
-import TopicBreadcrumbsComponent from '@/components/TopicBreadcrumbs'
+import TopicBreadcrumbsComponent from '@/components/other/TopicBreadcrumbs'
+import ToggleSortButtonComponent from '@/components/other/ToggleSortButton'
 
 export default {
   name: 'Pool',
@@ -87,7 +88,8 @@ export default {
     BarComponent,
     MenuComponent,
     NoteListComponent,
-    TopicBreadcrumbsComponent
+    TopicBreadcrumbsComponent,
+    ToggleSortButtonComponent
   },
 
   props: {
@@ -111,6 +113,7 @@ export default {
 
   computed: {
     ...mapGetters([
+      'getContext',
       'getOrderBy',
       'getOrderAsc'
     ])
@@ -130,17 +133,12 @@ export default {
   },
 
   methods: {
-    onModeChange (mode) {
-      this.mode = mode
-      if (mode) {
-        this.showBar()
-      }
+    onOpenNote (note) {
+      this.exitMenuMode()
+      this.openNoteAction({ note })
     },
-    onSelectionChange (selection) {
-      this.selection = selection
-      if (selection.length) {
-        this.showBar()
-      }
+    onOpenContext (context) {
+      this.openContextAction({ context })
     },
     onBarToggle (visible) {
       this.barVisible = visible
@@ -209,14 +207,17 @@ export default {
       }
     },
     ...mapMutations([
+      'appendContext',
       'setOrderBy',
       'setOrderAsc'
     ]),
     ...mapActions([
       'loadPoolAction',
+      'openModalAction',
+      'openNoteAction',
+      'openContextAction',
       'syncContextAction',
-      'removeFromPoolAction',
-      'openModalAction'
+      'removeFromPoolAction'
     ])
   }
 }

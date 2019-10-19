@@ -31,10 +31,12 @@ class ScrollController {
 }
 
 export default {
-  bind (element, binding) {
+  inserted (element, binding) {
     element.scrollController = new ScrollController({
       callback: binding.value,
-      scrollTarget: window
+      scrollTarget: binding.arg === 'window'
+        ? window
+        : document.getElementById(binding.arg)
     })
   },
 

@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import ConfigComponent from './components/screen/Config'
+import ConfigComponent from '@/components/screen/Config'
 import PoolComponent from '@/components/screen/Pool'
-import TableComponent from './components/screen/Table'
+import TableComponent from '@/components/screen/Table'
 
 Vue.use(Router)
 
@@ -34,7 +34,10 @@ export default new Router({
     {
       path: '/note/:noteId?',
       name: 'note',
-      props: true,
+      props: route => ({
+        topic: route.query.topic,
+        noteId: route.params.noteId
+      }),
       component: TableComponent
     },
     {
@@ -42,9 +45,6 @@ export default new Router({
       name: 'notes',
       props: route => ({
         topic: route.query.topic
-        // search: route.query.search,
-        // orderBy: route.query.orderBy,
-        // orderDirection: route.query.orderDirection
       }),
       component: PoolComponent
     },

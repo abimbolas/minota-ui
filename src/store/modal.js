@@ -1,17 +1,17 @@
 const state = {
-  list: []
+  stack: []
 }
 
 const getters = {
-  getModalsList: state => state.list
+  getModalStack: state => state.stack
 }
 
 const mutations = {
   addModal (state, payload) {
-    state.list.push(payload.modal)
+    state.stack.push(payload.modal)
   },
   removeModal (state, payload) {
-    state.list.splice(state.list.indexOf(payload.modal), 1)
+    state.stack.splice(state.stack.indexOf(payload.modal), 1)
   }
 }
 

@@ -20,7 +20,7 @@ export default {
   right 0
   bottom 0
   left 0
-  z-index 200
+  z-index menu-index
   display flex
   .backdrop
     position absolute

@@ -55,7 +55,8 @@ const actions = {
   },
 
   openNoteAction (context, payload) {
-    $router.push(`/note/${payload.note.config.id}`)
+    const topic = context.getters.getContext
+    $router.push(`/note/${payload.note.config.id}${topic ? '?topic=' + topic : ''}`)
   },
 
   deleteNotesAction (context, payload) {

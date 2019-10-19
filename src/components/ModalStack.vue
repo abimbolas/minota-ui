@@ -1,5 +1,5 @@
 <template lang="pug">
-  .minota-modals(v-if="lastModal")
+  .minota-modal-stack(v-if="lastModal")
     .minota-modal-backdrop
       component(
         v-bind:is="lastModal.component || 'SimpleModal'"
@@ -14,7 +14,7 @@ import CustomModal from '@/components/modal/Custom'
 import StorageModal from '@/components/modal/Storage'
 
 export default {
-  name: 'Modal',
+  name: 'ModalStack',
 
   components: {
     SimpleModal,
@@ -24,10 +24,10 @@ export default {
 
   computed: {
     lastModal () {
-      return this.getModalsList.slice(-1)[0]
+      return this.getModalStack.slice(-1)[0]
     },
     ...mapGetters([
-      'getModalsList'
+      'getModalStack'
     ])
   }
 }
@@ -46,7 +46,7 @@ export default {
   overflow auto
   -webkit-overflow-scroll touch
   background-color alpha(gainsboro, high-emphasis)
-  z-index 200
+  z-index modal-index-backdrop
 
 .minota-modal
   position absolute
@@ -57,7 +57,7 @@ export default {
   margin-bottom 4px
   box-sizing border-box
   border-radius 3px
-  z-index 201
+  z-index modal-index
   background-color background-color
   @media (min-width 480px)
     max-width 480px

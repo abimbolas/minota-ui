@@ -17,9 +17,13 @@ const mutations = {
     state.context = payload.context
   },
   appendContext (state, payload) {
-    state.context = (state.context ? state.context + topicDelimiter : '') + payload.context
+    state.context = appendContextUtil(state.context, payload.context)
+  },
+  popContext () {
+    state.context = popContextUtil(state.context)
   },
   clearContext (state) {
+    console.log('clear context')
     state.context = ''
   }
 }
@@ -41,4 +45,12 @@ export default {
   getters,
   mutations,
   actions
+}
+
+export function appendContextUtil (src, target) {
+  return (src ? src + topicDelimiter : '') + target
+}
+
+export function popContextUtil (src) {
+  return src.split(topicDelimiter).slice(0, -1).join(topicDelimiter)
 }

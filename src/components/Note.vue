@@ -52,6 +52,8 @@ export default {
   watch: {
     'note' (note) {
       this.setContentFromNote()
+      this.resetCursor()
+      bus.$emit(this.focusEventName)
     },
     'content' (value) {
       this.setContentToNote(value)
@@ -60,13 +62,7 @@ export default {
 
   mounted () {
     this.setContentFromNote()
-    // Set cursor to edit content (2nd line), not topic
-    if (this.note.topic) {
-      this.cursor = {
-        line: 2,
-        ch: 0
-      }
-    }
+    this.resetCursor()
   },
 
   methods: {
@@ -95,6 +91,20 @@ export default {
     },
     setContentFromNote () {
       this.content = this.getContentFromNote()
+    },
+    resetCursor () {
+      // Set cursor to edit content (2nd line), not topic
+      if (this.note.topic) {
+        this.cursor = {
+          line: 2,
+          ch: 0
+        }
+      } else {
+        this.cursor = {
+          line: 0,
+          ch: 0
+        }
+      }
     },
     onNoteClick (event) {
       bus.$emit(this.focusEventName)

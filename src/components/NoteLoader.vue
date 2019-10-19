@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import NoteComponent from '@/components/Note'
 
 export default {
@@ -27,6 +27,12 @@ export default {
     }
   },
 
+  computed: {
+    ...mapGetters([
+      'getContext'
+    ])
+  },
+
   watch: {
     noteId (id) {
       this.fetchNote(id)
@@ -47,7 +53,7 @@ export default {
         this.newNoteAction().then(note => {
           // Now we have regular note, redirect as if normally have this
           // note
-          this.$router.replace(`/note/${note.config.id}`)
+          this.$router.replace(`/note/${note.config.id}${this.getContext ? '?topic=' + this.getContext : ''}`)
         })
       } else {
         // Get either from NoteReference (cache-like object) or from server
@@ -64,7 +70,7 @@ export default {
                 cancel: false
               }
             }).then(() => {
-              this.$router.push('/notes')
+              this.$router.push(`/notes${this.getContext ? '?topic=' + this.getContext : ''}`)
             })
           }
         })

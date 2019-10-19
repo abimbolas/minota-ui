@@ -1,7 +1,7 @@
 <template lang="pug">
   button.minota-fab.bottom-right(
     elevation="8"
-    v-scroll="handleScroll"
+    v-scroll:[target]="handleScroll"
     v-bind:class="classes"
   )
     slot
@@ -23,6 +23,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    target: {
+      type: String,
+      required: false,
+      default: 'window'
     }
   },
 
@@ -58,6 +63,7 @@ export default {
 
 <style lang="stylus">
 @import '~@/assets/styles/variables'
+
 .minota-fab
   background-color primary-dark-color
   color alpha(white, high-emphasis)
@@ -75,9 +81,12 @@ export default {
   opacity 1
   transform translateY(0%)
   transition opacity 0.125s, transform 0.25s
+  a
+    text-decoration none
+    color inherit
   &.bottom-right
     position fixed
-    z-index 100
+    z-index fab-index
     bottom 16px
     right 16px
   &.hidden

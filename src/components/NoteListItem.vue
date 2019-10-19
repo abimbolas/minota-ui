@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import Group from '@/models/group'
 import Note from '@/models/note'
 import { topicDelimiter } from '@/store/ui'
@@ -51,6 +50,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    topic: {
+      type: String,
+      required: false,
+      default: ''
     }
   },
 
@@ -61,7 +65,7 @@ export default {
     noteTopic () {
       if (this.note) {
         return this.note.path
-          .slice(this.getContextArray.length)
+          .slice(this.contextArray.length)
           .join(topicDelimiter)
       } else {
         return ''
@@ -92,9 +96,9 @@ export default {
     isMenuMode () {
       return this.mode === 'menu'
     },
-    ...mapGetters([
-      'getContextArray'
-    ])
+    contextArray () {
+      return this.topic.split(topicDelimiter).filter(item => item)
+    }
   }
 }
 </script>

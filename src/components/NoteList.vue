@@ -6,9 +6,10 @@
       v-bind:key="item.id"
       v-bind:item="item"
       v-bind:mode="mode"
+      v-bind:topic="topic"
       v-bind:selected="isSelected(item)"
-      v-on:primary-action="primaryAction(item)"
-      v-on:menu-action="menuAction(item)")
+      v-on:primary-action="onPrimaryAction(item)"
+      v-on:menu-action="onMenuAction(item)")
     //- //- Leaf notes
     //- note-list-item-component(
     //-   v-for="item in leafItems"
@@ -32,9 +33,7 @@
 
 <script>
 /* eslint-disable brace-style */
-import { mapActions } from 'vuex'
 import Group from '@/models/group'
-// import Note from '@/models/note'
 import { topicDelimiter } from '@/store/ui'
 import NoteListItemComponent from '@/components/NoteListItem'
 
@@ -51,6 +50,11 @@ export default {
       required: true
     },
     mode: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    topic: {
       type: String,
       required: false,
       default: ''
@@ -118,54 +122,34 @@ export default {
   },
 
   methods: {
-    primaryAction (item) {
-      // On non-menu just open notes
-      if (this.mode !== 'menu') {
-        // 1. If this is leaf note, open it
+    onPrimaryAction (item) {
+      if (this.mode === 'menu') {
+        this.toggleSelection(item)
+      } else {
         if (item.leaf) {
-          this.openNoteAction({ note: item.leaf })
+          this.$emit('open-note', item.leaf)
+        } else {
+          this.$emit('open-context', item.fullGroup.path.join(topicDelimiter))
         }
-        // 2. Else it is group, enter it's context
-        else {
-          this.openContextAction({ context: item.fullGroup.path.join(topicDelimiter) })
-        }
-      }
-      // On menu mode, select items
-      else {
-        this.selectionChange(item)
-        setTimeout(() => {
-          if (!this.selection.length) {
-            this.modeChange('')
-          }
-        })
       }
     },
-    menuAction (item) {
-      this.modeChange('menu')
-      setTimeout(() => {
-        this.selectionChange(item)
-      })
+    onMenuAction (item) {
+      this.$emit('mode', 'menu')
+      this.toggleSelection(item)
     },
     isSelected (item) {
       return this.selection.findIndex(s => s.id === item.id) > -1
     },
-    modeChange (mode) {
-      this.$emit('mode-change', mode || '')
-    },
-    selectionChange (item) {
-      let s = this.selection.slice(0, this.selection.length)
-      const id = s.findIndex(s => s.id === item.id)
+    toggleSelection (item) {
+      const updatedSelection = this.selection.slice(0, this.selection.length)
+      const id = updatedSelection.findIndex(selected => selected.id === item.id)
       if (id > -1) {
-        s.splice(id, 1)
+        updatedSelection.splice(id, 1)
       } else {
-        s.push(item)
+        updatedSelection.push(item)
       }
-      this.$emit('selection-change', s)
-    },
-    ...mapActions([
-      'openNoteAction',
-      'openContextAction'
-    ])
+      this.$emit('selection', updatedSelection)
+    }
   }
 }
 </script>

@@ -1,6 +1,9 @@
 <template lang="pug">
   .minota-bar-placeholder
-    .minota-bar(v-scroll="handleScroll" v-bind:class="classes")
+    .minota-bar(
+      v-scroll:[target]="handleScroll"
+      v-bind:style="styles"
+      v-bind:class="classes")
       slot
         i.material-icons menu
 </template>
@@ -20,6 +23,16 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    target: {
+      type: String,
+      required: false,
+      default: 'window'
+    },
+    position: {
+      type: String,
+      required: false,
+      default: 'left'
     }
   },
 
@@ -32,7 +45,12 @@ export default {
         'switch': false
       },
       breakpoint: 56,
-      lastScroll: 0
+      lastScroll: 0,
+      styles: {
+        width: '100%',
+        left: '0px',
+        right: 'auto'
+      }
     }
   },
 
@@ -85,6 +103,20 @@ export default {
       } else {
         this.classes['no-shadow'] = false
       }
+
+      if (this.target !== 'window') {
+        this.styles.width = document.getElementById(this.target).getBoundingClientRect().width + 'px'
+      }
+
+      if (this.position === 'right') {
+        this.styles.left = 'auto'
+        this.styles.right = '0px'
+      }
+
+      if (this.position === 'left') {
+        this.styles.left = '0px'
+        this.styles.right = 'auto'
+      }
     }
   }
 }
@@ -105,7 +137,7 @@ export default {
   box-shadow 0px 2px 10px 0px alpha(black, 0.0)
   display flex
   align-items center
-  z-index 100
+  z-index bar-index
 
   &.sticky
     box-shadow 0px 2px 10px 0px alpha(black, 0.25)

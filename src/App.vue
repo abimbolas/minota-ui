@@ -1,19 +1,19 @@
 <template lang="pug">
   .minota-app
     router-view
-    modals-component
+    modal-stack-component
 </template>
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import ModalsComponent from '@/components/Modals'
+import ModalStackComponent from '@/components/ModalStack'
 import InitialCheckCreateStorage from '@/mixins/initial-check-create-storage'
 
 export default {
   name: 'App',
 
   components: {
-    ModalsComponent
+    ModalStackComponent
   },
 
   mixins: [

@@ -1,39 +1,53 @@
 <template lang="pug">
-  screen-component.minota-table
-    //- Bar
-    template(slot="bar")
-      router-link(to="/notes" title="List notes").button.icon-button
-        i.material-icons folder_open
-      router-link(to="/config" title="Setup storages").button.icon-button
-        i.material-icons cloud_queue
-      .title.text-overline
-        topic-breadcrumbs-component(v-bind:topic="getContext")
-      router-link(to="/new" title="New note").button.icon-button
-        i.material-icons add
-      //- .button.icon-button(v-on:click="deleteNote()")
-        i.material-icons delete
+  section.minota-screen.minota-table
+    //- Header
+    header.minota-screen-header
+      bar-component
+        //- router-link(to="/notes" title="List notes").button.icon-button
+        //-   i.material-icons folder_open
+        .button.icon-button(v-on:click="openDrawer()")
+          i.material-icons folder_open
+        router-link(to="/config" title="Setup storages").button.icon-button
+          i.material-icons cloud_queue
+        .title.text-overline
+          topic-breadcrumbs-component(
+            v-bind:topic="getContext"
+            v-on:set-topic="onSetTopic($event)")
+        router-link(to="/new" title="New note").button.icon-button
+          i.material-icons add
 
     //-  Content
-    template(slot="content" v-if="noteId")
-      note-loader-component(v-bind:note-id="noteId")
-    template(slot="content" v-else)
-      screen-quote-placeholder-component
+    main.minota-screen-main
+      template(v-if="noteId")
+        note-loader-component(v-bind:note-id="noteId")
+      template(v-else)
+        screen-quote-placeholder-component
+
+    //- Aside drawer
+    drawer-pool-component(
+      v-bind:topic="drawerTopic"
+      v-bind:toggle="drawerOpened"
+      v-on:toggle="drawerOpened = $event")
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import BarComponent from '@/components/Bar'
+import DrawerPoolComponent from '@/components/DrawerPool'
+import MenuComponent from '@/components/Menu'
 import NoteLoaderComponent from '@/components/NoteLoader'
-import TopicBreadcrumbsComponent from '@/components/TopicBreadcrumbs'
-import ScreenComponent from '@/components/Screen'
-import ScreenQuotePlaceholderComponent from '@/components/ScreenQuotePlaceholder'
+import TopicBreadcrumbsComponent from '@/components/other/TopicBreadcrumbs'
+import ScreenQuotePlaceholderComponent from '@/components/other/ScreenQuotePlaceholder'
 
 export default {
   name: 'Table',
 
   components: {
+    BarComponent,
+    DrawerPoolComponent,
+    MenuComponent,
     NoteLoaderComponent,
     TopicBreadcrumbsComponent,
-    ScreenComponent,
     ScreenQuotePlaceholderComponent
   },
 
@@ -42,6 +56,14 @@ export default {
       type: String,
       required: false,
       default: ''
+    }
+  },
+
+  data () {
+    return {
+      poolOpened: false,
+      drawerTopic: '',
+      drawerOpened: false
     }
   },
 
@@ -62,8 +84,15 @@ export default {
           }
         }
       }).then(() => {
-        console.log('delette', this.noteId)
+        console.log('delete', this.noteId)
       })
+    },
+    onSetTopic (topic) {
+      this.drawerTopic = topic
+      this.drawerOpened = true
+    },
+    openDrawer () {
+      this.drawerOpened = true
     },
     ...mapActions([
       'openModalAction'

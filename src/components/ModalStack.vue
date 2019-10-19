@@ -45,7 +45,7 @@ export default {
   height 100vh
   overflow auto
   -webkit-overflow-scroll touch
-  background-color alpha(gainsboro, high-emphasis)
+  background-color backdrop-color
   z-index modal-index-backdrop
 
 .minota-modal

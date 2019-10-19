@@ -26,21 +26,6 @@ export default {
     ])
   },
 
-  watch: {
-    '$route' (to, from) {
-      // Sync context
-      if (to.name === 'notes') {
-        if (this.getContext !== to.query.topic) {
-          if (to.query.topic) {
-            this.setContext({ context: to.query.topic })
-          } else {
-            this.clearContext()
-          }
-        }
-      }
-    }
-  },
-
   created () {
     console.log('Minota App created!')
   },

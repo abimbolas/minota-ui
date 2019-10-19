@@ -29,7 +29,7 @@ export default {
     bottom 0
     top 0
     z-index 1
-    background-color alpha(black, low-emphasis)
+    background-color backdrop-color
   .menu
     position relative
     z-index 2

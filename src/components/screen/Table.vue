@@ -7,14 +7,14 @@
         //-   i.material-icons folder_open
         .button.icon-button(v-on:click="openDrawer()")
           i.material-icons folder_open
-        router-link(to="/config" title="Setup storages").button.icon-button
-          i.material-icons cloud_queue
         .title.text-overline
           topic-breadcrumbs-component(
             v-bind:topic="getContext"
             v-on:set-topic="onSetTopic($event)")
         router-link(to="/new" title="New note").button.icon-button
           i.material-icons add
+        router-link(to="/config" title="Setup storages").button.icon-button
+          i.material-icons cloud_queue
 
     //-  Content
     main.minota-screen-main
@@ -56,6 +56,11 @@ export default {
       type: String,
       required: false,
       default: ''
+    },
+    topic: {
+      type: String,
+      requred: false,
+      default: ''
     }
   },
 
@@ -71,6 +76,10 @@ export default {
     ...mapGetters([
       'getContext'
     ])
+  },
+
+  created () {
+    this.syncContextAction({ context: this.topic })
   },
 
   methods: {
@@ -93,9 +102,11 @@ export default {
     },
     openDrawer () {
       this.drawerOpened = true
+      this.drawerTopic = ''
     },
     ...mapActions([
-      'openModalAction'
+      'openModalAction',
+      'syncContextAction'
     ])
   }
 }

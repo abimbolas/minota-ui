@@ -4,15 +4,37 @@
     #minota-drawer-pool-body.minota-drawer-body(v-on:close="closeDrawer()")
 
       bar-component(v-bind:target="'minota-drawer-pool-body'" v-bind:position="'right'")
-        .button.icon-button(v-on:click="closeDrawer()" v-if="!context")
-          i.material-icons close
-        .button.icon-button(v-on:click="onCloseContext()" v-if="context")
-          i.material-icons arrow_upward
-        .title.text-overline
-          topic-breadcrumbs-component(
-            v-bind:topic="context"
-            v-on:set-topic="onSetTopic($event)")
-        toggle-sort-button-component.text-button
+        template(v-if="mode === 'menu'")
+          .title.text-overline {{ selection.length }} selected
+            //- topic-breadcrumbs-component(v-bind:topic="context")
+          .button.icon-button(
+            title="Done with batch actions"
+            v-on:click="exitMenuMode()")
+            i.material-icons block
+          .button.icon-button(
+            title="Group notes under topic"
+            v-on:click="groupNotes()")
+            i.material-icons call_merge
+          .button.icon-button(
+            title="Ungroup topic into notes"
+            v-on:click="ungroupNotes()")
+            i.material-icons call_split
+          .button.icon-button(title="Edit notes")
+            i.material-icons edit
+          .button.icon-button(
+            title="Delete notes"
+            v-on:click="deleteNotes()")
+            i.material-icons delete
+        template(v-else)
+          .button.icon-button(v-on:click="closeDrawer()" v-if="!context")
+            i.material-icons close
+          .button.icon-button(v-on:click="onCloseContext()" v-if="context")
+            i.material-icons arrow_upward
+          .title.text-overline
+            topic-breadcrumbs-component(
+              v-bind:topic="context"
+              v-on:set-topic="onSetTopic($event)")
+          toggle-sort-button-component.text-button
 
       note-list-component(
         v-bind:list="pool"
@@ -31,6 +53,7 @@
 <script>
 /* eslint-disable brace-style */
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { extractItems } from '@/models/group'
 import BarComponent from '@/components/Bar'
 import FabComponent from '@/components/Fab'
 import ListItemComponent from '@/components/ListItem'
@@ -97,20 +120,18 @@ export default {
       }
     },
     'toggle' () {
-      this.loadPoolAction({ topic: this.getContext })
+      this.loadPoolAction({ topic: this.context })
     }
   },
 
   created () {
     this.context = this.topic
-    // this.syncContextAction({ context: this.topic })
     this.loadPoolAction({ topic: this.context })
   },
 
   methods: {
     onOpenNote (note) {
       this.exitMenuMode()
-      console.log('open note', note)
       // If we have focus size === 1, just replace context and open note.
       // Otherwise (focus is > 1), we should find the most common context
       // for both (root for totally different).
@@ -141,6 +162,7 @@ export default {
       }
     },
     closeDrawer () {
+      this.exitMenuMode()
       this.$emit('toggle', false)
     },
     addNewNoteInContext () {
@@ -148,17 +170,63 @@ export default {
       this.setContext({ context: this.context })
       this.$router.push(`/note/new${this.getContext ? ('?topic=' + this.getContext) : ''}`)
     },
+    deleteNotes () {
+      if (this.selection.length) {
+        const notes = extractItems(this.selection)
+        this.openModalAction({
+          modal: {
+            header: 'Delete',
+            body: `Are you sure to delete ${this.selection.length} item(s), which contain <strong>${notes.length} note(s)</strong>?`,
+            ok: {
+              label: 'Delete'
+            }
+          }
+        }).then(() => {
+          this.removeFromPoolAction({
+            items: this.selection.slice(0, this.selection.length)
+          })
+          this.exitMenuMode()
+        })
+      }
+    },
+    groupNotes () {
+      this.openModalAction({
+        modal: {
+          header: 'Group notes',
+          body: 'You want to group notes under one topic?',
+          ok: {
+            label: 'Group'
+          }
+        }
+      }).then(() => {
+        console.log('group notes')
+        this.exitMenuMode()
+      })
+    },
+    ungroupNotes () {
+      this.openModalAction({
+        modal: {
+          header: 'Ungroup notes',
+          body: 'Are you sure you want to group notes in this topic?',
+          ok: {
+            label: 'Ungroup'
+          }
+        }
+      }).then(() => {
+        console.log('ungroup notes')
+        this.exitMenuMode()
+      })
+    },
     ...mapMutations([
       'appendContext',
       'popContext',
       'setContext'
-      // 'setOrderBy',
-      // 'setOrderAsc'
     ]),
     ...mapActions([
       'loadPoolAction',
       'openNoteAction',
-      'syncContextAction'
+      'openModalAction',
+      'removeFromPoolAction'
     ])
   }
 }

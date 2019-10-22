@@ -9,16 +9,18 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import SimpleModal from '@/components/modal/Simple'
 import CustomModal from '@/components/modal/Custom'
+import GroupModal from '@/components/modal/Group'
+import SimpleModal from '@/components/modal/Simple'
 import StorageModal from '@/components/modal/Storage'
 
 export default {
   name: 'ModalStack',
 
   components: {
-    SimpleModal,
     CustomModal,
+    GroupModal,
+    SimpleModal,
     StorageModal
   },
 

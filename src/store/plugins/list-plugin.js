@@ -11,8 +11,8 @@ export const NoteGroup = new Group({
 
 export default function (store) {
   const actions = {
-    addToPool ({ notes, depth = 0 }) {
-      NoteGroup.batch('addItem', notes, depth)
+    addToPool ({ items, depth = 0 }) {
+      NoteGroup.batch('addItem', items, depth)
     },
     clearPool () {
       NoteGroup.children = []

@@ -24,14 +24,16 @@ const mutations = {
 
 const actions = {
   loadPoolAction (context, payload = {}) {
-    context.dispatch('getNotesAction').then(notes => {
+    return context.dispatch('getNotesAction').then(notes => {
       context.commit('clearPool')
+      const filtered = (payload.topic ? notes.filter(note => {
+        return note.topic.match(new RegExp(`^${payload.topic}`))
+      }) : notes)
       context.commit('addToPool', {
-        notes: (payload.topic ? notes.filter(note => {
-          return note.topic.match(new RegExp(`^${payload.topic}`))
-        }) : notes),
+        items: filtered,
         depth: payload.topic.split(topicDelimiter).filter(item => item).length
       })
+      return filtered
     })
   },
   removeFromPoolAction (context, payload = {}) {

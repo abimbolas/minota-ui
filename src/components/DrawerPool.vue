@@ -36,6 +36,8 @@
               v-on:set-topic="onSetTopic($event)")
           toggle-sort-button-component.text-button
 
+      m-linear-progress(v-bind:open="isLoading" indeterminate)
+
       note-list-component(
         v-bind:list="pool"
         v-bind:topic="context"
@@ -94,7 +96,8 @@ export default {
       pool: NoteGroup,
       mode: '',
       selection: [],
-      context: ''
+      context: '',
+      isLoading: false
       // barVisible: true,
       // barToggleFlag: false,
       // poolMenu: false
@@ -143,17 +146,29 @@ export default {
     onOpenContext (context) {
       this.exitMenuMode()
       this.context = appendContextUtil(this.context, context)
-      this.loadPoolAction({ topic: this.context })
+      this.isLoading = true
+      this.clearPool()
+      this.loadPoolAction({ topic: this.context }).then(() => {
+        this.isLoading = false
+      })
     },
     onCloseContext () {
       this.exitMenuMode()
       this.context = popContextUtil(this.context)
-      this.loadPoolAction({ topic: this.context })
+      this.isLoading = true
+      this.clearPool()
+      this.loadPoolAction({ topic: this.context }).then(() => {
+        this.isLoading = false
+      })
     },
     onSetTopic (context) {
       this.exitMenuMode()
       this.context = context
-      this.loadPoolAction({ topic: this.context })
+      this.isLoading = true
+      this.clearPool()
+      this.loadPoolAction({ topic: this.context }).then(() => {
+        this.isLoading = false
+      })
     },
     exitMenuMode () {
       this.mode = ''
@@ -182,8 +197,11 @@ export default {
             }
           }
         }).then(() => {
+          this.isLoading = true
           this.removeFromPoolAction({
             items: this.selection.slice(0, this.selection.length)
+          }).then(() => {
+            this.isLoading = false
           })
           this.exitMenuMode()
         })
@@ -192,14 +210,22 @@ export default {
     groupNotes () {
       this.openModalAction({
         modal: {
-          header: 'Group notes',
-          body: 'You want to group notes under one topic?',
+          // header: 'Group notes',
+          // body: 'You want to group notes under one topic?',
           ok: {
             label: 'Group'
-          }
+          },
+          component: 'GroupModal',
+          data: this.selection
         }
-      }).then(() => {
-        console.log('group notes')
+      }).then(topic => {
+        this.isLoading = true
+        this.groupNotesAction({
+          groups: this.selection,
+          topic
+        }).then(() => {
+          this.isLoading = false
+        })
         this.exitMenuMode()
       })
     },
@@ -207,26 +233,37 @@ export default {
       this.openModalAction({
         modal: {
           header: 'Ungroup notes',
-          body: 'Are you sure you want to group notes in this topic?',
+          body: 'Are you sure you want to ungroup notes?',
           ok: {
             label: 'Ungroup'
           }
         }
       }).then(() => {
-        console.log('ungroup notes')
+        this.isLoading = true
+        this.ungroupNotesAction({
+          groups: this.selection.filter(item => item.fullGroup)
+        }).then(() => {
+          this.isLoading = false
+        })
         this.exitMenuMode()
       })
     },
     ...mapMutations([
+      'addToPool',
       'appendContext',
+      'clearPool',
       'popContext',
+      'removeFromPool',
       'setContext'
     ]),
     ...mapActions([
+      'groupNotesAction',
       'loadPoolAction',
       'openNoteAction',
       'openModalAction',
-      'removeFromPoolAction'
+      'removeFromPoolAction',
+      'saveNotesAction',
+      'ungroupNotesAction'
     ])
   }
 }

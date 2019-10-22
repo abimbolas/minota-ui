@@ -1,32 +1,34 @@
 <script>
-import TextField from 'material-components-vue/dist/text-field'
-import FloatingLabel from 'material-components-vue/dist/floating-label'
-import LineRipple from 'material-components-vue/dist/line-ripple'
-import Select from 'material-components-vue/dist/select'
-import Menu from 'material-components-vue/dist/menu'
-import Icon from 'material-components-vue/dist/icon'
-import Tabs from 'material-components-vue/dist/tabs'
-import List from 'material-components-vue/dist/list'
-import Switch from 'material-components-vue/dist/switch'
-import FormField from 'material-components-vue/dist/form-field'
 import Checkbox from 'material-components-vue/dist/checkbox'
-import Radio from 'material-components-vue/dist/radio'
 // import Elevation from 'material-components-vue/dist/elevation'
+import FloatingLabel from 'material-components-vue/dist/floating-label'
+import FormField from 'material-components-vue/dist/form-field'
+import Icon from 'material-components-vue/dist/icon'
+import LineRipple from 'material-components-vue/dist/line-ripple'
+import LinearProgress from 'material-components-vue/dist/linear-progress'
+import List from 'material-components-vue/dist/list'
+import Menu from 'material-components-vue/dist/menu'
+import Radio from 'material-components-vue/dist/radio'
+import Select from 'material-components-vue/dist/select'
+import Switch from 'material-components-vue/dist/switch'
+import Tabs from 'material-components-vue/dist/tabs'
+import TextField from 'material-components-vue/dist/text-field'
 
 import Vue from 'vue'
-Vue.use(TextField)
-Vue.use(FloatingLabel)
-Vue.use(LineRipple)
-Vue.use(Select)
-Vue.use(Menu)
-Vue.use(Icon)
-Vue.use(Tabs)
-Vue.use(List)
-Vue.use(Switch)
-Vue.use(FormField)
 Vue.use(Checkbox)
-Vue.use(Radio)
 // Vue.use(Elevation)
+Vue.use(FloatingLabel)
+Vue.use(FormField)
+Vue.use(Icon)
+Vue.use(LineRipple)
+Vue.use(LinearProgress)
+Vue.use(List)
+Vue.use(Menu)
+Vue.use(Radio)
+Vue.use(Select)
+Vue.use(Switch)
+Vue.use(Tabs)
+Vue.use(TextField)
 
 export default {
   name: 'Material'
@@ -42,19 +44,20 @@ $mdc-theme-secondary: #424242;
 $mdc-theme-on-primary: rgba(255, 255, 255, 0.87);
 $mdc-theme-on-secondary: rgba(255, 255, 255, 0.87);
 
-@import "material-components-vue/dist/theme/styles";
-@import "material-components-vue/dist/text-field/styles";
-@import "material-components-vue/dist/floating-label/styles";
-@import "material-components-vue/dist/line-ripple/styles";
-@import "material-components-vue/dist/select/styles";
-@import "material-components-vue/dist/menu/styles";
-@import "material-components-vue/dist/tabs/styles";
-@import "material-components-vue/dist/list/styles";
-@import "material-components-vue/dist/switch/styles";
-@import "material-components-vue/dist/form-field/styles";
 @import "material-components-vue/dist/checkbox/styles";
-@import "material-components-vue/dist/radio/styles";
 // @import "material-components-vue/dist/elevation/styles";
+@import "material-components-vue/dist/floating-label/styles";
+@import "material-components-vue/dist/form-field/styles";
+@import "material-components-vue/dist/line-ripple/styles";
+@import "material-components-vue/dist/linear-progress/styles";
+@import "material-components-vue/dist/list/styles";
+@import "material-components-vue/dist/menu/styles";
+@import "material-components-vue/dist/radio/styles";
+@import "material-components-vue/dist/select/styles";
+@import "material-components-vue/dist/switch/styles";
+@import "material-components-vue/dist/tabs/styles";
+@import "material-components-vue/dist/text-field/styles";
+@import "material-components-vue/dist/theme/styles";
 
 .mdc-form-field {
   label {

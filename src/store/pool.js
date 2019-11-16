@@ -1,4 +1,3 @@
-import Note from '@/models/note'
 import Notespace from '@/models/notespace'
 
 const state = {
@@ -42,9 +41,7 @@ const mutations = {
   },
 
   recreatePoolState (state, payload) {
-    state.pool = new Notespace(payload.pool)
-    state.pool.focus = state.pool.focus.map(note => new Note(note))
-    state.pool.blur = state.pool.blur.map(note => new Note(note))
+    state.pool = new Notespace()
   }
 }
 

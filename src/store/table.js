@@ -1,6 +1,5 @@
 /* eslint-disable brace-style */
 import merge from 'lodash/merge'
-import Note from '@/models/note'
 import Notespace from '@/models/notespace'
 
 const state = {
@@ -28,9 +27,7 @@ const mutations = {
   },
 
   recreateTableState (state, payload) {
-    state.table = new Notespace(payload.table)
-    state.table.focus = state.table.focus.map(note => new Note(note))
-    state.table.blur = state.table.blur.map(note => new Note(note))
+    state.table = new Notespace()
   }
 }
 
@@ -38,14 +35,6 @@ export default {
   state,
   getters,
   mutations
-}
-
-export function tableRestoreState (state) {
-  return {
-    table: state.table
-      ? new Notespace(state.table)
-      : new Notespace()
-  }
 }
 
 export function tableNavigationGuard (store, to, from, next) {

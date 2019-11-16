@@ -27,6 +27,24 @@ function handleMouseDown (data, event) {
   spinnerTimeoutId = setTimeout(() => {
     data.ready = true
   }, data.delay)
+  data.mouseDown = true
+  data.mouseMove = false
+  data.position = {
+    x: event.clientX,
+    y: event.clientY
+  }
+}
+
+function handleMouseMove (data, event) {
+  if (data.mouseDown) {
+    const delta = {
+      x: Math.abs(data.position.x - event.clientX),
+      y: Math.abs(data.position.y - event.clientY)
+    }
+    if (delta.x > 5 || delta.y > 5) {
+      removeTimerSpinner(data)
+    }
+  }
 }
 
 function handleMouseUp (data, event) {
@@ -34,6 +52,7 @@ function handleMouseUp (data, event) {
   if (data.ready) {
     this.dispatchEvent(new CustomEvent('long-click'))
   }
+  data.mouseDown = false
 }
 
 function handleClick (data, event) {
@@ -51,15 +70,18 @@ export default {
     }
     data.delay = value
     element.handleMouseDown = handleMouseDown.bind(element, data)
+    element.handleMouseMove = handleMouseMove.bind(element, data)
     element.handleMouseUp = handleMouseUp.bind(element, data)
     element.handleClick = handleClick.bind(element, data)
     element.addEventListener('mousedown', element.handleMouseDown)
+    element.addEventListener('mousemove', element.handleMouseMove)
     element.addEventListener('mouseup', element.handleMouseUp)
     element.addEventListener('click', element.handleClick)
   },
 
   unbind (element) {
     element.removeEventListener('mousedown', element.handleMouseDown)
+    element.removeEventListener('mousemove', element.handleMouseMove)
     element.removeEventListener('mouseup', element.handleMouseUp)
     element.removeEventListener('click', element.handleClick)
   }

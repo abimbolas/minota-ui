@@ -2,11 +2,9 @@
   aside.minota-drawer.minota-drawer-pool(v-bind:class="{ 'active': toggle }")
     .minota-drawer-backdrop(v-on:click="closeDrawer()")
     #minota-drawer-pool-body.minota-drawer-body(v-on:close="closeDrawer()")
-
       bar-component(v-bind:target="'minota-drawer-pool-body'" v-bind:position="'right'")
         template(v-if="mode === 'menu'")
           .title.text-overline {{ selection.length }} selected
-            //- topic-breadcrumbs-component(v-bind:topic="context")
           .button.icon-button(
             title="Done with batch actions"
             v-on:click="exitMenuMode()")
@@ -19,11 +17,9 @@
             title="Ungroup topic into notes"
             v-on:click="ungroupNotes()")
             i.material-icons call_split
-          .button.icon-button(title="Edit notes")
-            i.material-icons edit
           .button.icon-button(
             title="Delete notes"
-            v-on:click="deleteNotes()")
+            v-on:click="onDeleteNotes()")
             i.material-icons delete
         template(v-else)
           .button.icon-button(v-on:click="closeDrawer()" v-if="!context")
@@ -33,7 +29,7 @@
           .title.text-overline
             topic-breadcrumbs-component(
               v-bind:topic="context"
-              v-on:set-topic="onSetTopic($event)")
+              v-on:set-topic="onChangeTopic($event)")
           toggle-sort-button-component.text-button
 
       m-linear-progress(v-bind:open="isLoading" indeterminate)
@@ -49,7 +45,7 @@
         v-on:open-context="onOpenContext($event)")
 
       fab-component(v-bind:target="'minota-drawer-pool-body'")
-        i.material-icons(v-on:click="addNewNoteInContext()") add
+        i.material-icons(v-on:click="onNewNote()") add
 </template>
 
 <script>
@@ -62,9 +58,14 @@ import ListItemComponent from '@/components/ListItem'
 import NoteListComponent from '@/components/NoteList'
 import TopicBreadcrumbsComponent from '@/components/other/TopicBreadcrumbs'
 import ToggleSortButtonComponent from '@/components/other/ToggleSortButton'
+import Language from '@/mixins/language'
 import { NoteGroup } from '@/store/plugins/list-plugin'
-// import { topicDelimiter } from '@/store/ui'
-import { appendContextUtil, popContextUtil } from '@/store/context'
+import {
+  appendContextUtil,
+  popContextUtil,
+  contextLengthUtil,
+  topicInContextUtil
+} from '@/store/context'
 
 export default {
   name: 'DrawerPool',
@@ -77,6 +78,8 @@ export default {
     TopicBreadcrumbsComponent,
     ToggleSortButtonComponent
   },
+
+  mixins: [Language],
 
   props: {
     topic: {
@@ -98,24 +101,21 @@ export default {
       selection: [],
       context: '',
       isLoading: false
-      // barVisible: true,
-      // barToggleFlag: false,
-      // poolMenu: false
     }
   },
 
   computed: {
     ...mapGetters([
+      'isInTableFocus',
       'getOrderBy',
-      'getOrderAsc',
-      'getContext'
+      'getOrderAsc'
     ])
   },
 
   watch: {
     'topic' (topic) {
       this.context = topic
-      this.loadPoolAction({ topic })
+      this.fetchTopic(this.context)
     },
     'selection' (selection) {
       if (!selection.length) {
@@ -123,112 +123,144 @@ export default {
       }
     },
     'toggle' () {
-      this.loadPoolAction({ topic: this.context })
+      this.fetchTopic(this.context)
     }
   },
 
   created () {
     this.context = this.topic
-    this.loadPoolAction({ topic: this.context })
+    this.fetchTopic(this.context)
+    // Watch for new and editing notes and update them
+    // in current pool, if needed
+    const actions = {
+      updateNoteAction: ({ note }) => {
+        if (topicInContextUtil(note.topic, this.context)) {
+          this.addToPoolFocus({ note, depth: contextLengthUtil(this.context) })
+        }
+      }
+    }
+    this.unsubscribeActions = this.$store.subscribeAction(action => {
+      if (actions[action.type]) {
+        actions[action.type](action.payload)
+      }
+    })
+  },
+
+  beforeDestroy () {
+    this.unsubscribeActions()
   },
 
   methods: {
+    fetchTopic (topic) {
+      this.isLoading = true
+      this.getNotesAction({ topic }).then(notes => {
+        this.clearPoolFocus()
+        this.addToPoolFocus({ notes, depth: contextLengthUtil(topic) })
+        this.isLoading = false
+      }).catch(error => {
+        console.warn('fetchTopic error:', error)
+      })
+    },
+
     onOpenNote (note) {
       this.exitMenuMode()
-      // If we have focus size === 1, just replace context and open note.
-      // Otherwise (focus is > 1), we should find the most common context
-      // for both (root for totally different).
-      // Currently consider focus is 1.
       this.setContext({ context: this.context })
       this.openNoteAction({ note })
       this.closeDrawer()
     },
+
     onOpenContext (context) {
       this.exitMenuMode()
       this.context = appendContextUtil(this.context, context)
-      this.isLoading = true
-      this.clearPool()
-      this.loadPoolAction({ topic: this.context }).then(() => {
-        this.isLoading = false
-      })
+      this.fetchTopic(this.context)
     },
+
     onCloseContext () {
       this.exitMenuMode()
       this.context = popContextUtil(this.context)
-      this.isLoading = true
-      this.clearPool()
-      this.loadPoolAction({ topic: this.context }).then(() => {
-        this.isLoading = false
-      })
+      this.fetchTopic(this.context)
     },
-    onSetTopic (context) {
+
+    onChangeTopic (context) {
       this.exitMenuMode()
       this.context = context
-      this.isLoading = true
-      this.clearPool()
-      this.loadPoolAction({ topic: this.context }).then(() => {
-        this.isLoading = false
-      })
+      this.fetchTopic(this.context)
     },
+
     exitMenuMode () {
       this.mode = ''
       if (this.selection.length) {
         this.selection = []
       }
     },
+
     closeDrawer () {
       this.exitMenuMode()
       this.$emit('toggle', false)
     },
-    addNewNoteInContext () {
+
+    onNewNote () {
       this.closeDrawer()
       this.setContext({ context: this.context })
-      this.$router.push(`/note/new${this.getContext ? ('?topic=' + this.getContext) : ''}`)
+      this.newNoteAction().then(note => this.openNoteAction({ note }))
     },
-    deleteNotes () {
+
+    onDeleteNotes () {
       if (this.selection.length) {
         const notes = extractItems(this.selection)
+        const focused = notes.filter(note => this.isInTableFocus(note)).length
+        const text = {
+          Delete: this.languageTranslate('delete', { capitalize: true })
+        }
+        const body = this.languageComplex('modalBodyDeleteItems', {
+          items: this.selection.length,
+          notes: notes.length,
+          focused: focused
+        })
         this.openModalAction({
           modal: {
-            header: 'Delete',
-            body: `Are you sure to delete ${this.selection.length} item(s), which contain <strong>${notes.length} note(s)</strong>?`,
+            header: text.Delete,
+            body: body,
             ok: {
-              label: 'Delete'
+              label: text.Delete
             }
           }
         }).then(() => {
           this.isLoading = true
-          this.removeFromPoolAction({
-            items: this.selection.slice(0, this.selection.length)
-          }).then(() => {
+          this.removeFromPoolFocus({ notes })
+          this.deleteNotesAction({ notes }).then(() => {
             this.isLoading = false
           })
           this.exitMenuMode()
         })
       }
     },
+
     groupNotes () {
       this.openModalAction({
         modal: {
-          // header: 'Group notes',
-          // body: 'You want to group notes under one topic?',
           ok: {
             label: 'Group'
           },
-          component: 'GroupModal',
-          data: this.selection
+          component: 'GroupModal'
         }
       }).then(topic => {
+        const src = this.context
+        const target = appendContextUtil(this.context, topic)
+        const notes = extractItems(this.selection)
+        this.removeFromPoolFocus({ notes })
+        notes.forEach(note => {
+          note.topic = note.topic.replace(new RegExp(`^${src}`), target)
+        })
+        this.addToPoolFocus({ notes, depth: contextLengthUtil(this.context) })
         this.isLoading = true
-        this.groupNotesAction({
-          groups: this.selection,
-          topic
-        }).then(() => {
+        this.updateNotesAction({ notes }).then(() => {
           this.isLoading = false
         })
         this.exitMenuMode()
       })
     },
+
     ungroupNotes () {
       this.openModalAction({
         modal: {
@@ -239,31 +271,43 @@ export default {
           }
         }
       }).then(() => {
+        let update = []
+        this.selection.filter(item => item.fullGroup).forEach(group => {
+          const src = appendContextUtil(this.context, group.key)
+          const target = this.context
+          const notes = extractItems(group.children)
+          this.removeFromPoolFocus({ notes })
+          notes.forEach(note => {
+            note.topic = note.topic.replace(new RegExp(`^${src}`), target)
+          })
+          this.addToPoolFocus({ notes, depth: contextLengthUtil(this.context) })
+          update = update.concat(notes)
+        })
         this.isLoading = true
-        this.ungroupNotesAction({
-          groups: this.selection.filter(item => item.fullGroup)
-        }).then(() => {
+        this.updateNotesAction({ notes: update }).then(() => {
           this.isLoading = false
         })
         this.exitMenuMode()
       })
     },
+
     ...mapMutations([
-      'addToPool',
-      'appendContext',
-      'clearPool',
-      'popContext',
-      'removeFromPool',
+      'addToPoolFocus',
+      'addToTableFocus',
+      'clearPoolFocus',
+      'removeFromPoolFocus',
       'setContext'
     ]),
+
     ...mapActions([
+      'deleteNotesAction',
+      'getNotesAction',
       'groupNotesAction',
-      'loadPoolAction',
+      'newNoteAction',
       'openNoteAction',
       'openModalAction',
-      'removeFromPoolAction',
-      'saveNotesAction',
-      'ungroupNotesAction'
+      'ungroupNotesAction',
+      'updateNotesAction'
     ])
   }
 }

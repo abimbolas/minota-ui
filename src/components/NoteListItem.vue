@@ -17,14 +17,14 @@
         i.material-icons(v-else) radio_button_unchecked
     //- Group item
     template(v-if="group")
-      div(slot="overline") {{ groupTopic }} ({{ group.children.length }})
+      div(slot="overline") {{ groupTopic }} ({{ numberOfNotes }})
       div(slot="secondary-action" v-if="isMenuMode")
         i.material-icons(v-if="selected") check_circle
         i.material-icons(v-else) radio_button_unchecked
 </template>
 
 <script>
-import Group from '@/models/group'
+import Group, { extractItems } from '@/models/group'
 import Note from '@/models/note'
 import { topicDelimiter } from '@/store/ui'
 import ListItemComponent from '@/components/ListItem'
@@ -98,6 +98,9 @@ export default {
     },
     contextArray () {
       return this.topic.split(topicDelimiter).filter(item => item)
+    },
+    numberOfNotes () {
+      return extractItems(this.group.children).length
     }
   }
 }

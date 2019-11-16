@@ -37,6 +37,10 @@ export default {
     ])
   },
 
+  mounted () {
+    this.syncSelectedSortOptions()
+  },
+
   methods: {
     toggleSortOptions () {
       this.sortSelected = this.sortSelected + 1
@@ -45,6 +49,16 @@ export default {
       }
       this.setOrderBy({ orderBy: this.sortOptions[this.sortSelected].orderBy })
       this.setOrderAsc({ orderAsc: this.sortOptions[this.sortSelected].orderAsc })
+    },
+    syncSelectedSortOptions () {
+      this.sortOptions.forEach((option, index) => {
+        if (
+          this.getOrderBy === option.orderBy &&
+          this.getOrderAsc === option.orderAsc
+        ) {
+          this.sortSelected = index
+        }
+      })
     },
     ...mapMutations([
       'setOrderBy',

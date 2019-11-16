@@ -35,6 +35,7 @@
 
 <script>
 import SimpleModal from '@/components/modal/Simple'
+import { topicDelimiter } from '@/store/ui'
 
 export default {
   name: 'GroupModal',
@@ -52,7 +53,9 @@ export default {
       if (this.topic) {
         this.resolveModalAction({
           modal: this.modal,
-          resolve: this.topic
+          resolve: this.topic.split(topicDelimiter)
+            .filter(i => i)
+            .join(topicDelimiter)
         })
       }
     }

@@ -13,7 +13,7 @@ function participant ({ type, promise }) {
   promises[type] = promise
 }
 
-export function lastPromise ({ type, promise }) {
+export default function lastPromise ({ type, promise }) {
   participant({ type, promise })
   return promise.then(result => winner({ type, promise, result }))
 }

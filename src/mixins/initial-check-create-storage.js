@@ -1,5 +1,5 @@
 import { mapGetters, mapActions } from 'vuex'
-import { createBackend } from '@/backend/utils'
+import { createBackend } from '@/backend'
 
 export default {
   computed: {
@@ -41,7 +41,7 @@ export default {
           }
         }
       }).then(() => {
-        this.$router.push('config')
+        this.$router.push({ name: 'config' })
       })
     },
     ...mapActions({

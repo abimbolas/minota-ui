@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '@/store'
 
 import ConfigComponent from '@/components/screen/Config'
 import PoolComponent from '@/components/screen/Pool'
 import TableComponent from '@/components/screen/Table'
+import { tableNavigationGuard } from '@/store/table'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -58,3 +60,13 @@ export default new Router({
     return { x: 0, y: 0 }
   }
 })
+
+router.beforeEach(function (to, from, next) {
+  if (to.name === 'note') {
+    tableNavigationGuard(store, to, from, next)
+  } else {
+    next()
+  }
+})
+
+export default router

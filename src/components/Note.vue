@@ -1,9 +1,11 @@
 <template lang="pug">
-  .minota-note(elevation="2" v-on:click="onNoteClick($event)")
-    //- .minota-note-actions
-      .button.icon-button
-        i.material-icons more_vert
-    editor-component(
+  .minota-note(
+    v-bind:elevation="elevation"
+    v-long-click="375"
+    v-on:normal-click="onNormalClick($event)"
+    v-on:long-click="$emit('mode', 'menu')"
+  )
+    editor-component.minota-note-editor(
       v-model="content"
       v-bind:focus-on="focusEventName"
       v-bind:cursor="cursor")
@@ -13,13 +15,19 @@
 import { mapGetters, mapActions } from 'vuex'
 import { topicDelimiter } from '@/store/ui'
 import EditorComponent from '@/components/Editor'
+import longClick from '@/directives/long-click'
 import bus from '@/event-bus'
+import breakpoint from '@/utils/breakpoint'
 
 export default {
   name: 'Note',
 
   components: {
     EditorComponent
+  },
+
+  directives: {
+    longClick
   },
 
   props: {
@@ -39,7 +47,8 @@ export default {
       cursor: {
         line: 0,
         ch: 0
-      }
+      },
+      elevation: 0
     }
   },
 
@@ -60,9 +69,20 @@ export default {
     }
   },
 
+  created () {
+    window.addEventListener('resize', this.updateElevation)
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateElevation)
+  },
+
   mounted () {
     this.setContentFromNote()
     this.resetCursor()
+    if (breakpoint.min.sm) {
+      this.elevation = 2
+    }
   },
 
   methods: {
@@ -79,15 +99,12 @@ export default {
       }
     },
     setContentToNote (value) {
+      const update = this.note.clone()
+      update.editableContent = value
       if (this.getContext) {
-        const clone = this.note.clone()
-        clone.editableContent = value
-        clone.topic = `${this.getContext}${clone.topic ? topicDelimiter + clone.topic : ''}`
-        this.note.editableContent = clone.editableContent
-      } else {
-        this.note.editableContent = value
+        update.topic = `${this.getContext}${update.topic ? topicDelimiter + update.topic : ''}`
       }
-      this.saveNoteAction({ note: this.note })
+      this.updateNoteAction({ note: update })
     },
     setContentFromNote () {
       this.content = this.getContentFromNote()
@@ -106,11 +123,18 @@ export default {
         }
       }
     },
-    onNoteClick (event) {
+    onNormalClick ($event) {
       bus.$emit(this.focusEventName)
     },
+    updateElevation () {
+      if (breakpoint.min.sm) {
+        this.elevation = 2
+      } else {
+        this.elevation = 0
+      }
+    },
     ...mapActions([
-      'saveNoteAction'
+      'updateNoteAction'
     ])
   }
 }
@@ -118,11 +142,13 @@ export default {
 
 <style lang="stylus">
 @import '~@/assets/styles/variables'
+@import '~@/assets/styles/material'
 
 .minota-note
   background-color white
   border-radius 3px
-  max-width 52rem
+  max-width 46rem
+  box-sizing content-box
   min-width: 320px
   z-index 1
   position relative
@@ -130,7 +156,25 @@ export default {
   padding 1rem
   cursor text
   @media (min-width screen-sm)
-    padding 2rem
+    max-width 48rem
+    padding 2.5rem 3rem
   @media (min-width screen-md)
-    padding 3rem
+    max-width 52rem
+    padding 3rem 4rem
+  @media (min-width screen-lg)
+    max-width 56rem
+    padding 4rem 5rem
+
+  .minota-note-editor
+    position relative
+    z-index 1
+
+  .minota-note-actions
+    margin-bottom 0.0rem
+    margin-top -0.5rem
+    text-align right
+    display flex
+    justify-content center
+    align-items center
+    z-index 2
 </style>

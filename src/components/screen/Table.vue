@@ -3,23 +3,24 @@
     //- Header
     header.minota-screen-header
       bar-component
-        //- router-link(to="/notes" title="List notes").button.icon-button
-        //-   i.material-icons folder_open
-        .button.icon-button(v-on:click="openDrawer()")
-          i.material-icons folder_open
-        .title.text-overline
-          topic-breadcrumbs-component(
+        template
+          .button.icon-button(v-on:click="openTopicInDrawer('')")
+            i.material-icons folder_open
+          topic-breadcrumbs-component.title.text-overline(
             v-bind:topic="getContext"
-            v-on:set-topic="onSetTopic($event)")
-        router-link(to="/new" title="New note").button.icon-button
-          i.material-icons add
-        router-link(to="/config" title="Setup storages").button.icon-button
-          i.material-icons cloud_queue
+            v-on:set-topic="openTopicInDrawer($event)")
+          router-link(to="/new" title="New note").button.icon-button
+            i.material-icons add
+          router-link(to="/config" title="Setup storages").button.icon-button
+            i.material-icons cloud_queue
 
     //-  Content
     main.minota-screen-main
-      template(v-if="noteId")
-        note-loader-component(v-bind:note-id="noteId")
+      template(v-if="getTableFocus.length")
+        note-component(
+          v-for="note in getTableFocus"
+          v-bind:key="note.config.id"
+          v-bind:note="note")
       template(v-else)
         screen-quote-placeholder-component
 
@@ -31,11 +32,11 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+/* eslint-disable brace-style */
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import BarComponent from '@/components/Bar'
 import DrawerPoolComponent from '@/components/DrawerPool'
-import MenuComponent from '@/components/Menu'
-import NoteLoaderComponent from '@/components/NoteLoader'
+import NoteComponent from '@/components/Note'
 import TopicBreadcrumbsComponent from '@/components/other/TopicBreadcrumbs'
 import ScreenQuotePlaceholderComponent from '@/components/other/ScreenQuotePlaceholder'
 
@@ -45,8 +46,7 @@ export default {
   components: {
     BarComponent,
     DrawerPoolComponent,
-    MenuComponent,
-    NoteLoaderComponent,
+    NoteComponent,
     TopicBreadcrumbsComponent,
     ScreenQuotePlaceholderComponent
   },
@@ -66,7 +66,6 @@ export default {
 
   data () {
     return {
-      poolOpened: false,
       drawerTopic: '',
       drawerOpened: false
     }
@@ -74,47 +73,98 @@ export default {
 
   computed: {
     ...mapGetters([
-      'getContext'
+      'getContext',
+      'getTableFocus'
     ])
   },
 
+  watch: {
+    'noteId' (noteId) {
+      this.fetchNoteById(noteId)
+    }
+  },
+
   created () {
-    this.syncContextAction({ context: this.topic })
+    const actions = {
+      // If note (in current focus) deleted somewhere (e.g in drawer), remove it from table
+      // also (with modal window).
+      deleteNotesAction: payload => {
+        this.removeFromTableFocus({ notes: payload.notes })
+        if (!this.getTableFocus.length) {
+          this.$router.replace({ name: 'note' })
+        }
+      }
+    }
+    this.unsubscribeActions = this.$store.subscribeAction(action => {
+      if (actions[action.type]) {
+        actions[action.type](action.payload)
+      }
+    })
+  },
+
+  mounted () {
+    this.fetchNoteById(this.noteId)
+  },
+
+  beforeDestroy () {
+    this.unsubscribeActions()
   },
 
   methods: {
-    deleteNote () {
-      this.openModalAction({
-        modal: {
-          header: 'Delete note',
-          body: `Are you sure to delete this note?`,
-          ok: {
-            label: 'Delete'
-          }
+    fetchNoteById (id) {
+      let promise
+      if (id === 'new') {
+        promise = this.newNoteAction()
+      } else if (id) {
+        promise = this.getNoteAction({ id })
+      } else {
+        promise = Promise.reject(new Error('No id'))
+      }
+      promise.then(note => {
+        this.addToTableFocus({ note })
+      }).catch(error => {
+        console.warn('fetchNoteById error:', error)
+        if (error.status === 404) {
+          this.$router.push({ name: 'note' })
         }
-      }).then(() => {
-        console.log('delete', this.noteId)
       })
     },
-    onSetTopic (topic) {
+
+    openTopicInDrawer (topic) {
       this.drawerTopic = topic
       this.drawerOpened = true
     },
-    openDrawer () {
-      this.drawerOpened = true
-      this.drawerTopic = ''
-    },
+
+    ...mapMutations([
+      'addToTableFocus',
+      'removeFromTableFocus'
+    ]),
+
     ...mapActions([
-      'openModalAction',
-      'syncContextAction'
+      'getNoteAction',
+      'newNoteAction'
     ])
   }
 }
 </script>
 
 <style lang="stylus">
+@import '~@/assets/styles/variables'
+
 .minota-table
+  .minota-screen-main
+    justify-content center
+  .minota-note
+    flex-grow 1
+    min-width 0
   .minota-note-loader
     flex-grow 1
     min-width 0
+  .minota-bar
+    background-color white
+  @media (min-width screen-sm)
+    .minota-bar
+      background-color transparent
+      &.sticky
+        background-color white
 </style>

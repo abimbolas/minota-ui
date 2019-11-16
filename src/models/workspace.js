@@ -1,35 +1,35 @@
 export default class Workspace {
-  constructor ({ focusCapacity = 1 } = {}) {
-    this.blur = []
-    this.focus = []
+  constructor ({ focusCapacity = 1, blur = [], focus = [] } = {}) {
+    this.blur = blur
+    this.focus = focus
     this.focusCapacity = focusCapacity
   }
 
   // Focus
 
-  addToFocus (obj) {
-    if (this.isIn('focus', obj)) {
-      this.replaceIn('focus', obj)
+  addToFocus (obj, { extendFocusCapacity = false } = {}) {
+    this._removeFrom('blur', obj)
+    this._addTo('focus', obj)
+    if (extendFocusCapacity) {
+      this.focusCapacity = this.focus.length + 1
     } else {
-      this.removeFrom('blur', obj)
-      while (this.focus.length >= this.focusCapacity) {
+      while (this.focus.length > this.focusCapacity) {
         this.blurFocus(this.focus.slice(-1)[0])
       }
-      this.addTo('focus', obj)
     }
   }
 
   isInFocus (obj) {
-    return this.isIn('focus', obj)
+    return this._isIn('focus', obj)
   }
 
   removeFromFocus (obj) {
-    this.removeFrom('focus', obj)
+    this._removeFrom('focus', obj)
   }
 
   blurFocus (obj) {
     if (obj) {
-      this.move('focus', 'blur', obj)
+      this._move('focus', 'blur', obj)
     } else {
       while (this.focus.length > 0) {
         this.blurFocus(this.focus[0])
@@ -37,34 +37,38 @@ export default class Workspace {
     }
   }
 
-  // Capacity
-
-  setFocusCapacity (size) {
-    this.focusCapacity = parseInt(size, 10)
+  clearFocus () {
+    this._clear('focus')
   }
 
-  // removeFocusCapacity () {
-  //   delete this.focusCapacity
-  // }
+  // Capacity
+
+  get focusCapacity () {
+    return this._focusCapacity
+  }
+
+  set focusCapacity (size) {
+    this._focusCapacity = parseInt(size, 10)
+  }
 
   // Blur
 
   addToBlur (obj) {
-    this.removeFrom('focus', obj)
-    this.addTo('blur', obj)
+    this._removeFrom('focus', obj)
+    this._addTo('blur', obj)
   }
 
   removeFromBlur (obj) {
-    this.removeFrom('blur', obj)
+    this._removeFrom('blur', obj)
   }
 
   isInBlur (obj) {
-    return this.isIn('blur', obj)
+    return this._isIn('blur', obj)
   }
 
   focusBlur (obj) {
     if (obj) {
-      this.move('blur', 'focus', obj)
+      this._move('blur', 'focus', obj)
     } else {
       while (this.blur.length > 0) {
         this.focusBlur(this.blur[0])
@@ -72,57 +76,53 @@ export default class Workspace {
     }
   }
 
+  clearBlur () {
+    this._clear('blur')
+  }
+
   // Universal
 
-  addTo (type, obj) {
-    if (!this.isIn(type, obj)) {
+  _addTo (type, obj) {
+    if (!this._isIn(type, obj)) {
       this[type].unshift(obj)
     }
   }
 
-  removeFrom (type, obj) {
-    const i = this.search(type, obj)
+  _removeFrom (type, obj) {
+    const i = this._search(type, obj)
     if (i > -1) {
       this[type].splice(i, 1)
     }
   }
 
-  replaceIn (type, obj) {
-    const i = this.search(type, obj)
+  _replaceIn (type, obj) {
+    const i = this._search(type, obj)
     if (i > -1) {
       this[type].splice(i, 1, obj)
     }
   }
 
-  clear (type) {
+  _clear (type) {
     while (this[type].length > 0) {
       this[type].pop()
     }
   }
 
-  isIn (type, obj) {
-    return this.search(type, obj) > -1
+  _isIn (type, obj) {
+    return this._search(type, obj) > -1
   }
 
-  search (type, obj) {
-    // let id = this[type].indexOf(obj)
-    // if (id < 0) {
-    //   this[type].forEach((item, index) => {
-    //     if (item.config.id === obj.config.id) {
-    //       id = index
-    //     }
-    //   })
-    // }
+  _search (type, obj) {
     return this[type].indexOf(obj)
   }
 
-  move (from, to, obj) {
+  _move (from, to, obj) {
     if (obj) {
-      this.removeFrom(from, obj)
-      this.addTo(to, obj)
+      this._removeFrom(from, obj)
+      this._addTo(to, obj)
     } else {
       while (this[from].length > 0) {
-        this.addTo(to, this[from].pop())
+        this._addTo(to, this[from].pop())
       }
     }
   }

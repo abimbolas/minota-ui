@@ -23,7 +23,6 @@ const mutations = {
     state.context = popContextUtil(state.context)
   },
   clearContext (state) {
-    console.log('clear context')
     state.context = ''
   }
 }
@@ -47,10 +46,31 @@ export default {
   actions
 }
 
+export function cleanPathUtil (src) {
+  return src.split(topicDelimiter).filter(i => i)
+}
+
 export function appendContextUtil (src, target) {
-  return (src ? src + topicDelimiter : '') + target
+  return (src ? cleanPathUtil(src) : [])
+    .concat(cleanPathUtil(target))
+    .join(topicDelimiter)
 }
 
 export function popContextUtil (src) {
   return src.split(topicDelimiter).slice(0, -1).join(topicDelimiter)
+}
+
+export function contextLengthUtil (context) {
+  return context.split(topicDelimiter).filter(item => item).length
+}
+
+export function topicInContextUtil (topic, context) {
+  // If root (empty) context, any topic is in it. Otherwise compare.
+  if (!context) {
+    return true
+  } else {
+    const topicPath = topic.split(topicDelimiter)
+    const contextPath = context.split(topicDelimiter)
+    return contextPath.every((key, index) => key === topicPath[index])
+  }
 }

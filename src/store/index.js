@@ -1,13 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { isElectron } from '@/utils/is-electron'
+import isElectron from '@/utils/is-electron'
 import createPersistedState from 'vuex-persistedstate'
 // Store modules
 import actions from './actions'
 import context from './context'
 import editor from './editor'
+import i18n from './i18n'
 import modal from './modal'
-import mutations from './mutations'
+import notespace from './notespace'
 import placeholder from './placeholder'
 import pool from './pool'
 import storageConfig from './storage-config'
@@ -29,14 +30,26 @@ if (isElectron()) {
   appStorage = localStorage
 }
 
+// List of modules to persist. Module's state may have custom classes with
+// behavior, and since we persist only as JSON objects, class info is lost.
+// We provide special mutations (as string values), in which we can instantiate all required
+// classes and do other init stuff. We will call all these mutations during
+// app's init phase (check App.vue's 'created' hook)
+export const persistedModules = {
+  'table': 'recreateTableState',
+  'pool': 'recreatePoolState',
+  'storageConfig': 'recreateStorageConfigState'
+}
+
 export default new Vuex.Store({
   strict: true,
   modules: {
     actions,
     context,
     editor,
+    i18n,
     modal,
-    mutations,
+    notespace,
     placeholder,
     pool,
     storageConfig,
@@ -48,11 +61,8 @@ export default new Vuex.Store({
     listPlugin,
     createPersistedState({
       key: 'minota-store',
-      paths: [
-        'pool',
-        'storageConfig'
-      ],
-      storage: appStorage
+      storage: appStorage,
+      paths: Object.keys(persistedModules)
     })
   ]
 })

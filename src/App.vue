@@ -5,9 +5,9 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
 import ModalStackComponent from '@/components/ModalStack'
 import InitialCheckCreateStorage from '@/mixins/initial-check-create-storage'
+import { persistedModules } from '@/store'
 
 export default {
   name: 'App',
@@ -20,25 +20,16 @@ export default {
     InitialCheckCreateStorage
   ],
 
-  computed: {
-    ...mapGetters([
-      'getContext'
-    ])
-  },
-
   created () {
+    // Recreate states of store modules, which we persist previously
+    Object.keys(persistedModules).forEach(key => {
+      this.$store.commit(persistedModules[key], this.$store.state[key])
+    })
     console.log('Minota App created!')
   },
 
   beforeDestroy () {
     console.log('Minota App destroyed...')
-  },
-
-  methods: {
-    ...mapMutations([
-      'setContext',
-      'clearContext'
-    ])
   }
 }
 </script>

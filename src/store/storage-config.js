@@ -51,7 +51,9 @@ const mutations = {
     } else {
       console.warn('store/storage-config: updateStorageConfig: no such config')
     }
-  }
+  },
+
+  recreateStorageConfigState () {}
 }
 
 const actions = {

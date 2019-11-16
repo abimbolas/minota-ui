@@ -10,19 +10,22 @@ export const NoteGroup = new Group({
 })
 
 export default function (store) {
-  const actions = {
-    addToPool ({ items, depth = 0 }) {
-      NoteGroup.batch('addItem', items, depth)
+  const mutations = {
+    addToPoolFocus ({ notes, note, depth = 0 }) {
+      NoteGroup.batch('removeItem', notes || [note])
+      NoteGroup.batch('addItem', notes || [note], depth)
     },
-    clearPool () {
+    clearPoolFocus () {
       NoteGroup.children = []
     },
-    removeFromPool ({ items }) {
-      NoteGroup.batch('removeItem', items)
+    removeFromPoolFocus ({ notes }) {
+      NoteGroup.batch('removeItem', notes)
     }
   }
 
   store.subscribe(mutation => {
-    actions[mutation.type] && actions[mutation.type](mutation.payload)
+    if (mutations[mutation.type]) {
+      mutations[mutation.type](mutation.payload)
+    }
   })
 }

@@ -1,9 +1,7 @@
 /* eslint-disable brace-style */
-
 import sortedIndexBy from 'lodash/sortedIndexBy'
 import uuid from 'uuid/v1'
 import GroupItemInterface from '@/models/group-item'
-import { topicDelimiter } from '@/store/ui'
 
 // Return item's sorting value to compare against.
 // For sorting by date this should be some kind of item's date (number),
@@ -73,16 +71,6 @@ export default class Group extends GroupItemInterface {
         return this.children[0].leaf
       }
     }
-  }
-
-  get context () {
-    let depth = 0
-    let item = this
-    while (item instanceof Group) {
-      item = item.children[0]
-      depth = depth + 1
-    }
-    return item.topic.split(topicDelimiter).slice(0, -depth)
   }
 
   get path () {

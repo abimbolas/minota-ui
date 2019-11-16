@@ -1,14 +1,7 @@
 import $router from '@/router'
 import Note from '@/models/note'
-import Group from '@/models/group'
-import { BackendReference, NoteReference } from '@/reference'
-import { lastPromise } from '@/utils/last-promise'
-import { topicDelimiter } from '@/store/ui'
-// import router from '@/router'
-
-function Backend ({ getters }) {
-  return BackendReference[getters.getCurrentStorageConfig.id]
-}
+import Backend from '@/backend'
+import lastPromise from '@/utils/last-promise'
 
 const state = {}
 
@@ -20,108 +13,108 @@ const actions = {
 
   newNoteAction (context) {
     const note = new Note()
-    context.commit('addToReference', { notes: [note] })
-    // context.commit('addToFocus', { note })
-    // router.push(`/table/${note.config.id}`)
+    context.commit('addToNotespace', { note })
     return Promise.resolve(note)
   },
 
-  getNotesAction (context, payload) {
-    return Backend(context).getNotes().then(notes => {
-      context.commit('addToReference', { notes })
-      return notes
-    })
-  },
-
   getNoteAction (context, payload) {
-    const existingNote = NoteReference[payload.id]
-    if (existingNote) {
-      return Promise.resolve(existingNote)
+    const note = context.getters.getNoteById(payload.id)
+    if (note) {
+      return Promise.resolve(note)
     } else {
-      return Backend(context).getNote(payload.id)
+      return context
+        .dispatch('backendAction', {
+          action: 'getNote',
+          payload: payload.id
+        })
         .then(note => {
-          context.commit('addToReference', { notes: [note] })
+          context.commit('addToNotespace', { note })
           return note
+        })
+        .catch(error => {
+          if (error.status === 404) {
+            return context.dispatch('openModalAction', {
+              modal: {
+                header: 'Not found',
+                body: `Note ${payload.id} not found.`,
+                cancel: false
+              }
+            }).then(() => {
+              return Promise.reject(error)
+            })
+          } else {
+            console.warn('getNoteAction catch:', error)
+            return Promise.reject(error)
+          }
         })
     }
   },
 
-  saveNoteAction (context, payload) {
-    return lastPromise({
-      type: `saveNoteAction_${payload.note.config.id}`,
-      promise: Backend(context).postNote(payload.note)
-    }).then(note => {
-      context.commit('addToReference', { notes: [note] })
-      return Promise.resolve(note)
-    })
+  getNotesAction (context, payload) {
+    return context
+      .dispatch('backendAction', {
+        action: 'getNotes'
+      })
+      .then(notes => {
+        notes.forEach(note => {
+          context.commit('addToNotespace', { note })
+        })
+        return notes
+      })
+      .then(notes => notes.filter(note => note.topic.match(payload.topic)))
+      .catch(error => {
+        console.warn('getNotesAction error', error)
+      })
   },
 
-  saveNotesAction (context, payload) {
+  updateNotesAction (context, payload) {
+    context.commit('updateInNotespace', { notes: payload.notes })
     return Promise.all(payload.notes.map(note => {
-      return Backend(context).postNote(note)
-    })).then(notes => {
-      context.commit('addToReference', { notes })
-      return notes
+      return context.dispatch('backendAction', {
+        action: 'postNote',
+        payload: note
+      })
+    }))
+  },
+
+  updateNoteAction (context, payload) {
+    context.commit('updateInNotespace', { note: payload.note })
+    return lastPromise({
+      type: `updateNoteAction_${payload.note.id}`,
+      promise: context.dispatch('backendAction', {
+        action: 'postNote',
+        payload: payload.note
+      })
     })
   },
 
   openNoteAction (context, payload) {
-    const topic = context.getters.getContext
-    $router.push(`/note/${payload.note.config.id}${topic ? '?topic=' + topic : ''}`)
+    const noteId = payload.note.id
+    const topic = payload.context || context.getters.getContext
+    context.commit('addToTableFocus', { note: payload.note })
+    $router.push(`/note/${noteId}${topic ? '?topic=' + topic : ''}`)
   },
 
   deleteNotesAction (context, payload) {
-    return Promise.all(payload.notes.map(note => {
-      return Backend(context).deleteNote(note)
+    return Promise.all((payload.notes || [payload.note]).map(note => {
+      return context.dispatch('backendAction', {
+        action: 'deleteNote',
+        payload: note
+      })
     }))
   },
 
-  groupNotesAction (context, payload) {
-    return Promise.all(payload.groups.map(group => {
-      let notes, oldContext, newContext
-      if (group instanceof Group) {
-        notes = group.getItems()
-        oldContext = group.context.join(topicDelimiter)
-      } else {
-        notes = [group]
-        oldContext = group.topic
-      }
-      newContext = oldContext.split(topicDelimiter).concat(payload.topic).join(topicDelimiter)
-      context.commit('removeFromPool', { items: notes })
-      notes.forEach(note => {
-        note.topic = note.topic.replace(new RegExp(`^${oldContext}`), newContext)
-      })
-      return context.dispatch('saveNotesAction', { notes }).then(notes => {
-        context.commit('addToPool', {
-          items: notes,
-          depth: oldContext.split(topicDelimiter).length
-        })
-        return notes
-      })
-    })).catch(error => {
-      console.error('Group action failed', error)
-    })
+  backendAction (context, payload) {
+    return context.dispatch('getBackendAction')
+      .then(backend => backend[payload.action](payload.payload))
   },
 
-  ungroupNotesAction (context, payload) {
-    return Promise.all(payload.groups.map(group => {
-      const notes = group.getItems()
-      const oldTopic = group.context.concat(group.key).join(topicDelimiter)
-      const newTopic = group.context.join(topicDelimiter)
-      context.commit('removeFromPool', { items: notes })
-      notes.forEach(note => {
-        note.topic = note.topic.replace(new RegExp(`^${oldTopic}`), newTopic)
-      })
-      return context.dispatch('saveNotesAction', { notes }).then(notes => {
-        context.commit('addToPool', {
-          items: notes,
-          depth: newTopic.split(topicDelimiter).length
-        })
-        return notes
-      })
-    })).catch(error => {
-      console.error('Ungroup action failed:', error)
-    })
+  getBackendAction ({ getters }) {
+    if (!getters.getCurrentStorageConfig) {
+      return Promise.reject(new Error('No storage config'))
+    } else {
+      return Promise.resolve(Backend[getters.getCurrentStorageConfig.id])
+    }
   }
 }
 

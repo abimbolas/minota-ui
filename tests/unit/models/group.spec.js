@@ -8,7 +8,7 @@ import uuid from 'uuid/v1'
 
 const chance = new Chance()
 
-describe.only('Group', () => {
+describe('Group', () => {
   let g
 
   beforeEach(() => {

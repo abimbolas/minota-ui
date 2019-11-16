@@ -1,4 +1,4 @@
-import { createBackend, destroyBackend } from '@/backend/utils'
+import { createBackend, destroyBackend } from '@/backend'
 
 export default function (store) {
   const actions = {

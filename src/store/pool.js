@@ -1,51 +1,55 @@
-import { topicDelimiter } from '@/store/ui'
-import { extractItems } from '@/models/group'
+import Note from '@/models/note'
+import Notespace from '@/models/notespace'
+
 const state = {
+  pool: new Notespace(),
   orderBy: 'date',
   orderAsc: false
 }
 
 const getters = {
+  getPoolFocus: state => state.pool.focus,
+  getPoolNoteById: state => id => state.pool.getById('focus', id),
   getOrderBy: state => state.orderBy,
   getOrderAsc: state => state.orderAsc
 }
 
 const mutations = {
-  addToPool: () => {},
-  clearPool: () => {},
-  removeFromPool: () => {},
+  addToPoolFocus (state, payload) {
+    (payload.notes || [payload.note]).forEach(note => {
+      state.pool.addToFocus(note, {
+        extendFocusCapacity: true
+      })
+    })
+  },
+
+  clearPoolFocus (state) {
+    state.pool.clearFocus()
+  },
+
+  removeFromPoolFocus (state, payload) {
+    (payload.notes || [payload.note]).forEach(note => {
+      state.pool.removeFromFocus(note)
+    })
+  },
+
   setOrderBy (state, payload) {
     state.orderBy = payload.orderBy
   },
+
   setOrderAsc (state, payload) {
     state.orderAsc = payload.orderAsc
-  }
-}
-
-const actions = {
-  loadPoolAction (context, payload = {}) {
-    return context.dispatch('getNotesAction').then(notes => {
-      context.commit('clearPool')
-      const filtered = (payload.topic ? notes.filter(note => {
-        return note.topic.match(new RegExp(`^${payload.topic}`))
-      }) : notes)
-      context.commit('addToPool', {
-        items: filtered,
-        depth: payload.topic.split(topicDelimiter).filter(item => item).length
-      })
-      return filtered
-    })
   },
-  removeFromPoolAction (context, payload = {}) {
-    context.commit('removeFromPool', payload)
-    const notes = extractItems(payload.items)
-    return context.dispatch('deleteNotesAction', { notes })
+
+  recreatePoolState (state, payload) {
+    state.pool = new Notespace(payload.pool)
+    state.pool.focus = state.pool.focus.map(note => new Note(note))
+    state.pool.blur = state.pool.blur.map(note => new Note(note))
   }
 }
 
 export default {
   state,
   getters,
-  mutations,
-  actions
+  mutations
 }

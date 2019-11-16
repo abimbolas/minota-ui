@@ -1,139 +1,112 @@
-// import Backend from '@/backend'
-import Workspace from '@/models/workspace'
-// import Note from '@/models/note'
-// import { lastPromise } from '@/utils/last-promise'
-// import { BackendReference } from '@/reference'
-
-// function Backend ({ getters }) {
-//   return BackendReference[getters.getCurrentStorageConfig.id]
-// }
+/* eslint-disable brace-style */
+import merge from 'lodash/merge'
+import Note from '@/models/note'
+import Notespace from '@/models/notespace'
 
 const state = {
-  workspace: new Workspace(),
-  mode: 'view'
+  table: new Notespace()
 }
 
 const getters = {
-  isFocusEmpty: state => state.workspace.focus.length === 0,
-  getFocus: state => state.workspace.focus,
-  getBlur: state => state.workspace.blur
+  getTableFocus: state => state.table.focus,
+  isInTableFocus: state => note => state.table.isInFocus(note)
 }
 
 const mutations = {
-  addToFocus (state, payload) {
-    state.workspace.addToFocus(payload.note.config.id)
+  addToTableFocus (state, payload) {
+    (payload.notes || [payload.note]).forEach(note => {
+      state.table.addToFocus(note, {
+        extendFocusCapacity: payload.extendFocusCapacity
+      })
+    })
   },
 
-  addToBlur (state, payload) {
-    state.workspace.addToBlur(payload.note.config.id)
+  removeFromTableFocus (state, payload) {
+    (payload.notes || [payload.note]).forEach(note => {
+      state.table.removeFromFocus(note)
+    })
   },
 
-  removeFromFocus (state, payload) {
-    state.workspace.removeFromFocus(payload.note.config.id)
-  },
-
-  removeFromBlur (state, payload) {
-    state.workspace.removeFromBlur(payload.note.config.id)
-  },
-
-  clearFocus () {
-    state.workspace.clear('focus')
-  },
-
-  clearBlur () {
-    state.workspace.clear('blur')
-  },
-
-  blurFocus (state, payload) {
-    if (payload && payload.note) {
-      state.workspace.blurFocus(payload.note.config.id)
-    } else {
-      state.workspace.blurFocus()
-    }
-  },
-
-  focusBlur (state, payload) {
-    if (payload && payload.note) {
-      state.workspace.focusBlur(payload.note.config.id)
-    } else {
-      state.workspace.focusBlur()
-    }
+  recreateTableState (state, payload) {
+    state.table = new Notespace(payload.table)
+    state.table.focus = state.table.focus.map(note => new Note(note))
+    state.table.blur = state.table.blur.map(note => new Note(note))
   }
-}
-
-const actions = {
-  // newNoteAction (context) {
-  //   const note = new Note()
-  //   context.commit('addToFocus', { note })
-  //   context.commit('addToArchive', { notes: [ note ] })
-  //   context.commit('setFocusEdit')
-  //   return Promise.resolve(note)
-  // },
-
-  // getNoteAction (context, payload) {
-  //   return lastPromise({
-  //     type: `getNote${payload.id}`,
-  //     promise: Backend(context).getNote(payload.id)
-  //   }).then(note => {
-  //     context.commit('addToArchive', { notes: [note] })
-  //     return Promise.resolve(note)
-  //   })
-  // },
-
-  // focusNoteAction (context, payload) {
-  //   context.commit('addToFocus', payload)
-  // },
-
-  // blurNoteAction (context, payload) {
-  //   context.commit('addToBlur', payload)
-  // },
-  //
-  // clearTableAction (context) {
-  //   context.commit('clearFocus')
-  //   context.commit('clearBlur')
-  // },
-  //
-  // saveNoteAction (context, payload) {
-  //   return lastPromise({
-  //     type: `saveNote${payload.note.config.id}`,
-  //     promise: Backend(context).postNote(payload.note)
-  //   }).then(note => {
-  //     context.commit('addToArchive', { notes: [note] })
-  //     return Promise.resolve(note)
-  //   })
-  // },
-
-  // updateNoteContentAction (context, payload) {
-  //   return lastPromise({
-  //     type: `updateContent${payload.note.config.id}`,
-  //     promise: Backend.updateNote(payload.note)
-  //   })
-  // },
-
-  // deleteNoteAction (context, payload) {
-  //   context.commit('removeFromFocus', payload)
-  //   context.commit('removeFromBlur', payload)
-  //   context.commit('removeFromArchive', payload)
-  //   return Backend(context).deleteNote(payload.note)
-  // },
-  //
-  // closeNoteAction (context, payload) {
-  //   context.commit('removeFromFocus', payload)
-  //   context.commit('removeFromBlur', payload)
-  // },
-  //
-  // blurTableAction (context) {
-  //   context.commit('blurFocus')
-  // },
-  //
-  // focusBlurAction (context) {
-  //   context.commit('focusBlur')
-  // }
 }
 
 export default {
   state,
   getters,
-  mutations,
-  actions
+  mutations
+}
+
+export function tableRestoreState (state) {
+  return {
+    table: state.table
+      ? new Notespace(state.table)
+      : new Notespace()
+  }
+}
+
+export function tableNavigationGuard (store, to, from, next) {
+  // If we load app first time with this url
+  // e.g. /note/909-dfdf-89890/?topic=MyTopic, take it's topic as
+  // initial context
+  if (!from.name) {
+    store.commit('setContext', { context: to.query.topic || '' })
+    // next()
+  }
+
+  // If this is 'new' note, create one and redirect to it as usual
+  // + add context if any
+  if (to.params.noteId === 'new') {
+    store.dispatch('newNoteAction').then(note => {
+      store.commit('addToTableFocus', { note })
+      const context = store.getters.getContext
+      const route = merge({}, to)
+      route.params.noteId = note.id
+      if (route.query.topic === undefined && context) {
+        route.query.topic = context
+      }
+      delete route.path
+      next(route)
+    }).catch(error => {
+      console.warn('tableNavigationGuard error:', error)
+      next()
+    })
+  }
+
+  // If no noteId or topic specified, but we have one or both of them,
+  // add it to url
+  else if (to.params.noteId === undefined || to.query.topic === undefined) {
+    const note = store.getters.getTableFocus.slice(-1)[0]
+    const context = store.getters.getContext
+    const route = merge({}, to)
+    Object.keys(route)
+      .filter(key => ['name', 'params', 'query'].indexOf(key) < 0)
+      .forEach(key => {
+        delete route[key]
+      })
+    if (route.params.noteId === undefined && note) {
+      route.params.noteId = note.id
+    }
+    if (route.query.topic === undefined && context) {
+      route.query.topic = context
+    }
+    // If newly created route is the same as previous, just pass through,
+    // otherwise redirect to updated router
+    if (
+      route.params.noteId !== to.params.noteId ||
+      route.query.topic !== to.query.topic
+    ) {
+      next(route)
+    } else {
+      next()
+    }
+  }
+
+  // or just pass through
+  else {
+    next()
+  }
 }

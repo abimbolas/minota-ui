@@ -133,7 +133,7 @@ export default {
   padding-left 4px
   padding-right 4px
   min-height 56px
-  background-color background-color
+  background-color transparent
   box-shadow 0px 2px 10px 0px alpha(black, 0.0)
   display flex
   align-items center
@@ -146,6 +146,7 @@ export default {
     top 0px
     right 0px
     transform translateY(0)
+    background-color white
   &.hidden
     transform translateY(-100%)
   &.switch

@@ -160,11 +160,4 @@ export default {
   .minota-note-loader
     flex-grow 1
     min-width 0
-  .minota-bar
-    background-color white
-  @media (min-width screen-sm)
-    .minota-bar
-      background-color transparent
-      &.sticky
-        background-color white
 </style>

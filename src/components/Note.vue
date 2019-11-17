@@ -66,6 +66,9 @@ export default {
     },
     'content' (value) {
       this.setContentToNote(value)
+    },
+    'getContext' (value) {
+      this.setContentFromNote()
     }
   },
 

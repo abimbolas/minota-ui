@@ -48,6 +48,8 @@ body
   position relative
   min-height 100%
   overflow hidden
-  background-color background-color
   color alpha(black, high-emphasis)
+  background-color white
+  @media (min-width screen-sm)
+    background-color background-color
 </style>

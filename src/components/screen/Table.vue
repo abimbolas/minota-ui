@@ -9,13 +9,13 @@
           topic-breadcrumbs-component.title.text-overline(
             v-bind:topic="getContext"
             v-on:set-topic="openTopicInDrawer($event)")
-          router-link(to="/new" title="New note").button.icon-button
+          //- router-link(to="/new" title="New note").button.icon-button
             i.material-icons add
           router-link(to="/config" title="Setup storages").button.icon-button
             i.material-icons cloud_queue
 
     //-  Content
-    main.minota-screen-main
+    main#minota-screen-table.minota-screen-main
       template(v-if="getTableFocus.length")
         note-component(
           v-for="note in getTableFocus"
@@ -23,6 +23,9 @@
           v-bind:note="note")
       template(v-else)
         screen-quote-placeholder-component
+
+    fab-component(v-bind:target="'window'" v-if="!drawerOpened")
+      i.material-icons(v-on:click="createNewNote()") add
 
     //- Aside drawer
     drawer-pool-component(
@@ -35,6 +38,7 @@
 /* eslint-disable brace-style */
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import BarComponent from '@/components/Bar'
+import FabComponent from '@/components/Fab'
 import DrawerPoolComponent from '@/components/DrawerPool'
 import NoteComponent from '@/components/Note'
 import TopicBreadcrumbsComponent from '@/components/other/TopicBreadcrumbs'
@@ -45,6 +49,7 @@ export default {
 
   components: {
     BarComponent,
+    FabComponent,
     DrawerPoolComponent,
     NoteComponent,
     TopicBreadcrumbsComponent,
@@ -81,6 +86,11 @@ export default {
   watch: {
     'noteId' (noteId) {
       this.fetchNoteById(noteId)
+    },
+    'getContext' (context) {
+      // Compare context with topics of the focused notes and choose
+      // the most common topic from them (or none at all)
+      console.log('watch context:', context)
     }
   },
 
@@ -100,6 +110,8 @@ export default {
         actions[action.type](action.payload)
       }
     })
+    // Set capacity
+    this.setTableFocusCapacity({ capacity: 1 })
   },
 
   mounted () {
@@ -135,14 +147,23 @@ export default {
       this.drawerOpened = true
     },
 
+    createNewNote () {
+      console.log('new note', this.getContext)
+      this.newNoteAction().then(note => {
+        this.openNoteAction({ note })
+      })
+    },
+
     ...mapMutations([
       'addToTableFocus',
-      'removeFromTableFocus'
+      'removeFromTableFocus',
+      'setTableFocusCapacity'
     ]),
 
     ...mapActions([
       'getNoteAction',
-      'newNoteAction'
+      'newNoteAction',
+      'openNoteAction'
     ])
   }
 }
@@ -154,10 +175,28 @@ export default {
 .minota-table
   .minota-screen-main
     justify-content center
+    flex-wrap wrap
+
   .minota-note
     flex-grow 1
     min-width 0
-  .minota-note-loader
-    flex-grow 1
-    min-width 0
+
+    & + .minota-note
+      margin-top 1rem
+      position relative
+      &:before
+        content ''
+        display block
+        height 1px
+        position absolute
+        top -0.5rem
+        left 0
+        right 0
+        background-color border-color
+      @media (min-width screen-sm)
+        margin-top 0.5rem
+        &:before
+          content none
+      @media (min-width screen-md)
+        margin-top 1rem
 </style>

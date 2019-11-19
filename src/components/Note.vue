@@ -3,8 +3,7 @@
     v-bind:elevation="elevation"
     v-long-click="375"
     v-on:normal-click="onNormalClick($event)"
-    v-on:long-click="$emit('mode', 'menu')"
-  )
+    v-on:long-click="$emit('mode', 'menu')")
     editor-component.minota-note-editor(
       v-model="content"
       v-bind:focus-on="focusEventName"
@@ -53,6 +52,12 @@ export default {
   },
 
   computed: {
+    // isInContext () {
+    //   const context = this.getContext
+    //   const contextMatch = this.note.topic.match(new RegExp(`^${context}`))
+    //   return !context || (context && Boolean(contextMatch))
+    // },
+
     ...mapGetters([
       'getContext'
     ])
@@ -66,10 +71,10 @@ export default {
     },
     'content' (value) {
       this.setContentToNote(value)
-    },
-    'getContext' (value) {
-      this.setContentFromNote()
     }
+    // 'getContext' (value) {
+    //   this.setContentFromNote()
+    // }
   },
 
   created () {

@@ -98,7 +98,7 @@ export default {
     bottom 0
     left 0
     right 0
-    background-color gainsboro
+    background-color border-color
   &:last-child:after
     content none
 

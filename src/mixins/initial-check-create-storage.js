@@ -11,15 +11,16 @@ export default {
   created () {
     // Create corresponding Backends for all storage configs
     this.storageList.forEach(config => {
-      createBackend(config).then(() => {
-        console.log(
-          'Backend',
-          config.id,
-          config.topic,
-          config.storage.url,
-          'successfully created'
-        )
-      })
+      createBackend(config)
+      // .then(() => {
+      //   console.log(
+      //     'Backend',
+      //     config.id,
+      //     config.topic,
+      //     config.storage.url,
+      //     'successfully created'
+      //   )
+      // })
     })
   },
 

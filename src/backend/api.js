@@ -10,13 +10,13 @@ export default class BackendAPI {
   onReady () {}
   init () {
     return new Promise(resolve => {
-      console.log('Init Backend')
+      // console.log('Init Backend')
       resolve()
     })
   }
   destroy () {
     return new Promise(resolve => {
-      console.log('Destroy Backend')
+      // console.log('Destroy Backend')
       resolve()
     })
   }

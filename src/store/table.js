@@ -28,6 +28,10 @@ const mutations = {
 
   recreateTableState (state, payload) {
     state.table = new Notespace()
+  },
+
+  setTableFocusCapacity (state, payload) {
+    state.table.focusCapacity = payload.capacity
   }
 }
 

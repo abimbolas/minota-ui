@@ -52,12 +52,6 @@ export default {
   },
 
   computed: {
-    // isInContext () {
-    //   const context = this.getContext
-    //   const contextMatch = this.note.topic.match(new RegExp(`^${context}`))
-    //   return !context || (context && Boolean(contextMatch))
-    // },
-
     ...mapGetters([
       'getContext'
     ])
@@ -72,17 +66,26 @@ export default {
     'content' (value) {
       this.setContentToNote(value)
     }
-    // 'getContext' (value) {
-    //   this.setContentFromNote()
-    // }
   },
 
   created () {
     window.addEventListener('resize', this.updateElevation)
+    // React to context change
+    const mutations = {
+      setContext (payload) {
+        console.log('setContext', payload)
+      }
+    }
+    this.unsubscribeMutations = this.$store.subscribe(mutation => {
+      if (mutations[mutation.type]) {
+        mutations[mutation.type](mutation.payload)
+      }
+    })
   },
 
   beforeDestroy () {
     window.removeEventListener('resize', this.updateElevation)
+    this.unsubscribeMutations()
   },
 
   mounted () {
@@ -107,12 +110,15 @@ export default {
       }
     },
     setContentToNote (value) {
-      const update = this.note.clone()
-      update.editableContent = value
-      if (this.getContext) {
-        update.topic = `${this.getContext}${update.topic ? topicDelimiter + update.topic : ''}`
-      }
-      this.updateNoteAction({ note: update })
+      clearTimeout(this.updateNoteActionTimeout)
+      this.updateNoteActionTimeout = setTimeout(() => {
+        const update = this.note.clone()
+        update.editableContent = value
+        if (this.getContext) {
+          update.topic = `${this.getContext}${update.topic ? topicDelimiter + update.topic : ''}`
+        }
+        this.updateNoteAction({ note: update })
+      }, 1000)
     },
     setContentFromNote () {
       this.content = this.getContentFromNote()

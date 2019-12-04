@@ -22,13 +22,11 @@ const router = new Router({
     //
     {
       path: '/new',
-      name: 'new',
-      redirect: '/note/new'
+      name: 'new'
     },
     {
       path: '/table',
-      name: 'table',
-      redirect: '/note'
+      name: 'table'
     },
     //
     // Core

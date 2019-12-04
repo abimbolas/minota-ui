@@ -11,8 +11,8 @@ const actions = {
   // Core
   //
 
-  newNoteAction (context) {
-    const note = new Note()
+  newNoteAction (context, payload) {
+    const note = new Note(payload ? payload.note : undefined)
     context.commit('addToNotespace', { note })
     return Promise.resolve(note)
   },
@@ -61,7 +61,16 @@ const actions = {
         })
         return notes
       })
-      .then(notes => notes.filter(note => note.topic.match(payload.topic)))
+      .then(notes => notes.filter(note => {
+        // filter by topic:
+        // - no context topic
+        // - either equal
+        // - in context + ' /'
+        const noContext = !payload.topic
+        const isEqual = payload.topic === note.topic
+        const isInContext = note.topic.indexOf(`${payload.topic} /`) === 0
+        return noContext || isEqual || isInContext
+      }))
       .catch(error => {
         console.warn('getNotesAction error', error)
       })
@@ -90,9 +99,9 @@ const actions = {
 
   openNoteAction (context, payload) {
     const noteId = payload.note.id
-    const topic = payload.context || context.getters.getContext
+    context.commit('setContext', { context: payload.context || '' })
     context.commit('addToTableFocus', { note: payload.note })
-    $router.push(`/note/${noteId}${topic ? '?topic=' + topic : ''}`)
+    $router.push(`/note/${noteId}${payload.context ? '?topic=' + payload.context : ''}`)
   },
 
   deleteNotesAction (context, payload) {

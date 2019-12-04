@@ -86,22 +86,25 @@ export default {
   watch: {
     'noteId' (noteId) {
       this.fetchNoteById(noteId)
-    },
-    'getContext' (context) {
-      // Compare context with topics of the focused notes and choose
-      // the most common topic from them (or none at all)
-      console.log('watch context:', context)
     }
   },
 
   created () {
     const actions = {
-      // If note (in current focus) deleted somewhere (e.g in drawer), remove it from table
-      // also (with modal window).
       deleteNotesAction: payload => {
+        // If note (in current focus) deleted somewhere (e.g in drawer),
+        // remove it from table also.
         this.removeFromTableFocus({ notes: payload.notes })
         if (!this.getTableFocus.length) {
-          this.$router.replace({ name: 'note' })
+          const route = {
+            name: 'note'
+          }
+          if (this.getContext) {
+            route.query = {
+              topic: this.getContext
+            }
+          }
+          this.$router.push(route)
         }
       }
     }
@@ -148,10 +151,7 @@ export default {
     },
 
     createNewNote () {
-      console.log('new note', this.getContext)
-      this.newNoteAction().then(note => {
-        this.openNoteAction({ note })
-      })
+      this.$router.push('/new')
     },
 
     ...mapMutations([
@@ -162,8 +162,7 @@ export default {
 
     ...mapActions([
       'getNoteAction',
-      'newNoteAction',
-      'openNoteAction'
+      'newNoteAction'
     ])
   }
 }

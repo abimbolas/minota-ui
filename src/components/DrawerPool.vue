@@ -200,15 +200,10 @@ export default {
 
     onNewNote () {
       this.closeDrawer()
-      this.newNoteAction({
-        note: {
-          config: {
-            topic: this.context
-          }
-        }
-      }).then(note => {
-        this.openNoteAction({ note, context: this.context })
-      })
+      if (this.getContext !== this.context) {
+        this.setContext({ context: this.context })
+      }
+      this.$router.push('/new')
     },
 
     onDeleteNotes () {

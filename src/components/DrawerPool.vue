@@ -1,5 +1,5 @@
 <template lang="pug">
-  aside.minota-drawer.minota-drawer-pool(v-bind:class="{ 'active': toggle }")
+  aside.minota-drawer.minota-drawer-pool(v-bind:class="[mode, { 'active': toggle }]")
     .minota-drawer-backdrop(v-on:click="closeDrawer()")
     #minota-drawer-pool-body.minota-drawer-body(v-on:close="closeDrawer()")
       bar-component(v-bind:target="'minota-drawer-pool-body'" v-bind:position="'right'")
@@ -164,8 +164,7 @@ export default {
 
     onOpenNote (note) {
       this.exitMenuMode()
-      this.setContext({ context: this.context })
-      this.openNoteAction({ note })
+      this.openNoteAction({ note, context: this.context })
       this.closeDrawer()
     },
 
@@ -201,8 +200,15 @@ export default {
 
     onNewNote () {
       this.closeDrawer()
-      this.setContext({ context: this.context })
-      this.newNoteAction().then(note => this.openNoteAction({ note }))
+      this.newNoteAction({
+        note: {
+          config: {
+            topic: this.context
+          }
+        }
+      }).then(note => {
+        this.openNoteAction({ note, context: this.context })
+      })
     },
 
     onDeleteNotes () {
@@ -304,8 +310,8 @@ export default {
       'getNotesAction',
       'groupNotesAction',
       'newNoteAction',
-      'openNoteAction',
       'openModalAction',
+      'openNoteAction',
       'ungroupNotesAction',
       'updateNotesAction'
     ])
@@ -324,4 +330,7 @@ export default {
     @media (min-width screen-md)
       margin-left 0rem
       margin-right 0rem
+  &.menu
+    .minota-drawer-body
+      background-color background-color
 </style>

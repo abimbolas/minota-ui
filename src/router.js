@@ -62,7 +62,7 @@ const router = new Router({
 })
 
 router.beforeEach(function (to, from, next) {
-  if (to.name === 'note') {
+  if (to.name.match(/note|table|new/)) {
     tableNavigationGuard(store, to, from, next)
   } else {
     next()

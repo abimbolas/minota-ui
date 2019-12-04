@@ -42,7 +42,8 @@ export default {
 
   data () {
     return {
-      placeholder: 'Write down your mind'
+      placeholder: 'Write down your mind',
+      historyInitialized: false
     }
   },
 
@@ -50,6 +51,11 @@ export default {
     'value' (val) {
       if (val !== this.simplemde.value()) {
         this.simplemde.value(val)
+      }
+      // Remove first entry from undo history
+      if (val && !this.historyInitialized) {
+        this.simplemde.codemirror.getDoc().clearHistory()
+        this.historyInitialized = true
       }
     },
     'cursor' (val) {

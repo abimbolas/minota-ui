@@ -67,13 +67,24 @@ export default {
     this.unwatchClassesHidden = this.$watch(() => this.classes['hidden'], isHidden => {
       this.$emit('bar-toggle', !isHidden)
     })
+    // Watch resize
+    window.addEventListener('resize', this.refreshWidth)
   },
 
   beforeDestroy () {
     this.unwatchClassesHidden()
+    window.removeEventListener('resize', this.refreshWidth)
   },
 
   methods: {
+    refreshWidth () {
+      if (this.target !== 'window') {
+        window.requestAnimationFrame(() => {
+          this.styles.width = document.getElementById(this.target).getBoundingClientRect().width + 'px'
+        })
+      }
+    },
+
     handleScroll (event) {
       this.lastScroll = event.scrollTop
       if (
@@ -105,7 +116,7 @@ export default {
       }
 
       if (this.target !== 'window') {
-        this.styles.width = document.getElementById(this.target).getBoundingClientRect().width + 'px'
+        this.refreshWidth()
       }
 
       if (this.position === 'right') {

@@ -1,5 +1,5 @@
 <template lang="pug">
-  .button(v-on:click="toggleSortOptions()")
+  .toggle-sort-button.button(v-on:click="toggleSortOptions()")
     span Sort by {{ getOrderName }}
     i.material-icons(v-if="getOrderAsc") arrow_upward
     i.material-icons(v-else) arrow_downward

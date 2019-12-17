@@ -50,8 +50,10 @@ export default {
 @import '~@/assets/styles/variables'
 
 .minota-topic-breadcrumbs
-  display flex
+  // display flex
+  display block
   .topic-item
+    display inline-block
     &:after
       content '/'
       margin 0 0.25rem

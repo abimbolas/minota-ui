@@ -328,4 +328,10 @@ export default {
   &.menu
     .minota-drawer-body
       background-color background-color
+  .toggle-sort-button
+    flex-shrink 0
+  .minota-topic-breadcrumbs
+    display block
+    .topic-item
+      display inline-block
 </style>

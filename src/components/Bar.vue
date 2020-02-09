@@ -1,7 +1,7 @@
 <template lang="pug">
   .minota-bar-placeholder
     .minota-bar(
-      v-scroll:[target]="handleScroll"
+      v-scroll:[scrollTarget]="handleScroll"
       v-bind:style="styles"
       v-bind:class="classes")
       slot
@@ -24,7 +24,7 @@ export default {
       required: false,
       default: false
     },
-    target: {
+    scrollTarget: {
       type: String,
       required: false,
       default: 'window'
@@ -78,9 +78,9 @@ export default {
 
   methods: {
     refreshWidth () {
-      if (this.target !== 'window') {
+      if (this.scrollTarget !== 'window') {
         window.requestAnimationFrame(() => {
-          this.styles.width = document.getElementById(this.target).getBoundingClientRect().width + 'px'
+          this.styles.width = document.getElementById(this.scrollTarget).getBoundingClientRect().width + 'px'
         })
       }
     },
@@ -115,7 +115,7 @@ export default {
         this.classes['no-shadow'] = false
       }
 
-      if (this.target !== 'window') {
+      if (this.scrollTarget !== 'window') {
         this.refreshWidth()
       }
 

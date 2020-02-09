@@ -27,6 +27,7 @@ button
   line-height 20px
   padding 9px 12px 0px 12px
   user-select none
+  font-family sans-family
 
   &[disabled]
     pointer-events none
@@ -88,6 +89,9 @@ button
     i.material-icons
       line-height inherit
       display block
+
+    & + .icon-button
+      margin-left 0px
 
 // Form fields
 .form-field + .form-field

@@ -72,11 +72,11 @@ export default {
     padding-right 0.5rem
 
   @media (min-width screen-md)
-    margin-left -0.5rem
-    margin-right -0.5rem
+    margin-left 1rem
+    margin-right 1rem
     padding-left 0.5rem
     padding-right 0.5rem
-    width calc(100% + 1rem)
+    width calc(100% - 2rem)
 
   // &:not([disabled])
   //   cursor pointer

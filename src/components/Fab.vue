@@ -1,7 +1,7 @@
 <template lang="pug">
   button.minota-fab.bottom-right(
     elevation="8"
-    v-scroll:[target]="handleScroll"
+    v-scroll:[scrollTarget]="handleScroll"
     v-bind:class="classes"
   )
     slot
@@ -24,7 +24,7 @@ export default {
       required: false,
       default: false
     },
-    target: {
+    scrollTarget: {
       type: String,
       required: false,
       default: 'window'

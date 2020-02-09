@@ -2,45 +2,81 @@
   section.minota-screen.minota-table
     //- Header
     header.minota-screen-header
-      bar-component
+      bar-component(target="window")
         template
-          .button.icon-button(v-on:click="openTopicInDrawer('')")
+          .button.icon-button(v-on:click="openPoolDrawer()")
             i.material-icons folder_open
           topic-breadcrumbs-component.title.text-overline(
             v-bind:topic="getContext"
-            v-on:set-topic="openTopicInDrawer($event)")
+            v-on:set-topic="openPoolDrawer($event)")
           //- router-link(to="/new" title="New note").button.icon-button
             i.material-icons add
           router-link(to="/config" title="Setup storages").button.icon-button
             i.material-icons cloud_queue
+          .button.icon-button.media-max-sm(
+            title="Unpin"
+            v-if="getTableFocus[0] && getTableFocus[0].config.pinned"
+            v-on:click="onNoteMenuTogglePin(getTableFocus[0])")
+            i.material-icons star
+          .button.icon-button.media-max-sm(
+            v-on:click="openNoteMenuDrawer(getTableFocus[0])")
+            i.material-icons more_vert
 
     //-  Content
-    main#minota-screen-table.minota-screen-main
+    main.minota-screen-main
       template(v-if="getTableFocus.length")
         note-component(
           v-for="note in getTableFocus"
           v-bind:key="note.config.id"
-          v-bind:note="note")
+          v-bind:note="note"
+          v-on:open-menu="openNoteMenuDrawer(note)")
       template(v-else)
         screen-quote-placeholder-component
 
-    fab-component(v-bind:target="'window'" v-if="!drawerOpened")
+    fab-component(v-bind:target="'window'" v-if="!drawer.opened")
       i.material-icons(v-on:click="createNewNote()") add
 
-    //- Aside drawer
-    drawer-pool-component(
-      v-bind:topic="drawerTopic"
-      v-bind:toggle="drawerOpened"
-      v-on:toggle="drawerOpened = $event")
+    drawer-component(
+      v-bind:position="drawer.position"
+      v-bind:opened="drawer.opened"
+      v-on:opened="drawer.opened = $event"
+      id="table-drawer")
+      template(v-if="drawer.type === 'pool'")
+        pool-component(
+          v-bind:topic="poolTopic"
+          v-on:opened="drawer.opened = $event"
+          v-on:topic="poolTopic = $event"
+          scroll-target="table-drawer"
+          position="right")
+      template(v-if="drawer.type === 'menu'")
+          menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="!getTableFocus[0].config.pinned")
+            template(v-slot:icon)
+              i.material-icons star_border
+            template(v-slot:title)
+              span Pin
+          menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="getTableFocus[0].config.pinned")
+            template(v-slot:icon)
+              i.material-icons star
+            template(v-slot:title)
+              span Unpin
+          menu-item-component(v-on:click="onNoteMenuDelete()")
+            template(v-slot:icon)
+              i.material-icons delete_outline
+            template(v-slot:title)
+              span Delete
 </template>
 
 <script>
 /* eslint-disable brace-style */
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import BarComponent from '@/components/Bar'
-import FabComponent from '@/components/Fab'
+import DrawerComponent from '@/components/Drawer'
 import DrawerPoolComponent from '@/components/DrawerPool'
+import FabComponent from '@/components/Fab'
+import MenuComponent from '@/components/Menu'
+import MenuItemComponent from '@/components/MenuItem'
 import NoteComponent from '@/components/Note'
+import PoolComponent from '@/components/Pool'
 import TopicBreadcrumbsComponent from '@/components/other/TopicBreadcrumbs'
 import ScreenQuotePlaceholderComponent from '@/components/other/ScreenQuotePlaceholder'
 
@@ -49,9 +85,13 @@ export default {
 
   components: {
     BarComponent,
-    FabComponent,
+    DrawerComponent,
     DrawerPoolComponent,
+    FabComponent,
+    MenuItemComponent,
+    MenuComponent,
     NoteComponent,
+    PoolComponent,
     TopicBreadcrumbsComponent,
     ScreenQuotePlaceholderComponent
   },
@@ -71,8 +111,12 @@ export default {
 
   data () {
     return {
-      drawerTopic: '',
-      drawerOpened: false
+      poolTopic: '',
+      drawer: {
+        type: '',
+        opened: false,
+        position: 'left'
+      }
     }
   },
 
@@ -145,13 +189,46 @@ export default {
       })
     },
 
-    openTopicInDrawer (topic) {
-      this.drawerTopic = topic
-      this.drawerOpened = true
+    openNoteMenuDrawer (note) {
+      this.noteForMenu = note
+      this.drawer = {
+        type: 'menu',
+        opened: true,
+        position: 'top'
+      }
+    },
+
+    openPoolDrawer (topic = '') {
+      this.poolTopic = topic
+      this.drawer = {
+        type: 'pool',
+        opened: true,
+        position: 'right'
+      }
+    },
+
+    closeDrawer () {
+      this.noteMenu = null
+      this.poolTopic = ''
+      this.drawer = {
+        opened: false
+      }
     },
 
     createNewNote () {
       this.$router.push('/new')
+    },
+
+    onNoteMenuTogglePin (note) {
+      this.closeDrawer()
+      const update = note ? note.clone() : this.noteForMenu.clone()
+      update.config.pinned = !update.config.pinned
+      this.updateNoteAction({ note: update })
+    },
+
+    onNoteMenuDelete () {
+      this.closeDrawer()
+      console.log('delete note', this.noteForMenu)
     },
 
     ...mapMutations([
@@ -162,14 +239,15 @@ export default {
 
     ...mapActions([
       'getNoteAction',
-      'newNoteAction'
+      'newNoteAction',
+      'updateNoteAction'
     ])
   }
 }
 </script>
 
 <style lang="stylus">
-@import '~@/assets/styles/variables'
+@import '~@/assets/styles/everything'
 
 .minota-table
   .minota-screen-main

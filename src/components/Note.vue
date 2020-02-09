@@ -4,6 +4,19 @@
     v-long-click="375"
     v-on:normal-click="onNormalClick($event)"
     v-on:long-click="$emit('mode', 'menu')")
+    //- Actions
+    .minota-note-actions
+      .button.icon-button(
+        title="Unpin"
+        v-if="note.config.pinned"
+        v-on:click="unpinNote()")
+        i.material-icons star
+      .button.icon-button(
+        title="Menu"
+        v-on:click="openMenu()")
+        i.material-icons more_vert
+
+    //- Editor
     editor-component.minota-note-editor(
       v-model="content"
       v-bind:focus-on="focusEventName"
@@ -109,6 +122,7 @@ export default {
         return this.note.editableContent
       }
     },
+
     setContentToNote (value) {
       clearTimeout(this.updateNoteActionTimeout)
       this.updateNoteActionTimeout = setTimeout(() => {
@@ -120,9 +134,21 @@ export default {
         this.updateNoteAction({ note: update })
       }, 1000)
     },
+
     setContentFromNote () {
       this.content = this.getContentFromNote()
     },
+
+    openMenu () {
+      this.$emit('open-menu', this.note)
+    },
+
+    unpinNote () {
+      const update = this.note.clone()
+      update.config.pinned = !update.config.pinned
+      this.updateNoteAction({ note: update })
+    },
+
     resetCursor () {
       // Set cursor to edit content (2nd line), not topic
       if (this.note.topic) {
@@ -137,9 +163,11 @@ export default {
         }
       }
     },
+
     onNormalClick ($event) {
       bus.$emit(this.focusEventName)
     },
+
     updateElevation () {
       if (breakpoint.min.sm) {
         this.elevation = 2
@@ -147,6 +175,7 @@ export default {
         this.elevation = 0
       }
     },
+
     ...mapActions([
       'updateNoteAction'
     ])
@@ -184,11 +213,21 @@ export default {
     z-index 1
 
   .minota-note-actions
-    margin-bottom 0.0rem
-    margin-top -0.5rem
+    display none
     text-align right
-    display flex
-    justify-content center
+    justify-content flex-end
     align-items center
     z-index 2
+    @media (min-width screen-sm)
+      display flex
+      margin-top calc(-2.5rem + 12px)
+      margin-right calc(-3rem + 12px)
+    @media (min-width screen-md)
+      // display flex
+      margin-top calc(-3rem + 12px)
+      margin-right calc(-4rem + 12px)
+    @media (min-width screen-lg)
+      // display flex
+      margin-top calc(-4rem + 12px)
+      margin-right calc(-5rem + 12px)
 </style>

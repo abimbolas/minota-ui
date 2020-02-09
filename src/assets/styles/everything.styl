@@ -1,5 +1,6 @@
 @import "variables"
 @import "material"
+@import "typography"
 
 /* App Preloader */
 #app-preloader
@@ -28,43 +29,10 @@
     @media (min-width screen-md)
       padding 0.25rem 1rem 1rem 1rem
 
-// Drawer
-.minota-drawer
-  position fixed
-  top 0
-  right 0
-  bottom 0
-  left 0
-  z-index drawer-index
-
-  display flex
-  visibility hidden
-  pointer-events none
-  &.active
-    pointer-events all
-    visibility visible
-
-  .minota-drawer-backdrop
-    position absolute
-    left 0
-    right 0
-    bottom 0
-    top 0
-    z-index 0
-    background-color backdrop-color
-
-  .minota-drawer-body
-    @extend .elevation-8
-    position relative
-    z-index 2
-    background-color white
-    width 100%
-    height 100%
-    overflow auto
-    max-width 480px
-    margin 0 0 0 auto
-    padding 0
-    z-index 1
+// Media
+.media-max-sm
+  @media (min-width screen-sm)
+    display none !important
 
 // Line after
 .line-after

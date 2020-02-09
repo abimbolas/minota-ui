@@ -5,8 +5,6 @@
     v-bind:class="{ 'selected': selected }")
     //- Leaf item
     template(v-if="note")
-      div.icon-button.button(slot="secondary-action" v-if="note.config.pinned")
-        i.material-icons star
       div(
         slot="title"
         v-if="noteTopic") {{ noteTopic }}
@@ -17,6 +15,8 @@
       div(slot="secondary-action" v-if="isMenuMode")
         i.material-icons(v-if="selected") check_circle
         i.material-icons(v-else) radio_button_unchecked
+      div(slot="secondary-action" v-if="note.config.pinned && !isMenuMode")
+        i.material-icons star
     //- Group item
     template(v-if="group")
       div(slot="overline") {{ groupTopic }} ({{ numberOfNotes }})
@@ -117,4 +117,6 @@ export default {
   &.selected
     background-color white
     @extend .elevation-2
+  &:hover
+    background-color background-hover-color
 </style>

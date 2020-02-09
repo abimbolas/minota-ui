@@ -2,9 +2,7 @@
   screen-component.minota-config
     template(slot="bar")
       router-link.button.icon-button(to="/table" title="Table")
-        i.material-icons home
-      router-link(to="/notes" title="List notes").button.icon-button
-        i.material-icons folder_open
+        i.material-icons arrow_back
       .title
       .button.icon-button(v-on:click="addStorage()" title="Add storage")
         i.material-icons add

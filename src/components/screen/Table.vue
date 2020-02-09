@@ -4,15 +4,15 @@
     header.minota-screen-header
       bar-component(target="window")
         template
-          .button.icon-button(v-on:click="openPoolDrawer()")
-            i.material-icons folder_open
+          .button.icon-button(v-on:click="openAppMenuDrawer()")
+            i.material-icons menu
           topic-breadcrumbs-component.title.text-overline(
             v-bind:topic="getContext"
             v-on:set-topic="openPoolDrawer($event)")
           //- router-link(to="/new" title="New note").button.icon-button
             i.material-icons add
-          router-link(to="/config" title="Setup storages").button.icon-button
-            i.material-icons cloud_queue
+          .button.icon-button(v-on:click="openPoolDrawer()")
+            i.material-icons folder_open
           .button.icon-button.media-max-sm(
             title="Unpin"
             v-if="getTableFocus[0] && getTableFocus[0].config.pinned"
@@ -49,22 +49,42 @@
           v-on:topic="poolTopic = $event"
           scroll-target="table-drawer"
           position="right")
+
+      template(v-if="drawer.type === 'app'")
+        router-link.no-style(to="/table" title="Setup storages")
+          menu-item-component
+            template(v-slot:icon)
+              i.material-icons edit
+            template(v-slot:title)
+              span Table
+        router-link.no-style(to="/config" title="Setup storages")
+          menu-item-component
+            template(v-slot:icon)
+              i.material-icons cloud_queue
+            template(v-slot:title)
+              span Config
+        menu-item-component
+          template(v-slot:icon)
+            i.material-icons folder_open
+          template(v-slot:title)
+            span Notes
+
       template(v-if="drawer.type === 'menu'")
-          menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="!getTableFocus[0].config.pinned")
-            template(v-slot:icon)
-              i.material-icons star_border
-            template(v-slot:title)
-              span Pin
-          menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="getTableFocus[0].config.pinned")
-            template(v-slot:icon)
-              i.material-icons star
-            template(v-slot:title)
-              span Unpin
-          menu-item-component(v-on:click="onNoteMenuDelete()")
-            template(v-slot:icon)
-              i.material-icons delete_outline
-            template(v-slot:title)
-              span Delete
+        menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="!getTableFocus[0].config.pinned")
+          template(v-slot:icon)
+            i.material-icons star_border
+          template(v-slot:title)
+            span Pin
+        menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="getTableFocus[0].config.pinned")
+          template(v-slot:icon)
+            i.material-icons star
+          template(v-slot:title)
+            span Unpin
+        menu-item-component(v-on:click="onNoteMenuDelete()")
+          template(v-slot:icon)
+            i.material-icons delete_outline
+          template(v-slot:title)
+            span Delete
 </template>
 
 <script>
@@ -72,7 +92,6 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import BarComponent from '@/components/Bar'
 import DrawerComponent from '@/components/Drawer'
-import DrawerPoolComponent from '@/components/DrawerPool'
 import FabComponent from '@/components/Fab'
 import MenuComponent from '@/components/Menu'
 import MenuItemComponent from '@/components/MenuItem'
@@ -87,7 +106,6 @@ export default {
   components: {
     BarComponent,
     DrawerComponent,
-    DrawerPoolComponent,
     FabComponent,
     MenuItemComponent,
     MenuComponent,
@@ -209,12 +227,18 @@ export default {
       }
     },
 
+    openAppMenuDrawer () {
+      this.drawer = {
+        type: 'app',
+        opened: true,
+        position: 'left'
+      }
+    },
+
     closeDrawer () {
       this.noteForMenu = null
-      this.poolTopic = ''
-      this.drawer = {
-        opened: false
-      }
+      // this.poolTopic = ''
+      this.drawer.opened = false
     },
 
     createNewNote () {

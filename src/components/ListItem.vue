@@ -132,7 +132,9 @@ export default {
     .material-icons
     .text-button
       display block
-      color alpha(black, medium-emphasis)
+      color alpha(black, high-emphasis)
+    .icon-button
+      margin-right -12px
 
   .meta
     margin-top 1rem

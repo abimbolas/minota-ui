@@ -145,7 +145,7 @@ export default {
 
     unpinNote () {
       const update = this.note.clone()
-      update.config.pinned = !update.config.pinned
+      update.config.pinned = false
       this.updateNoteAction({ note: update })
     },
 

@@ -33,6 +33,7 @@
     m-linear-progress(v-bind:open="isLoading" indeterminate)
 
     note-list-component(
+      v-if="!isLoading"
       v-bind:list="pool"
       v-bind:topic="context"
       v-bind:mode="mode" v-on:mode="mode = $event"

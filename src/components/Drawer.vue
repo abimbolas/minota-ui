@@ -1,8 +1,10 @@
 <template lang="pug">
   .minota-drawer(v-bind:class="{ 'active': opened }")
-    .minota-drawer-backdrop(v-on:click="closeDrawer()")
-    .minota-drawer-body(v-bind:position="position" v-bind:id="id")
-      slot
+    transition(name="fade")
+      .minota-drawer-backdrop(v-on:click="closeDrawer()" v-show="opened")
+    transition(name="slide")
+      .minota-drawer-body(v-bind:position="position" v-bind:id="id" v-show="opened")
+        slot
 </template>
 
 <script>
@@ -38,11 +40,6 @@ export default {
 @import '~@/assets/styles/everything'
 
 .minota-drawer
-  visibility hidden
-  pointer-events none
-  &.active
-    pointer-events all
-    visibility visible
   .minota-drawer-backdrop
     position fixed
     left 0
@@ -51,13 +48,23 @@ export default {
     bottom 0
     z-index drawer-index - 1
     background-color backdrop-color
+    &.fade-enter
+    &.fade-leave-to
+      opacity 0
+    &.fade-enter-to
+    &.fade-leave
+      opacity 1
+    &.fade-enter-active
+    &.fade-leave-active
+      transition all 0.2s ease-out
 
   .minota-drawer-body
     @extend .elevation-8
     position fixed
     z-index drawer-index
-    background-color background-color
+    background-color white
     overflow-y auto
+    transition all 0.3s ease-out
 
     &[position="left"]
       left 0
@@ -88,4 +95,30 @@ export default {
       right 0
       bottom 0
       min-height 1rem
+
+    &.slide-enter[position="left"]
+    &.slide-leave-to[position="left"]
+      transform translate3d(-100%, 0, 0)
+    &.slide-enter[position="right"]
+    &.slide-leave-to[position="right"]
+      transform translate3d(100%, 0, 0)
+    &.slide-enter[position="top"]
+    &.slide-leave-to[position="top"]
+      transform translate3d(0, -100%, 0)
+    &.slide-enter[position="bottom"]
+    &.slide-leave-to[position="bottom"]
+      transform translate3d(0, 100%, 0)
+    &.slide-enter-to[position="left"]
+    &.slide-leave[position="left"]
+    &.slide-enter-to[position="right"]
+    &.slide-leave[position="right"]
+    &.slide-enter-to[position="top"]
+    &.slide-leave[position="top"]
+    &.slide-enter-to[position="bottom"]
+    &.slide-leave[position="bottom"]
+      transform translate3d(0, 0, 0)
+    &.slide-enter-active
+      transition transform 0.3s ease
+    &.slide-leave-active
+      transition transform 0.2s ease
 </style>

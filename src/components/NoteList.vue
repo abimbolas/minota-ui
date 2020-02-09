@@ -83,8 +83,15 @@ export default {
         .sort((a, b) => {
           const sortPropA = a.leaf.config[this.orderBy]
           const sortPropB = b.leaf.config[this.orderBy]
-          let result = sortPropA > sortPropB ? 1 : (sortPropA < sortPropB ? -1 : 0)
-          return this.orderAsc ? (-1 * result) : result
+          console.log('sort', a.leaf.config.pinned, b.leaf.config.pinned)
+          if (a.leaf.config.pinned && !b.leaf.config.pinned) {
+            return -1
+          } else if (!a.leaf.config.pinned && b.leaf.config.pinned) {
+            return 1
+          } else {
+            let result = sortPropA > sortPropB ? 1 : (sortPropA < sortPropB ? -1 : 0)
+            return this.orderAsc ? (-1 * result) : result
+          }
         })
     },
 
@@ -105,18 +112,28 @@ export default {
         .sort((a, b) => {
           let sortPropA
           let sortPropB
+          let pinnedA
+          let pinnedB
           if (a.leaf) {
             sortPropA = a.leaf.config[this.orderBy]
+            pinnedA = a.leaf.config.pinned
           } else {
             sortPropA = a.calcItemProp(item => item.config[this.orderBy])
           }
           if (b.leaf) {
             sortPropB = b.leaf.config[this.orderBy]
+            pinnedB = b.leaf.config.pinned
           } else {
             sortPropB = b.calcItemProp(item => item.config[this.orderBy])
           }
-          let result = sortPropA > sortPropB ? 1 : (sortPropA < sortPropB ? -1 : 0)
-          return this.orderAsc ? (-1 * result) : result
+          if (pinnedA && !pinnedB) {
+            return -1
+          } else if (!pinnedA && pinnedB) {
+            return 1
+          } else {
+            let result = sortPropA > sortPropB ? 1 : (sortPropA < sortPropB ? -1 : 0)
+            return this.orderAsc ? (-1 * result) : result
+          }
         })
     }
   },

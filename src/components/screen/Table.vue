@@ -19,6 +19,7 @@
             v-on:click="onNoteMenuTogglePin(getTableFocus[0])")
             i.material-icons star
           .button.icon-button.media-max-sm(
+            v-if="getTableFocus[0]"
             v-on:click="openNoteMenuDrawer(getTableFocus[0])")
             i.material-icons more_vert
 
@@ -112,6 +113,7 @@ export default {
   data () {
     return {
       poolTopic: '',
+      noteForMenu: null,
       drawer: {
         type: '',
         opened: false,
@@ -208,7 +210,7 @@ export default {
     },
 
     closeDrawer () {
-      this.noteMenu = null
+      this.noteForMenu = null
       this.poolTopic = ''
       this.drawer = {
         opened: false
@@ -220,10 +222,10 @@ export default {
     },
 
     onNoteMenuTogglePin (note) {
-      this.closeDrawer()
       const update = note ? note.clone() : this.noteForMenu.clone()
       update.config.pinned = !update.config.pinned
       this.updateNoteAction({ note: update })
+      this.closeDrawer()
     },
 
     onNoteMenuDelete () {

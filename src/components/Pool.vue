@@ -201,7 +201,6 @@ export default {
 
     closePool () {
       this.exitMenuMode()
-      console.log('$emit opened false')
       this.$emit('opened', false)
     },
 

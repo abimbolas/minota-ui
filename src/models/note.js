@@ -8,7 +8,8 @@ export default class Note extends GroupItemInterface {
     this.config = {
       id: uuid(),
       date: new Date(),
-      topic: ''
+      topic: '',
+      pinned: false
     }
     this.editableContent = content // initially parses content with topic
     this.merge({ config }) // overwrites topic, if present

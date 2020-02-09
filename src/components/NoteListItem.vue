@@ -5,6 +5,8 @@
     v-bind:class="{ 'selected': selected }")
     //- Leaf item
     template(v-if="note")
+      div.icon-button.button(slot="secondary-action" v-if="note.config.pinned")
+        i.material-icons star
       div(
         slot="title"
         v-if="noteTopic") {{ noteTopic }}

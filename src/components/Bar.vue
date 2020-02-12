@@ -33,6 +33,16 @@ export default {
       type: String,
       required: false,
       default: 'left'
+    },
+    extended: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    extendedOnSticky: {
+      type: [Boolean, String],
+      required: false,
+      default: false
     }
   },
 
@@ -40,6 +50,7 @@ export default {
     return {
       classes: {
         'sticky': false,
+        'extended': false,
         'no-shadow': false,
         'hidden': false,
         'switch': false
@@ -63,6 +74,7 @@ export default {
   },
 
   created () {
+    this.classes['extended'] = this.extended
     // Watch bar toggling
     this.unwatchClassesHidden = this.$watch(() => this.classes['hidden'], isHidden => {
       this.$emit('bar-toggle', !isHidden)
@@ -92,6 +104,7 @@ export default {
         event.scrollTop - event.delta <= this.breakpoint
       ) {
         this.classes['sticky'] = true
+        this.classes['extended'] = this.extended || this.extendedOnSticky
         this.classes['hidden'] = true
         this.classes['switch'] = true
       } else {
@@ -106,6 +119,7 @@ export default {
 
       if (event.scrollTop < 2 && event.delta < 0) {
         this.classes['sticky'] = false
+        this.classes['extended'] = this.extended
         this.classes['hidden'] = false
       }
 
@@ -141,14 +155,15 @@ export default {
 .minota-bar
   box-sizing border-box
   transition transform 0.25s, box-shadow 0.25s
-  padding-left 4px
-  padding-right 4px
-  min-height 56px
+  padding 4px
   background-color transparent
   box-shadow 0px 2px 10px 0px alpha(black, 0.0)
   display flex
-  align-items center
+  align-items flex-start
   z-index bar-index
+  min-height 56px
+  &.extended
+    min-height 128px
 
   &.sticky
     box-shadow 0px 2px 10px 0px alpha(black, 0.25)
@@ -168,8 +183,14 @@ export default {
   .title
     flex-grow 1
     padding 0 16px
+    align-self center
     &:first-child
       padding-left 12px
+
+  &.extended
+    .title
+      align-self flex-end
+      margin-bottom 1.25rem
 
   .icon-button
     flex-basis 48px
@@ -177,5 +198,4 @@ export default {
     cursor pointer
     & + .icon-button
       margin-left 0
-
 </style>

@@ -2,15 +2,17 @@
   section.minota-screen.minota-table
     //- Header
     header.minota-screen-header
-      bar-component(target="window")
+      bar-component(
+        target="window"
+        v-bind:extended-on-sticky="focusedNoteTitle")
         template
           .button.icon-button(v-on:click="openAppMenuDrawer()")
             i.material-icons menu
-          topic-breadcrumbs-component.title.text-overline(
-            v-bind:topic="getContext"
-            v-on:set-topic="openPoolDrawer($event)")
-          //- router-link(to="/new" title="New note").button.icon-button
-            i.material-icons add
+          .title
+            topic-breadcrumbs-component.text-overline(
+              v-bind:topic="getContext"
+              v-on:set-topic="openPoolDrawer($event)")
+            .topic.text-h6(v-if="focusedNoteTitle") {{ focusedNoteTitle }}
           .button.icon-button(v-on:click="openPoolDrawer()")
             i.material-icons folder_open
           .button.icon-button.media-max-sm(
@@ -38,53 +40,60 @@
       i.material-icons(v-on:click="createNewNote()") add
 
     drawer-component(
-      v-bind:position="drawer.position"
-      v-bind:opened="drawer.opened"
-      v-on:opened="drawer.opened = $event"
-      id="table-drawer")
-      template(v-if="drawer.type === 'pool'")
-        pool-component(
-          v-bind:topic="poolTopic"
-          v-on:opened="drawer.opened = $event"
-          v-on:topic="poolTopic = $event"
-          scroll-target="table-drawer"
-          position="right")
+      position="right"
+      v-bind:opened="drawerPoolOpened"
+      v-on:opened="drawerPoolOpened = $event"
+      id="pool-drawer")
+      pool-component(
+        v-bind:topic="poolTopic"
+        v-on:opened="drawerPoolOpened = $event"
+        v-on:topic="poolTopic = $event"
+        scroll-target="pool-drawer"
+        position="right")
 
-      template(v-if="drawer.type === 'app'")
-        router-link.no-style(to="/table" title="Setup storages")
-          menu-item-component
-            template(v-slot:icon)
-              i.material-icons edit
-            template(v-slot:title)
-              span Table
-        router-link.no-style(to="/config" title="Setup storages")
-          menu-item-component
-            template(v-slot:icon)
-              i.material-icons cloud_queue
-            template(v-slot:title)
-              span Config
+    drawer-component(
+      position="left"
+      v-bind:opened="drawerAppMenuOpened"
+      v-on:opened="drawerAppMenuOpened = $event"
+      id="app-menu-drawer")
+      router-link.no-style(to="/table" title="Setup storages")
         menu-item-component
           template(v-slot:icon)
-            i.material-icons folder_open
+            i.material-icons edit
           template(v-slot:title)
-            span Notes
+            span Table
+      router-link.no-style(to="/config" title="Setup storages")
+        menu-item-component
+          template(v-slot:icon)
+            i.material-icons cloud_queue
+          template(v-slot:title)
+            span Config
+      menu-item-component
+        template(v-slot:icon)
+          i.material-icons folder_open
+        template(v-slot:title)
+          span Notes
 
-      template(v-if="drawer.type === 'menu'")
-        menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="!getTableFocus[0].config.pinned")
-          template(v-slot:icon)
-            i.material-icons star_border
-          template(v-slot:title)
-            span Pin
-        menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="getTableFocus[0].config.pinned")
-          template(v-slot:icon)
-            i.material-icons star
-          template(v-slot:title)
-            span Unpin
-        menu-item-component(v-on:click="onNoteMenuDelete()")
-          template(v-slot:icon)
-            i.material-icons delete_outline
-          template(v-slot:title)
-            span Delete
+    drawer-component(
+      position="top"
+      v-bind:opened="drawerNoteMenuOpened"
+      v-on:opened="drawerNoteMenuOpened = $event"
+      id="note-menu-drawer")
+      menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="!getTableFocus[0] || !getTableFocus[0].config.pinned")
+        template(v-slot:icon)
+          i.material-icons star_border
+        template(v-slot:title)
+          span Pin
+      menu-item-component(v-on:click="onNoteMenuTogglePin()" v-if="getTableFocus[0] && getTableFocus[0].config.pinned")
+        template(v-slot:icon)
+          i.material-icons star
+        template(v-slot:title)
+          span Unpin
+      menu-item-component(v-on:click="onNoteMenuDelete()")
+        template(v-slot:icon)
+          i.material-icons delete_outline
+        template(v-slot:title)
+          span Delete
 </template>
 
 <script>
@@ -132,15 +141,24 @@ export default {
     return {
       poolTopic: '',
       noteForMenu: null,
+      isBarSticky: false,
       drawer: {
         type: '',
         opened: false,
         position: 'left'
-      }
+      },
+      drawerNoteMenuOpened: false,
+      drawerAppMenuOpened: false,
+      drawerPoolOpened: false
     }
   },
 
   computed: {
+    focusedNoteTitle () {
+      return this.getTableFocus[0] &&
+        this.getTableFocus[0].topic !== this.getContext &&
+        this.getTableFocus[0].path.slice(-1)[0]
+    },
     ...mapGetters([
       'getContext',
       'getTableFocus'
@@ -211,34 +229,16 @@ export default {
 
     openNoteMenuDrawer (note) {
       this.noteForMenu = note
-      this.drawer = {
-        type: 'menu',
-        opened: true,
-        position: 'top'
-      }
+      this.drawerNoteMenuOpened = true
     },
 
     openPoolDrawer (topic = '') {
       this.poolTopic = topic
-      this.drawer = {
-        type: 'pool',
-        opened: true,
-        position: 'right'
-      }
+      this.drawerPoolOpened = true
     },
 
     openAppMenuDrawer () {
-      this.drawer = {
-        type: 'app',
-        opened: true,
-        position: 'left'
-      }
-    },
-
-    closeDrawer () {
-      this.noteForMenu = null
-      // this.poolTopic = ''
-      this.drawer.opened = false
+      this.drawerAppMenuOpened = true
     },
 
     createNewNote () {
@@ -249,11 +249,11 @@ export default {
       const update = note ? note.clone() : this.noteForMenu.clone()
       update.config.pinned = !update.config.pinned
       this.updateNoteAction({ note: update })
-      this.closeDrawer()
+      this.drawerNoteMenuOpened = false
     },
 
     onNoteMenuDelete () {
-      this.closeDrawer()
+      this.drawerNoteMenuOpened = false
       console.log('delete note', this.noteForMenu)
     },
 
@@ -276,6 +276,16 @@ export default {
 @import '~@/assets/styles/everything'
 
 .minota-table
+  .minota-bar
+    .topic
+      display none
+    &.extended
+      .topic
+        display block
+        font-weight 500
+      .minota-topic-breadcrumbs
+        line-height 30px
+
   .minota-screen-main
     justify-content center
     flex-wrap wrap

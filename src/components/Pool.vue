@@ -118,8 +118,14 @@ export default {
 
   watch: {
     'topic' (topic) {
-      this.context = topic
-      this.fetchTopic(this.context)
+      if (topic !== this.context) {
+        this.context = topic
+        clearTimeout(this.fetchTopicTimeout)
+        this.isLoading = true
+        this.fetchTopicTimeout = setTimeout(() => {
+          this.fetchTopic(this.context)
+        }, 150)
+      }
     },
     'context' (context) {
       this.$emit('topic', context)
@@ -128,9 +134,6 @@ export default {
       if (!selection.length) {
         this.mode = ''
       }
-    },
-    'toggle' () {
-      this.fetchTopic(this.context)
     }
   },
 
@@ -328,6 +331,24 @@ export default {
   .minota-pool
     width 100%
 
+  .slide-enter
+  .slide-leave-to
+    .minota-fab
+      opacity 0
+
+  .slide-enter-to
+  .slide-leave
+    .minota-fab
+      opacity 1
+
+  .slide-enter-active
+  .slide-leave-active
+    .minota-fab
+      transition opacity 0.5s ease
+  .slide-enter-active
+    .minota-fab
+      transition-delay 0.1s
+
 .minota-pool
   .minota-list-item
     padding-left 1rem
@@ -336,11 +357,7 @@ export default {
     @media (min-width screen-md)
       margin-left 0rem
       margin-right 0rem
-  &.menu
-    .minota-drawer-body
-      background-color background-color
-  .toggle-sort-button
-    flex-shrink 0
+
   .minota-topic-breadcrumbs
     display block
     .topic-item

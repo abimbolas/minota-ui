@@ -64,7 +64,6 @@ export default {
     z-index drawer-index
     background-color white
     overflow-y auto
-    transition all 0.3s ease-out
 
     &[position="left"]
       left 0
@@ -98,27 +97,28 @@ export default {
 
     &.slide-enter[position="left"]
     &.slide-leave-to[position="left"]
-      transform translate3d(-100%, 0, 0)
+      transform translateX(-100%)
     &.slide-enter[position="right"]
     &.slide-leave-to[position="right"]
-      transform translate3d(100%, 0, 0)
+      transform translateX(100%)
     &.slide-enter[position="top"]
     &.slide-leave-to[position="top"]
-      transform translate3d(0, -100%, 0)
+      transform translateY(-100%)
     &.slide-enter[position="bottom"]
     &.slide-leave-to[position="bottom"]
-      transform translate3d(0, 100%, 0)
+      transform translateY(100%)
     &.slide-enter-to[position="left"]
     &.slide-leave[position="left"]
     &.slide-enter-to[position="right"]
     &.slide-leave[position="right"]
+      transform translateX(0%)
     &.slide-enter-to[position="top"]
     &.slide-leave[position="top"]
     &.slide-enter-to[position="bottom"]
     &.slide-leave[position="bottom"]
-      transform translate3d(0, 0, 0)
+      transform translateY(0%)
     &.slide-enter-active
-      transition transform 0.3s ease
+      transition transform 0.15s ease
     &.slide-leave-active
-      transition transform 0.2s ease
+      transition transform 0.1s ease
 </style>

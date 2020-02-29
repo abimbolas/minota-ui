@@ -92,7 +92,12 @@ export default {
     refreshWidth () {
       if (this.scrollTarget !== 'window') {
         window.requestAnimationFrame(() => {
-          this.styles.width = document.getElementById(this.scrollTarget).getBoundingClientRect().width + 'px'
+          const w = document.getElementById(this.scrollTarget).getBoundingClientRect().width
+          if (w) {
+            this.styles.width = w + 'px'
+          } else {
+            this.refreshWidth()
+          }
         })
       }
     },

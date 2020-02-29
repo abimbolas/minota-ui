@@ -20,15 +20,26 @@
           v-on:click="onDeleteNotes()")
           i.material-icons delete
       template(v-else)
-        .button.icon-button(v-on:click="closePool()" v-if="!context")
-          i.material-icons close
         .button.icon-button(v-on:click="onCloseContext()" v-if="context")
           i.material-icons arrow_upward
-        .title.text-overline
-          topic-breadcrumbs-component(
+        //- .button.icon-button(v-on:click="closePool()" v-else)
+          i.material-icons arrow_back
+        .title
+          topic-breadcrumbs-component.text-overline(
             v-bind:topic="context"
             v-on:set-topic="onChangeTopic($event)")
-        toggle-sort-button-component.icon-button
+        //- toggle-sort-button-component.icon-button
+        button.button.icon-button(
+          v-on:click="onNewNote()"
+          title="New note")
+          i.material-icons add
+        router-link.no-style.button.icon-button(
+          v-bind:to="poolWithContexURL"
+          title="Open Pool"
+          target="_blank")
+          i.material-icons open_in_new
+        .button.icon-button(v-on:click="closePool()")
+          i.material-icons close
 
     m-linear-progress(v-bind:open="isLoading" indeterminate)
 
@@ -42,8 +53,7 @@
       v-bind:order-asc="getOrderAsc"
       v-on:open-note="onOpenNote($event)"
       v-on:open-context="onOpenContext($event)")
-
-    fab-component(v-bind:scrollTarget="scrollTarget")
+    //- fab-component(v-bind:scrollTarget="scrollTarget")
       i.material-icons(v-on:click="onNewNote()") add
 </template>
 
@@ -63,7 +73,8 @@ import {
   appendContextUtil,
   popContextUtil,
   contextLengthUtil,
-  topicInContextUtil
+  topicInContextUtil,
+  topicDelimiter
 } from '@/store/context'
 
 export default {
@@ -109,10 +120,14 @@ export default {
   },
 
   computed: {
+    poolWithContexURL () {
+      return this.context ? '/notes?topic=' + this.context : '/notes'
+    },
     ...mapGetters([
       'isInTableFocus',
       'getOrderBy',
-      'getOrderAsc'
+      'getOrderAsc',
+      'getContextArray'
     ])
   },
 
@@ -256,19 +271,28 @@ export default {
           component: 'GroupModal'
         }
       }).then(topic => {
-        const src = this.context
-        const target = appendContextUtil(this.context, topic)
-        const notes = extractItems(this.selection)
-        this.removeFromPoolFocus({ notes })
-        notes.forEach(note => {
-          note.topic = note.topic.replace(new RegExp(`^${src}`), target)
-        })
-        this.addToPoolFocus({ notes, depth: contextLengthUtil(this.context) })
-        this.isLoading = true
-        this.updateNotesAction({ notes }).then(() => {
-          this.isLoading = false
-        })
-        this.exitMenuMode()
+        // DO MUTATION & CLONE!
+        console.log(topic, topicDelimiter)
+        //
+        // if (!topic) {
+        //   this.exitMenuMode()
+        //   return
+        // }
+        // const notes = extractItems(this.selection)
+        // notes.forEach(note => {
+        //   note.topic = note.path
+        //     .slice(0, this.getContextArray.length)
+        //     .concat(topic.split(topicDelimiter).filter(i => i))
+        //     .concat(note.path.slice(this.getContextArray.length))
+        //     .filter(i => i)
+        //     .join(topicDelimiter)
+        // })
+        // this.addToPoolFocus({ notes, depth: contextLengthUtil(this.context) })
+        // this.isLoading = true
+        // this.updateNotesAction({ notes }).then(() => {
+        //   this.isLoading = false
+        // })
+        // this.exitMenuMode()
       })
     },
 
@@ -282,23 +306,27 @@ export default {
           }
         }
       }).then(() => {
-        let update = []
-        this.selection.filter(item => item.fullGroup).forEach(group => {
-          const src = appendContextUtil(this.context, group.key)
-          const target = this.context
-          const notes = extractItems(group.children)
-          this.removeFromPoolFocus({ notes })
-          notes.forEach(note => {
-            note.topic = note.topic.replace(new RegExp(`^${src}`), target)
-          })
-          this.addToPoolFocus({ notes, depth: contextLengthUtil(this.context) })
-          update = update.concat(notes)
-        })
-        this.isLoading = true
-        this.updateNotesAction({ notes: update }).then(() => {
-          this.isLoading = false
-        })
-        this.exitMenuMode()
+        // DO MUTATION & CLONE!
+
+        // let update = []
+        // this.selection.filter(item => item.fullGroup).forEach(group => {
+        //   const notes = extractItems(group.children)
+        //   this.removeFromPoolFocus({ notes })
+        //   notes.forEach(note => {
+        //     note.topic = note.path
+        //       .slice(0, this.getContextArray.length)
+        //       .concat(note.path.slice(this.getContextArray.length + 1))
+        //       .filter(i => i)
+        //       .join(topicDelimiter)
+        //   })
+        //   this.addToPoolFocus({ notes, depth: contextLengthUtil(this.context) })
+        //   update = update.concat(notes)
+        // })
+        // this.isLoading = true
+        // this.updateNotesAction({ notes: update }).then(() => {
+        //   this.isLoading = false
+        // })
+        // this.exitMenuMode()
       })
     },
 

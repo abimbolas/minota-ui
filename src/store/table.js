@@ -1,5 +1,4 @@
 /* eslint-disable brace-style */
-import merge from 'lodash/merge'
 import Notespace from '@/models/notespace'
 
 const state = {
@@ -86,8 +85,10 @@ export function tableNavigationGuard (store, to, from, next) {
     const context = store.getters.getContext
     const note = store.getters.getTableFocus.slice(-1)[0]
     const route = {
-      name: 'note',
-      params: {
+      name: 'note'
+    }
+    if (note) {
+      route.params = {
         noteId: note.id
       }
     }
@@ -97,6 +98,17 @@ export function tableNavigationGuard (store, to, from, next) {
       }
     }
     next(route)
+  }
+
+  // If we redirected to 'note', with context (topic) in url,
+  // set it as app context
+  else if (to.name === 'note') {
+    const appContext = store.getters.getContext
+    const urlContext = to.query.topic
+    if (appContext !== urlContext) {
+      store.commit('setContext', { context: urlContext })
+    }
+    next()
   }
 
   // or just pass through

@@ -1,5 +1,6 @@
 import $router from '@/router'
-import { topicDelimiter } from '@/store/ui'
+// import { topicDelimiter } from '@/store/ui'
+export const topicDelimiter = ' / '
 
 const state = {
   context: ''
@@ -51,8 +52,8 @@ export function cleanPathUtil (src) {
 }
 
 export function appendContextUtil (src, target) {
-  return (src ? cleanPathUtil(src) : [])
-    .concat(cleanPathUtil(target))
+  return (cleanPathUtil(src || ''))
+    .concat(cleanPathUtil(target || ''))
     .join(topicDelimiter)
 }
 

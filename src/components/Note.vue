@@ -6,12 +6,12 @@
     v-on:long-click="$emit('mode', 'menu')")
     //- Actions
     .minota-note-actions
-      .button.icon-button(
+      button.button.icon-button(
         title="Unpin"
         v-if="note.config.pinned"
         v-on:click="unpinNote()")
         i.material-icons star
-      .button.icon-button(
+      button.button.icon-button(
         title="Menu"
         v-on:click="openMenu()")
         i.material-icons more_vert

@@ -62,7 +62,7 @@ export default {
     @extend .elevation-8
     position fixed
     z-index drawer-index
-    background-color white
+    background-color background-color
     overflow-y auto
 
     &[position="left"]

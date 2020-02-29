@@ -6,21 +6,24 @@
         target="window"
         v-bind:extended-on-sticky="focusedNoteTitle")
         template
-          .button.icon-button(v-on:click="openAppMenuDrawer()")
+          //- .button.icon-button(v-on:click="openAppMenuDrawer()")
             i.material-icons menu
-          .title
+          .button.icon-button(v-on:click="openPoolDrawer()")
+            i.material-icons folder_open
+          .title(v-if="getContext")
             topic-breadcrumbs-component.text-overline(
+              v-if="getContext"
               v-bind:topic="getContext"
               v-on:set-topic="openPoolDrawer($event)")
             .topic.text-h6(v-if="focusedNoteTitle") {{ focusedNoteTitle }}
-          .button.icon-button(v-on:click="openPoolDrawer()")
+          //- .button.icon-button(v-on:click="openPoolDrawer()")
             i.material-icons folder_open
-          .button.icon-button.media-max-sm(
+          .button.icon-button.table-note-menu(
             title="Unpin"
             v-if="getTableFocus[0] && getTableFocus[0].config.pinned"
             v-on:click="onNoteMenuTogglePin(getTableFocus[0])")
             i.material-icons star
-          .button.icon-button.media-max-sm(
+          .button.icon-button.table-note-menu(
             v-if="getTableFocus[0]"
             v-on:click="openNoteMenuDrawer(getTableFocus[0])")
             i.material-icons more_vert
@@ -40,7 +43,7 @@
       i.material-icons(v-on:click="createNewNote()") add
 
     drawer-component(
-      position="right"
+      position="left"
       v-bind:opened="drawerPoolOpened"
       v-on:opened="drawerPoolOpened = $event"
       id="pool-drawer")
@@ -49,7 +52,7 @@
         v-on:opened="drawerPoolOpened = $event"
         v-on:topic="poolTopic = $event"
         scroll-target="pool-drawer"
-        position="right")
+        position="left")
 
     drawer-component(
       position="left"
@@ -284,7 +287,12 @@ export default {
         display block
         font-weight 500
       .minota-topic-breadcrumbs
-        line-height 30px
+        margin-bottom 0.5rem
+
+    .table-note-menu
+      display block
+      @media (min-width screen-sm)
+        display none
 
   .minota-screen-main
     justify-content center

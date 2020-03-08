@@ -189,7 +189,7 @@ export default {
 
     onOpenNote (note) {
       this.exitMenuMode()
-      this.openNoteAction({ note, context: this.context })
+      this.openNoteAction({ note })
       this.closePool()
     },
 

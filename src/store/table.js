@@ -12,7 +12,8 @@ const getters = {
 
 const mutations = {
   addToTableFocus (state, payload) {
-    (payload.notes || [payload.note]).forEach(note => {
+    const notes = payload.notes || [payload.note]
+    notes.slice().reverse().forEach(note => {
       state.table.addToFocus(note, {
         extendFocusCapacity: payload.extendFocusCapacity
       })
@@ -20,9 +21,14 @@ const mutations = {
   },
 
   removeFromTableFocus (state, payload) {
-    (payload.notes || [payload.note]).forEach(note => {
+    const notes = payload.notes || [payload.note]
+    notes.forEach(note => {
       state.table.removeFromFocus(note)
     })
+  },
+
+  clearTableFocus (state) {
+    state.table.clearFocus()
   },
 
   recreateTableState (state, payload) {
@@ -38,81 +44,4 @@ export default {
   state,
   getters,
   mutations
-}
-
-export function tableNavigationGuard (store, to, from, next) {
-  // If we load app first time with this url
-  // e.g. /note/909-dfdf-89890/?topic=MyTopic, take it's topic as
-  // initial context
-  if (!from.name && to.query.topic) {
-    store.commit('setContext', { context: to.query.topic })
-    // next()
-  }
-
-  // If this is 'new' note, create one and redirect to it as usual
-  // + add context if any
-  if (to.name === 'new') {
-    const context = store.getters.getContext || ''
-    store.dispatch('newNoteAction', {
-      note: {
-        config: {
-          topic: context
-        }
-      }
-    }).then(note => {
-      store.commit('addToTableFocus', { note })
-      const route = {
-        name: 'note',
-        params: {
-          noteId: note.id
-        }
-      }
-      if (context) {
-        route.query = {
-          topic: context
-        }
-      }
-      next(route)
-    }).catch(error => {
-      console.warn('tableNavigationGuard error:', error)
-      next()
-    })
-  }
-
-  // If redirected to 'table', that means we want to restore
-  // existing focus and context
-  else if (to.name === 'table') { // to.params.noteId === undefined || to.query.topic === undefined) {
-    const context = store.getters.getContext
-    const note = store.getters.getTableFocus.slice(-1)[0]
-    const route = {
-      name: 'note'
-    }
-    if (note) {
-      route.params = {
-        noteId: note.id
-      }
-    }
-    if (context) {
-      route.query = {
-        topic: context
-      }
-    }
-    next(route)
-  }
-
-  // If we redirected to 'note', with context (topic) in url,
-  // set it as app context
-  else if (to.name === 'note') {
-    const appContext = store.getters.getContext
-    const urlContext = to.query.topic
-    if (appContext !== urlContext) {
-      store.commit('setContext', { context: urlContext })
-    }
-    next()
-  }
-
-  // or just pass through
-  else {
-    next()
-  }
 }

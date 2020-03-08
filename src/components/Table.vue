@@ -6,17 +6,16 @@
         target="window"
         v-bind:extended-on-sticky="focusedNoteTitle")
         template
-          //- .button.icon-button(v-on:click="openAppMenuDrawer()")
+          .button.icon-button(v-on:click="openAppMenuDrawer()")
             i.material-icons menu
-          .button.icon-button(v-on:click="openPoolDrawer()")
-            i.material-icons folder_open
           .title(v-if="getContext")
             topic-breadcrumbs-component.text-overline(
               v-if="getContext"
               v-bind:topic="getContext"
               v-on:set-topic="openPoolDrawer($event)")
             .topic.text-h6(v-if="focusedNoteTitle") {{ focusedNoteTitle }}
-          //- .button.icon-button(v-on:click="openPoolDrawer()")
+          .title(v-else) &nbsp;
+          .button.icon-button(v-on:click="openPoolDrawer()")
             i.material-icons folder_open
           .button.icon-button.table-note-menu(
             title="Unpin"
@@ -33,7 +32,7 @@
       template(v-if="getTableFocus.length")
         note-component(
           v-for="note in getTableFocus"
-          v-bind:key="note.config.id"
+          v-bind:key="note.id"
           v-bind:note="note"
           v-on:open-menu="openNoteMenuDrawer(note)")
       template(v-else)
@@ -102,6 +101,7 @@
 <script>
 /* eslint-disable brace-style */
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import cloneDeep from 'lodash.clonedeep'
 import BarComponent from '@/components/Bar'
 import DrawerComponent from '@/components/Drawer'
 import FabComponent from '@/components/Fab'
@@ -128,15 +128,22 @@ export default {
   },
 
   props: {
-    noteId: {
-      type: String,
-      required: false,
-      default: ''
-    },
-    topic: {
+    context: {
       type: String,
       requred: false,
       default: ''
+    },
+    focus: {
+      type: Array,
+      required: false,
+      default () {
+        return []
+      }
+    },
+    pool: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
@@ -169,8 +176,14 @@ export default {
   },
 
   watch: {
-    'noteId' (noteId) {
-      this.fetchNoteById(noteId)
+    'pool' (pool) {
+      this.syncFromPropPool(pool)
+    },
+    'focus' (focus) {
+      this.syncFromPropFocus(focus)
+    },
+    'drawerPoolOpened' (pool) {
+      this.syncToUrlPool(pool)
     }
   },
 
@@ -198,37 +211,108 @@ export default {
         actions[action.type](action.payload)
       }
     })
+
+    // const mutations = {
+    //   addToTableFocus: payload => {
+    //     this.syncFocusToUrl()
+    //   }
+    // }
+    // this.unsubscribeMutations = this.$store.subscribe(mutation => {
+    //   if (mutations[mutation.type]) {
+    //     mutations[mutation.type](mutation.payload)
+    //   }
+    // })
+
     // Set capacity
-    this.setTableFocusCapacity({ capacity: 1 })
+    this.setTableFocusCapacity({ capacity: 3 })
+
+    // Sync focused notes
+    this.syncFromPropFocus(this.focus || [])
+
+    // Sync pool
+    this.syncFromPropPool(this.pool)
   },
 
-  mounted () {
-    this.fetchNoteById(this.noteId)
-  },
+  // mounted () {
+  //   // this.fetchNoteById(this.noteId)
+  // },
 
   beforeDestroy () {
     this.unsubscribeActions()
   },
 
   methods: {
-    fetchNoteById (id) {
-      let promise
-      if (id === 'new') {
-        promise = this.newNoteAction()
-      } else if (id) {
-        promise = this.getNoteAction({ id })
-      } else {
-        promise = Promise.reject(new Error('No id'))
+    syncFromPropFocus (focus) {
+      const srcFocus = JSON.stringify(this.getTableFocus.map(note => note.id))
+      const targetFocus = JSON.stringify(focus)
+      if (srcFocus !== targetFocus) {
+        this.clearTableFocus()
+        const notes = {}
+        const promises = []
+        focus.forEach(id => {
+          let promise
+          if (id === 'new') {
+            promise = this.newNoteAction()
+          } else {
+            promise = this.getNoteAction({ id })
+          }
+          promises.push(promise)
+          promise.then(note => {
+            notes[note.id] = note
+          }).catch(error => {
+            console.error('Table.vue, syncFocusPropToStore:', error)
+          })
+        })
+        Promise.all(promises).then(() => {
+          this.addToTableFocus({
+            notes: focus.map(noteId => notes[noteId])
+          })
+          console.log('all done', notes)
+        })
       }
-      promise.then(note => {
-        this.addToTableFocus({ note })
-      }).catch(error => {
-        console.warn('fetchNoteById error:', error)
-        if (error.status === 404) {
-          this.$router.push({ name: 'note' })
-        }
-      })
     },
+
+    syncToUrlFocus (focus) {
+      //
+    },
+
+    syncFromPropPool (pool) {
+      if (this.drawerPoolOpened !== pool) {
+        this.drawerPoolOpened = pool
+      }
+    },
+
+    syncToUrlPool (targetPool) {
+      const query = cloneDeep(this.$route.query)
+      const srcPool = (this.$route.query.pool === true || this.$route.query.pool === 'true')
+      if (srcPool !== targetPool) {
+        if (targetPool) {
+          query.pool = true
+        } else {
+          delete query.pool
+        }
+        this.$router.replace(Object.assign({}, this.$route, { query }))
+      }
+    },
+
+    // fetchNoteById (id) {
+    //   let promise
+    //   if (id === 'new') {
+    //     promise = this.newNoteAction()
+    //   } else if (id) {
+    //     promise = this.getNoteAction({ id })
+    //   } else {
+    //     promise = Promise.reject(new Error('No id'))
+    //   }
+    //   promise.then(note => {
+    //     this.addToTableFocus({ note })
+    //   }).catch(error => {
+    //     console.warn('fetchNoteById error:', error)
+    //     if (error.status === 404) {
+    //       this.$router.push({ name: 'note' })
+    //     }
+    //   })
+    // },
 
     openNoteMenuDrawer (note) {
       this.noteForMenu = note
@@ -263,6 +347,7 @@ export default {
     ...mapMutations([
       'addToTableFocus',
       'removeFromTableFocus',
+      'clearTableFocus',
       'setTableFocusCapacity'
     ]),
 

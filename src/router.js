@@ -2,10 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import store from '@/store'
 
-import ConfigComponent from '@/components/screen/Config'
-import PoolComponent from '@/components/screen/Pool'
-import TableComponent from '@/components/screen/Table'
-import { tableNavigationGuard } from '@/store/table'
+import ConfigComponent from '@/components/Config'
+import PoolComponent from '@/components/Pool'
+import TableComponent from '@/components/Table'
 
 Vue.use(Router)
 
@@ -15,7 +14,7 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      redirect: '/note/'
+      redirect: '/table'
     },
     //
     // Actions
@@ -24,25 +23,22 @@ const router = new Router({
       path: '/new',
       name: 'new'
     },
-    {
-      path: '/table',
-      name: 'table'
-    },
     //
     // Core
     //
     {
-      path: '/note/:noteId?',
-      name: 'note',
+      path: '/table',
+      name: 'table',
       props: route => ({
-        topic: route.query.topic,
-        noteId: route.params.noteId
+        context: route.query.context,
+        focus: !route.query.focus ? [] : (Array.isArray(route.query.focus) ? route.query.focus : [route.query.focus]),
+        pool: route.query.pool === 'true'
       }),
       component: TableComponent
     },
     {
-      path: '/notes',
-      name: 'notes',
+      path: '/pool',
+      name: 'pool',
       props: route => ({
         topic: route.query.topic
       }),
@@ -60,11 +56,35 @@ const router = new Router({
 })
 
 router.beforeEach(function (to, from, next) {
-  if (to.name.match(/note|table|new/)) {
-    tableNavigationGuard(store, to, from, next)
+  const guards = {
+    new: navigationGuardNew
+  }
+  if (guards[to.name]) {
+    guards[to.name](store, to, from, next)
   } else {
+    console.log('to', to)
     next()
   }
 })
+
+function navigationGuardNew (store, to, from, next) {
+  store.dispatch('newNoteAction', {
+    note: {
+      config: {
+        topic: to.query.topic || ''
+      }
+    }
+  }).then(note => {
+    next({
+      name: 'table',
+      query: {
+        focus: note.id
+      }
+    })
+  }).catch(error => {
+    console.warn('navigationGuardNew:', error)
+    next()
+  })
+}
 
 export default router

@@ -98,10 +98,14 @@ const actions = {
   },
 
   openNoteAction (context, payload) {
-    const noteId = payload.note.id
-    context.commit('setContext', { context: payload.context || '' })
+    if (context.getters.isInTableFocus(payload.note)) {
+      context.commit('removeFromTableFocus', { note: payload.note })
+    }
     context.commit('addToTableFocus', { note: payload.note })
-    $router.push(`/note/${noteId}${payload.context ? '?topic=' + payload.context : ''}`)
+    const query = Object.assign({}, $router.currentRoute.query, {
+      focus: context.getters['getTableFocus'].map(note => note.id)
+    })
+    $router.push({ name: 'table', query })
   },
 
   deleteNotesAction (context, payload) {

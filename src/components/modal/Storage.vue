@@ -43,7 +43,7 @@
       .form-field.text-right
         m-form-field
           m-checkbox(v-model="active" id="storage-active")
-          label(for="storage-active") Activate storage
+          label(for="storage-active") Current storage
 
     .minota-modal-footer
       .button.text-button.alternate-action(

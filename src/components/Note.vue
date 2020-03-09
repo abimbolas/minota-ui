@@ -196,7 +196,7 @@ export default {
   z-index 1
   position relative
   box-sizing border-box
-  padding 1rem
+  padding 0rem 1rem 1.5rem 1.5rem
   cursor text
   @media (min-width screen-sm)
     max-width 48rem

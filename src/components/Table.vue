@@ -2,27 +2,35 @@
   section.minota-screen.minota-table
     //- Header
     header.minota-screen-header
-      bar-component(
-        target="window"
-        v-bind:extended-on-sticky="focusedNoteTitle")
+      bar-component(target="window"
+        v-bind:extended-on-sticky="false")
         template
-          .button.icon-button(v-on:click="openAppMenuDrawer()")
+          //- .button.icon-button(v-on:click="openAppMenuDrawer()")
             i.material-icons menu
-          .title(v-if="getContext")
-            topic-breadcrumbs-component.text-overline(
+
+          //- .button.icon-button(v-on:click="openPoolDrawer()")
+            i.material-icons folder_open
+
+          .title &nbsp;
+            //- topic-breadcrumbs-component.text-overline(
               v-if="getContext"
               v-bind:topic="getContext"
               v-on:set-topic="openPoolDrawer($event)")
-            .topic.text-h6(v-if="focusedNoteTitle") {{ focusedNoteTitle }}
-          .title(v-else) &nbsp;
+            //- .topic.text-h6(v-if="focusedNoteTitle") {{ focusedNoteTitle }}
+
+          router-link.button.icon-button(to="/new" title="New")
+            i.material-icons add
+
           .button.icon-button(v-on:click="openPoolDrawer()")
-            i.material-icons folder_open
-          .button.icon-button.table-note-menu(
+            i.material-icons menu
+          //- router-link.button.icon-button(to="/pool" title="Pool")
+
+          //- .button.icon-button.table-note-menu(
             title="Unpin"
             v-if="getTableFocus[0] && getTableFocus[0].config.pinned"
             v-on:click="onNoteMenuTogglePin(getTableFocus[0])")
             i.material-icons star
-          .button.icon-button.table-note-menu(
+          //- .button.icon-button.table-note-menu(
             v-if="getTableFocus[0]"
             v-on:click="openNoteMenuDrawer(getTableFocus[0])")
             i.material-icons more_vert
@@ -38,21 +46,24 @@
       template(v-else)
         screen-quote-placeholder-component
 
-    fab-component(v-bind:target="'window'" v-if="!drawer.opened")
+    //- FAB
+    //- fab-component(v-bind:target="'window'" v-if="!drawer.opened")
       i.material-icons(v-on:click="createNewNote()") add
 
+    //- Pool drawer
     drawer-component(
-      position="left"
+      position="right"
       v-bind:opened="drawerPoolOpened"
       v-on:opened="drawerPoolOpened = $event"
       id="pool-drawer")
       pool-component(
+        position="right"
         v-bind:topic="poolTopic"
         v-on:opened="drawerPoolOpened = $event"
         v-on:topic="poolTopic = $event"
-        scroll-target="pool-drawer"
-        position="left")
+        scroll-target="pool-drawer")
 
+    //- App menu drawer
     drawer-component(
       position="left"
       v-bind:opened="drawerAppMenuOpened"
@@ -76,6 +87,7 @@
         template(v-slot:title)
           span Notes
 
+    //- Note menu drawer
     drawer-component(
       position="top"
       v-bind:opened="drawerNoteMenuOpened"
@@ -212,19 +224,8 @@ export default {
       }
     })
 
-    // const mutations = {
-    //   addToTableFocus: payload => {
-    //     this.syncFocusToUrl()
-    //   }
-    // }
-    // this.unsubscribeMutations = this.$store.subscribe(mutation => {
-    //   if (mutations[mutation.type]) {
-    //     mutations[mutation.type](mutation.payload)
-    //   }
-    // })
-
     // Set capacity
-    this.setTableFocusCapacity({ capacity: 3 })
+    this.setTableFocusCapacity({ capacity: 1 })
 
     // Sync focused notes
     this.syncFromPropFocus(this.focus || [])
@@ -232,10 +233,6 @@ export default {
     // Sync pool
     this.syncFromPropPool(this.pool)
   },
-
-  // mounted () {
-  //   // this.fetchNoteById(this.noteId)
-  // },
 
   beforeDestroy () {
     this.unsubscribeActions()
@@ -272,10 +269,6 @@ export default {
       }
     },
 
-    syncToUrlFocus (focus) {
-      //
-    },
-
     syncFromPropPool (pool) {
       if (this.drawerPoolOpened !== pool) {
         this.drawerPoolOpened = pool
@@ -294,25 +287,6 @@ export default {
         this.$router.replace(Object.assign({}, this.$route, { query }))
       }
     },
-
-    // fetchNoteById (id) {
-    //   let promise
-    //   if (id === 'new') {
-    //     promise = this.newNoteAction()
-    //   } else if (id) {
-    //     promise = this.getNoteAction({ id })
-    //   } else {
-    //     promise = Promise.reject(new Error('No id'))
-    //   }
-    //   promise.then(note => {
-    //     this.addToTableFocus({ note })
-    //   }).catch(error => {
-    //     console.warn('fetchNoteById error:', error)
-    //     if (error.status === 404) {
-    //       this.$router.push({ name: 'note' })
-    //     }
-    //   })
-    // },
 
     openNoteMenuDrawer (note) {
       this.noteForMenu = note

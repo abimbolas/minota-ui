@@ -29,15 +29,19 @@
             v-bind:topic="context"
             v-on:set-topic="onChangeTopic($event)")
         //- toggle-sort-button-component.icon-button
-        button.button.icon-button(
+        //- button.button.icon-button(
           v-on:click="onNewNote()"
           title="New note")
           i.material-icons add
-        router-link.no-style.button.icon-button(
+        //- router-link.no-style.button.icon-button(
           v-bind:to="poolWithContexURL"
           title="Open Pool"
           target="_blank")
           i.material-icons open_in_new
+        router-link.button.icon-button(to="/new" title="New")
+          i.material-icons add
+        //- router-link.button.icon-button(to="/table" title="Table")
+          i.material-icons crop_square
         .button.icon-button(v-on:click="closePool()")
           i.material-icons close
 
@@ -53,6 +57,7 @@
       v-bind:order-asc="getOrderAsc"
       v-on:open-note="onOpenNote($event)"
       v-on:open-context="onOpenContext($event)")
+    //- FAB
     //- fab-component(v-bind:scrollTarget="scrollTarget")
       i.material-icons(v-on:click="onNewNote()") add
 </template>

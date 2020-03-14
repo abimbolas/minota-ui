@@ -43,13 +43,11 @@ body
   margin 0
   padding 0
   height 100% // Hack parent container
+  background-color background-color
 
 .minota-app
   position relative
   min-height 100%
   overflow hidden
   color alpha(black, high-emphasis)
-  background-color white
-  @media (min-width screen-sm)
-    background-color background-color
 </style>

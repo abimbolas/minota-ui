@@ -264,7 +264,6 @@ export default {
           this.addToTableFocus({
             notes: focus.map(noteId => notes[noteId])
           })
-          console.log('all done', notes)
         })
       }
     },
@@ -294,7 +293,7 @@ export default {
     },
 
     openPoolDrawer (topic = '') {
-      this.poolTopic = topic
+      // this.poolTopic = topic
       this.drawerPoolOpened = true
     },
 

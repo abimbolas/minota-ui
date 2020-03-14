@@ -1,7 +1,7 @@
 import { createBackend, destroyBackend } from '@/backend'
 
 export default function (store) {
-  const actions = {
+  const mutations = {
     addStorageConfig ({ config }) {
       createBackend(config).then(() => {
         console.log(`Backend ${config.id} successfully initialized`)
@@ -24,6 +24,6 @@ export default function (store) {
   }
 
   store.subscribe(mutation => {
-    actions[mutation.type] && actions[mutation.type](mutation.payload)
+    mutations[mutation.type] && mutations[mutation.type](mutation.payload)
   })
 }

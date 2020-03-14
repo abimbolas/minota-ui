@@ -62,7 +62,6 @@ router.beforeEach(function (to, from, next) {
   if (guards[to.name]) {
     guards[to.name](store, to, from, next)
   } else {
-    console.log('to', to)
     next()
   }
 })

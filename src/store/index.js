@@ -16,7 +16,8 @@ import table from './table'
 import ui from './ui'
 // Plugins
 import backendPlugin from './plugins/backend-plugin'
-import listPlugin from './plugins/list-plugin'
+import tablePlugin from './plugins/table-plugin'
+import poolPlugin from './plugins/pool-plugin'
 
 Vue.use(Vuex)
 
@@ -58,7 +59,8 @@ export default new Vuex.Store({
   },
   plugins: [
     backendPlugin,
-    listPlugin,
+    tablePlugin,
+    poolPlugin,
     createPersistedState({
       key: 'minota-store',
       storage: appStorage,

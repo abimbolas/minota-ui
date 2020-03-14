@@ -1,6 +1,6 @@
 <template lang="pug">
   .minota-note(
-    v-bind:elevation="elevation"
+    elevation="2"
     v-long-click="375"
     v-on:normal-click="onNormalClick($event)"
     v-on:long-click="$emit('mode', 'menu')")
@@ -29,7 +29,6 @@ import { topicDelimiter } from '@/store/ui'
 import EditorComponent from '@/components/Editor'
 import longClick from '@/directives/long-click'
 import bus from '@/event-bus'
-import breakpoint from '@/utils/breakpoint'
 
 export default {
   name: 'Note',
@@ -59,8 +58,7 @@ export default {
       cursor: {
         line: 0,
         ch: 0
-      },
-      elevation: 0
+      }
     }
   },
 
@@ -82,7 +80,6 @@ export default {
   },
 
   created () {
-    window.addEventListener('resize', this.updateElevation)
     // React to context change
     const mutations = {
       setContext (payload) {
@@ -97,16 +94,12 @@ export default {
   },
 
   beforeDestroy () {
-    window.removeEventListener('resize', this.updateElevation)
     this.unsubscribeMutations()
   },
 
   mounted () {
     this.setContentFromNote()
     this.resetCursor()
-    if (breakpoint.min.sm) {
-      this.elevation = 2
-    }
   },
 
   methods: {
@@ -168,14 +161,6 @@ export default {
       bus.$emit(this.focusEventName)
     },
 
-    updateElevation () {
-      if (breakpoint.min.sm) {
-        this.elevation = 2
-      } else {
-        this.elevation = 0
-      }
-    },
-
     ...mapActions([
       'updateNoteAction'
     ])
@@ -189,14 +174,14 @@ export default {
 
 .minota-note
   background-color white
-  border-radius 3px
+  border-radius 0.5rem
   max-width 46rem
   box-sizing content-box
   min-width: 320px
   z-index 1
   position relative
   box-sizing border-box
-  padding 0rem 1rem 1.5rem 1.5rem
+  padding 1rem 1rem 1.5rem 1.5rem
   cursor text
   @media (min-width screen-sm)
     max-width 48rem

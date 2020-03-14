@@ -27,6 +27,13 @@ const mutations = {
     })
   },
 
+  updateInTableFocus (state, payload) {
+    const notes = payload.notes || [payload.note]
+    notes.forEach(note => {
+      state.table._replaceIn('focus', note)
+    })
+  },
+
   clearTableFocus (state) {
     state.table.clearFocus()
   },

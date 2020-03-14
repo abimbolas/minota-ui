@@ -88,6 +88,7 @@ export default {
 .minota-modal-body
   @extend .text-body
   padding 20px 16px
+  word-break break-all
   @media (min-width 768px)
     padding 20px 24px
 

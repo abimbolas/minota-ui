@@ -3,10 +3,12 @@
     bar-component(v-bind:scroll-target="scrollTarget" v-bind:position="position")
       template(v-if="mode === 'menu'")
         .title.text-overline {{ selection.length }} selected
+
         .button.icon-button(
-          title="Done with batch actions"
-          v-on:click="exitMenuMode()")
-          i.material-icons block
+          title="Delete notes"
+          v-on:click="onDeleteNotes()")
+          i.material-icons delete
+
         .button.icon-button(
           title="Group notes under topic"
           v-on:click="groupNotes()")
@@ -15,10 +17,11 @@
           title="Ungroup topic into notes"
           v-on:click="ungroupNotes()")
           i.material-icons call_split
+
         .button.icon-button(
-          title="Delete notes"
-          v-on:click="onDeleteNotes()")
-          i.material-icons delete
+          title="Done with batch actions"
+          v-on:click="exitMenuMode()")
+          i.material-icons block
       template(v-else)
         .button.icon-button(v-on:click="onCloseContext()" v-if="context")
           i.material-icons arrow_upward
@@ -28,6 +31,7 @@
           topic-breadcrumbs-component.text-overline(
             v-bind:topic="context"
             v-on:set-topic="onChangeTopic($event)")
+
         //- toggle-sort-button-component.icon-button
         //- button.button.icon-button(
           v-on:click="onNewNote()"
@@ -40,6 +44,10 @@
           i.material-icons open_in_new
         router-link.button.icon-button(to="/new" title="New")
           i.material-icons add
+
+        //- .button.icon-button(v-on:click="mode = 'menu'")
+          i.material-icons edit
+
         //- router-link.button.icon-button(to="/table" title="Table")
           i.material-icons crop_square
         .button.icon-button(v-on:click="closePool()")
@@ -73,7 +81,7 @@ import NoteListComponent from '@/components/NoteList'
 import TopicBreadcrumbsComponent from '@/components/other/TopicBreadcrumbs'
 import ToggleSortButtonComponent from '@/components/other/ToggleSortButton'
 import Language from '@/mixins/language'
-import { NoteGroup } from '@/store/plugins/list-plugin'
+import { NoteGroup } from '@/store/plugins/pool-plugin'
 import {
   appendContextUtil,
   popContextUtil,
@@ -142,9 +150,7 @@ export default {
         this.context = topic
         clearTimeout(this.fetchTopicTimeout)
         this.isLoading = true
-        this.fetchTopicTimeout = setTimeout(() => {
-          this.fetchTopic(this.context)
-        }, 150)
+        this.fetchTopic(this.context)
       }
     },
     'context' (context) {
@@ -390,6 +396,7 @@ export default {
     @media (min-width screen-md)
       margin-left 0rem
       margin-right 0rem
+      width calc(100% - 0rem)
 
   .minota-topic-breadcrumbs
     display block

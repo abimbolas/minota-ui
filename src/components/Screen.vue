@@ -41,8 +41,8 @@ export default {
     display flex
     min-height calc(100vh - 56px)
     box-sizing border-box
-    @media (min-width screen-sm)
-      padding 0.125rem 0.5rem 0.5rem 0.5rem
+    // @media (min-width screen-sm)
+    padding 0.125rem 0.5rem 0.5rem 0.5rem
     @media (min-width screen-md)
       padding 0.25rem 1rem 1rem 1rem
 </style>

@@ -59,7 +59,7 @@ export default {
       transition all 0.2s ease-out
 
   .minota-drawer-body
-    @extend .elevation-8
+    @extend .elevation-24
     position fixed
     z-index drawer-index
     background-color background-color

@@ -60,7 +60,7 @@ export default {
   box-sizing border-box
   border-radius 3px
   z-index modal-index
-  background-color background-color
+  background-color foreground-layer-color
   @media (min-width 480px)
     max-width 480px
 

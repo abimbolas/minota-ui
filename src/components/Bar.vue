@@ -187,10 +187,10 @@ export default {
 
   .title
     flex-grow 1
-    padding 0 16px
+    padding 0 1.25rem
     align-self center
     &:first-child
-      padding-left 12px
+      padding-left 0.75rem
 
   &.extended
     .title

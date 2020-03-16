@@ -16,6 +16,8 @@
       slot(name="meta")
     .right.secondary-action
       slot(name="secondary-action")
+    .right.secondary-activation
+      slot(name="secondary-activation")
 
     //- Body
     .body

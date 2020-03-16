@@ -2,7 +2,7 @@
   list-item-component.minota-note-list-item(
     v-on:primary-action="$emit('primary-action')"
     v-on:menu-action="$emit('menu-action')"
-    v-bind:class="{ 'selected': selected }")
+    v-bind:class="{ 'selected': selected, 'focused': isFocused(note) }")
     //- Leaf item
     template(v-if="note")
       div(
@@ -15,7 +15,7 @@
       div(slot="secondary-action" v-if="isMenuMode")
         i.material-icons(v-if="selected") check_circle
         i.material-icons(v-else) radio_button_unchecked
-      div(slot="secondary-action" v-if="note.config.pinned && !isMenuMode")
+      div(slot="meta" v-if="note.config.pinned && !isMenuMode")
         i.material-icons star
     //- Group item
     template(v-if="group")
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Group, { extractItems } from '@/models/group'
 import Note from '@/models/note'
 import { topicDelimiter } from '@/store/ui'
@@ -103,6 +104,17 @@ export default {
     },
     numberOfNotes () {
       return extractItems(this.group.children).length
+    },
+    ...mapGetters([
+      'isInTableFocus'
+    ])
+  },
+
+  methods: {
+    isFocused (note) {
+      if (note) {
+        return this.isInTableFocus(note)
+      }
     }
   }
 }
@@ -117,6 +129,8 @@ export default {
   &.selected
     background-color white
     @extend .elevation-2
+  &.focused
+    background-color hover-layer-color
   &:hover
-    background-color background-hover-color
+    background-color hover-layer-color
 </style>

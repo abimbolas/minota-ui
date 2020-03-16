@@ -28,9 +28,10 @@ const mutations = {
   },
 
   updateInTableFocus (state, payload) {
-    const notes = payload.notes || [payload.note]
-    notes.forEach(note => {
-      state.table._replaceIn('focus', note)
+    (payload.notes || [payload.note]).forEach(note => {
+      state.table.focus.filter(focused => focused.id === note.id).forEach(focused => {
+        focused.merge(note)
+      })
     })
   },
 

@@ -62,8 +62,9 @@ export default {
     @extend .elevation-24
     position fixed
     z-index drawer-index
-    background-color background-color
+    background-color foreground-layer-color
     overflow-y auto
+    overflow-x hidden
 
     &[position="left"]
       left 0

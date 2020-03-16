@@ -43,7 +43,7 @@ body
   margin 0
   padding 0
   height 100% // Hack parent container
-  background-color background-color
+  background-color background-layer-color
 
 .minota-app
   position relative

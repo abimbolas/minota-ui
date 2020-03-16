@@ -30,7 +30,7 @@ export default {
   display flex
   align-items center
   &:hover
-    background-color background-hover-color
+    background-color hover-layer-color
   &:first-child
     margin-top 8px
   &:last-child

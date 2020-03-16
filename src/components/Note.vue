@@ -82,7 +82,7 @@ export default {
   created () {
     // React to context change
     const mutations = {
-      setContext (payload) {
+      setContext: payload => {
         console.log('setContext', payload)
       }
     }

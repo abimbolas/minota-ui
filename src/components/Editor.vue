@@ -162,7 +162,11 @@ export default {
         } else if (task.indexOf('[x]') > -1) {
           task = task.replace('[x]', '[ ]')
         }
-        textLines[cursor.line] = textLine.substring(0, cursor.ch - 3) + task + textLine.substring(cursor.ch + 3, textLine.length)
+        textLines[cursor.line] = [
+          textLine.substring(0, cursor.ch - 3),
+          task,
+          textLine.substring(cursor.ch + 3, textLine.length)
+        ].join('')
         this.simplemde.value(textLines.join('\n'))
         this.simplemde.codemirror.setCursor(cursor)
       })

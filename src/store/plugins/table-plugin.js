@@ -1,9 +1,7 @@
 export default function (store) {
   const mutations = {
     updateInNotespace (payload) {
-      (payload.notes || [payload.note]).forEach(note => {
-        store.commit('updateInTableFocus', { note })
-      })
+      store.commit('updateInTableFocus', payload)
     }
   }
 

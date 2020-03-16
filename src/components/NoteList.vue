@@ -170,3 +170,9 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.minota-note-list
+  margin-top 0.5rem
+  margin-bottom 0.5rem
+</style>

@@ -1,47 +1,37 @@
 <template lang="pug">
-  .minota-modal.group-modal(elevation="24" color="default")
+  .minota-modal(elevation="24")
     .minota-modal-header
-      .text-h6 Topic
+      .text-h6 {{ modal.header }}
     .minota-modal-body
       .form-field
         m-text-field(
-          v-model="topic"
-          id="topic-to-group-under"
+          v-model="inputText"
           required
           full-width
-          v-set-placeholder="'Set topic for new group'"
-          aria-label="Group under topic"
+          v-set-placeholder="placeholder"
           v-bind:focused="true"
           v-on:keyup.enter="resolve()")
-          m-floating-label(for="topic-to-group-under") Topic
           m-line-ripple(slot="bottomLine")
-        //- m-text-field-helper-text(persistent) Specify topic, under which to group notes
-
     .minota-modal-footer
       .button(
+        v-if="isCancelPresent"
         v-bind:class="cancelClass"
         v-on:click="rejectModalAction({ modal })"
       ) {{ cancelLabel }}
       .button(
-        v-if="topic"
-        v-bind:class="okClass"
-        v-on:click="resolve()"
-      ) {{ okLabel }}
-      .button(
-        v-else
-        disabled="disabled"
+        v-if="isOkPresent"
         v-bind:class="okClass"
         v-on:click="resolve()"
       ) {{ okLabel }}
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import SimpleModal from '@/components/modal/Simple'
 import setPlaceholder from '@/directives/set-placeholder'
-import { topicDelimiter } from '@/store/ui'
 
 export default {
-  name: 'GroupModal',
+  name: 'InputText',
 
   directives: {
     setPlaceholder
@@ -51,23 +41,40 @@ export default {
 
   data () {
     return {
-      topic: ''
+      inputText: ''
     }
+  },
+
+  computed: {
+    placeholder () {
+      return this.modal.placeholder
+    },
+
+    header () {
+      return this.modal.header
+    }
+  },
+
+  created () {
+    this.inputText = this.modal.inputText || this.inputText || ''
   },
 
   methods: {
     resolve () {
-      if (this.topic) {
+      if (this.inputText) {
         this.resolveModalAction({
           modal: this.modal,
-          resolve: this.topic.split(topicDelimiter)
-            .filter(i => i)
-            .join(topicDelimiter)
+          resolve: this.inputText
         })
       }
-    }
+    },
+
+    ...mapActions([
+      'resolveModalAction'
+    ])
   }
 }
 </script>
 
-<!-- <style lang="stylus"></style> -->
+<style lang="stylus">
+</style>

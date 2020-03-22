@@ -108,6 +108,16 @@ const actions = {
     $router.push({ name: 'table', query })
   },
 
+  closeNoteAction (context, payload) {
+    if (context.getters.isInTableFocus(payload.note)) {
+      context.commit('removeFromTableFocus', { note: payload.note })
+    }
+    const query = Object.assign({}, $router.currentRoute.query, {
+      focus: context.getters['getTableFocus'].map(note => note.id)
+    })
+    $router.push({ name: 'table', query })
+  },
+
   deleteNotesAction (context, payload) {
     return Promise.all((payload.notes || [payload.note]).map(note => {
       return context.dispatch('backendAction', {

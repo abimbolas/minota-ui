@@ -11,6 +11,7 @@
 import { mapGetters } from 'vuex'
 import CustomModal from '@/components/modal/Custom'
 import GroupModal from '@/components/modal/Group'
+import InputTextModal from '@/components/modal/InputText'
 import SimpleModal from '@/components/modal/Simple'
 import StorageModal from '@/components/modal/Storage'
 
@@ -20,6 +21,7 @@ export default {
   components: {
     CustomModal,
     GroupModal,
+    InputTextModal,
     SimpleModal,
     StorageModal
   },

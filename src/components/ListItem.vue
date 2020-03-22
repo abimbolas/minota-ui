@@ -4,12 +4,15 @@
     v-long-click="375"
     v-on:normal-click="$emit('primary-action')"
     v-on:long-click="$emit('menu-action')"
+    v-bind:class="{ 'minota-list-item_menu-item': menuItem }"
   )
     //- Left
     .left.primary-activation
       slot(name="primary-activation")
     .left.primary-action
       slot(name="primary-action")
+    .left.primary-icon
+      slot(name="primary-icon")
 
     //- Right
     .right.meta.text-caption.medium-emphasis
@@ -23,7 +26,7 @@
     .body
       .overline.text-overline
         slot(name="overline")
-      .title.text-h6
+      .title(v-bind:class="currentClasses.title")
         slot(name="title")
       .description.text-body-smaller
         slot(name="description")
@@ -31,6 +34,7 @@
 
 <script>
 import longClick from '@/directives/long-click'
+import merge from 'lodash/merge'
 
 export default {
   name: 'ListItem',
@@ -43,7 +47,39 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    menuItem: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    classes: {
+      type: Object,
+      required: false,
+      default () {
+        return {}
+      }
     }
+  },
+
+  data () {
+    return {
+      defaultClasses: {
+        title: 'text-h6',
+        description: 'title-body-smaller'
+      },
+      currentClasses: {}
+    }
+  },
+
+  watch: {
+    'classes' () {
+      this.syncClasses()
+    }
+  },
+
+  created () {
+    this.syncClasses()
   },
 
   methods: {
@@ -52,6 +88,9 @@ export default {
     },
     handleContextAction (event) {
       this.$emit('context-action')
+    },
+    syncClasses () {
+      this.currentClasses = merge({}, this.defaultClasses, this.classes)
     }
   }
 }
@@ -69,30 +108,12 @@ export default {
   padding-right 1rem
   box-sizing border-box
 
-  @media (min-width screen-sm)
-    padding-left 0.5rem
-    padding-right 0.5rem
+  &.minota-list-item_menu-item
+    cursor pointer
+    &:hover
+      background-color hover-layer-color
 
-  @media (min-width screen-md)
-    margin-left 1rem
-    margin-right 1rem
-    padding-left 0.5rem
-    padding-right 0.5rem
-    width calc(100% - 2rem)
-
-  // &:not([disabled])
-  //   cursor pointer
-
-  // &:hover:not([disabled])
-    // background-color alpha(gainsboro, low-emphasis)
-
-  // &[disabled]
-  //   pointer-events none
-
-  // &[disabled] > *
-  //   opacity low-emphasis
-
-  &:after
+  &:not(.minota-list-item_menu-item):after
     content ''
     display block
     height 1px
@@ -110,8 +131,6 @@ export default {
 
   .left
     order 1
-    &:not(:empty)
-      margin-right 0.5rem
 
   .right
     order 3
@@ -127,6 +146,10 @@ export default {
     .button
     .material-icons
       display block
+
+  .primary-icon:not(:empty)
+    align-self center
+    width 72px
 
   .secondary-action:not(:empty)
     align-self center
@@ -151,7 +174,7 @@ export default {
     position relative
     top -1px
     color alpha(black, high-emphasis)
-    font-weight 500
+    // font-weight 500
     white-space nowrap
     overflow hidden
     text-overflow ellipsis

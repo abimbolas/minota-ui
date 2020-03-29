@@ -157,6 +157,7 @@ export default {
 
 .minota-bar-placeholder
   height 56px
+
 .minota-bar
   box-sizing border-box
   transition transform 0.25s, box-shadow 0.25s

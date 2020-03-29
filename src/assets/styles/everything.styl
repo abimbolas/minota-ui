@@ -24,14 +24,37 @@ body
 .minota-screen
   position relative
   min-height 100vh
-  .minota-screen-main
+  display flex
+  flex-direction column
+
+.minota-screen__header
+  order 10
+  align-items center
+  justify-content center
+  &:not(:empty)
+    min-height 56px
     display flex
+
+.minota-screen__footer
+  order 30
+  display flex
+  align-items center
+  justify-content center
+  &:not(:empty)
+    min-height 56px
+
+.minota-screen__main
+  order 20
+  display flex
+  min-height 100vh
+  box-sizing border-box
+  padding 0.25rem
+  .minota-screen__header:not(:empty) ~ &
     min-height calc(100vh - 56px)
-    box-sizing border-box
-    @media (min-width screen-sm)
-      padding 0.125rem 0.5rem 0.5rem 0.5rem
-    @media (min-width screen-md)
-      padding 0.25rem 1rem 1rem 1rem
+  .minota-screen__footer:not(:empty) ~ &
+    min-height calc(100vh - 56px)
+  .minota-screen__header:not(:empty) ~ .minota-screen__footer:not(:empty) ~ &
+    min-height calc(100vh - 112px)
 
 // Media
 .media-max-sm

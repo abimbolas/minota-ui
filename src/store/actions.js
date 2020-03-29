@@ -18,9 +18,9 @@ const actions = {
   },
 
   getNoteAction (context, payload) {
-    const note = context.getters.getNoteById(payload.id)
-    if (note) {
-      return Promise.resolve(note)
+    const found = context.getters.getNoteById(payload.id)
+    if (found) {
+      return Promise.resolve(found)
     } else {
       return context
         .dispatch('backendAction', {

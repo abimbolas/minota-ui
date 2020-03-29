@@ -120,6 +120,9 @@ export default {
     },
 
     codemirrorOnChange (instance, change) {
+      if (instance.doc.size - 5 <= change.to.line) {
+        this.$emit('edit-last-lines')
+      }
       clearTimeout(this.changeTimeout)
       this.changeTimeout = setTimeout(() => {
         this.$emit('input', this.simplemde.value())

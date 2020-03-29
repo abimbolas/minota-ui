@@ -5,6 +5,8 @@
         slot(name="bar")
     main.minota-screen-main
       slot(name="content")
+    footer.minota-screen-footer
+      slot(name="footer")
 </template>
 
 <script>

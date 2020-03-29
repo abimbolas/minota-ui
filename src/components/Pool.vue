@@ -22,6 +22,7 @@
           title="Done with batch actions"
           v-on:click="exitMenuMode()")
           i.material-icons block
+
       template(v-else)
         .button.icon-button(v-on:click="onCloseContext()" v-if="context")
           i.material-icons arrow_upward
@@ -33,25 +34,24 @@
             v-on:set-topic="onChangeTopic($event)")
 
         //- toggle-sort-button-component.icon-button
-        //- button.button.icon-button(
-          v-on:click="onNewNote()"
-          title="New note")
+
+        .button.icon-button(v-on:click="onNewNote()" title="New note")
           i.material-icons add
+
+        .button.icon-button(v-on:click="closePool()")
+          i.material-icons close
+
         //- router-link.no-style.button.icon-button(
-          v-bind:to="poolWithContexURL"
+          v-bind:to="poolWithContextURL"
           title="Open Pool"
           target="_blank")
           i.material-icons open_in_new
-        router-link.button.icon-button(to="/new" title="New")
-          i.material-icons add
 
         //- .button.icon-button(v-on:click="mode = 'menu'")
           i.material-icons edit
 
         //- router-link.button.icon-button(to="/table" title="Table")
           i.material-icons crop_square
-        .button.icon-button(v-on:click="closePool()")
-          i.material-icons close
 
     m-linear-progress(v-bind:open="isLoading" indeterminate)
 
@@ -133,9 +133,9 @@ export default {
   },
 
   computed: {
-    poolWithContexURL () {
-      return this.context ? '/notes?topic=' + this.context : '/notes'
-    },
+    // poolWithContextURL () {
+    //   return this.context ? '/notes?topic=' + this.context : '/notes'
+    // },
     ...mapGetters([
       'isInTableFocus',
       'getOrderBy',
@@ -198,10 +198,24 @@ export default {
       })
     },
 
+    onNewNote () {
+      this.closePool()
+      if (this.context) {
+        this.$router.push({
+          name: 'new',
+          query: {
+            topic: this.context
+          }
+        })
+      } else {
+        this.$router.push('/new')
+      }
+    },
+
     onOpenNote (note) {
       this.exitMenuMode()
-      this.openNoteAction({ note })
       this.closePool()
+      this.openNoteAction({ note })
     },
 
     onOpenContext (context) {
@@ -222,37 +236,18 @@ export default {
       this.fetchTopic(this.context)
     },
 
-    exitMenuMode () {
-      this.mode = ''
-      if (this.selection.length) {
-        this.selection = []
-      }
-    },
-
-    closePool () {
-      this.exitMenuMode()
-      this.$emit('opened', false)
-    },
-
-    onNewNote () {
-      this.closePool()
-      if (this.getContext !== this.context) {
-        this.setContext({ context: this.context })
-      }
-      this.$router.push('/new')
-    },
-
     onDeleteNotes () {
       if (this.selection.length) {
         const notes = extractItems(this.selection)
-        const focused = notes.filter(note => this.isInTableFocus(note)).length
+        const focused = notes.filter(note => this.isInTableFocus(note))
         const text = {
-          Delete: this.languageTranslate('delete', { capitalize: true })
+          Delete: this.languageTranslate('delete', { capitalize: true }),
+          Cancel: this.languageTranslate('cancel', { capitalize: true })
         }
         const body = this.languageComplex('modalBodyDeleteItems', {
           items: this.selection.length,
           notes: notes.length,
-          focused: focused
+          focused: focused.length
         })
         this.openModalAction({
           modal: {
@@ -260,9 +255,13 @@ export default {
             body: body,
             ok: {
               label: text.Delete
+            },
+            cancel: {
+              label: text.Cancel
             }
           }
         }).then(() => {
+          console.log('delete notes', notes)
           this.isLoading = true
           this.removeFromPoolFocus({ notes })
           this.deleteNotesAction({ notes }).then(() => {
@@ -339,6 +338,18 @@ export default {
         // })
         // this.exitMenuMode()
       })
+    },
+
+    exitMenuMode () {
+      this.mode = ''
+      if (this.selection.length) {
+        this.selection = []
+      }
+    },
+
+    closePool () {
+      this.exitMenuMode()
+      this.$emit('opened', false)
     },
 
     ...mapMutations([

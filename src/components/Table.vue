@@ -1,16 +1,18 @@
 <template lang="pug">
-  section.minota-screen.minota-table
+  section.minota-screen.minota-screen_table
     //- Header
-    header.minota-screen-header
-      bar-component(target="window"
+    header.minota-screen__header
+      //- h4 Header
+      //- .button.icon-button
+        i.material-icons more_horiz
+
+      //- bar-component(target="window"
         v-bind:extended-on-sticky="false")
         template
           //- .button.icon-button(v-on:click="openAppMenuDrawer()")
             i.material-icons menu
-
-          //- .button.icon-button(v-on:click="openPoolDrawer()")
+          .button.icon-button(v-on:click="openPoolDrawer()")
             i.material-icons folder_open
-
           .title &nbsp;
             //- topic-breadcrumbs-component.text-overline(
               v-if="getContext"
@@ -18,13 +20,11 @@
               v-on:set-topic="openPoolDrawer($event)")
             //- .topic.text-h6(v-if="focusedNoteTitle") {{ focusedNoteTitle }}
 
-          router-link.button.icon-button(to="/new" title="New")
+          router-link.button.icon-button(to="/new" title="New note")
             i.material-icons add
-
           .button.icon-button(v-on:click="openPoolDrawer()")
             i.material-icons menu
           //- router-link.button.icon-button(to="/pool" title="Pool")
-
           //- .button.icon-button.table-note-menu(
             title="Unpin"
             v-if="getTableFocus[0] && getTableFocus[0].config.pinned"
@@ -35,8 +35,12 @@
             v-on:click="openNoteMenuDrawer(getTableFocus[0])")
             i.material-icons more_vert
 
+    footer.minota-screen__footer
+      //- .button.icon-button
+        i.material-icons add
+
     //-  Content
-    main.minota-screen-main
+    main.minota-screen__main
       template(v-if="getTableFocus.length")
         note-component(
           v-for="note in getTableFocus"
@@ -48,18 +52,18 @@
 
     //- FAB
     //- fab-component(v-bind:target="'window'" v-if="!drawer.opened")
-      i.material-icons(v-on:click="createNewNote()") add
+      i.material-icons more_horiz
 
     //- Pool drawer
     drawer-component(
       position="right"
       v-bind:opened="drawerPoolOpened"
-      v-on:opened="drawerPoolOpened = $event"
+      v-on:opened="drawerToggleOpened($event)"
       id="pool-drawer")
       pool-component(
         position="right"
         v-bind:topic="poolTopic"
-        v-on:opened="drawerPoolOpened = $event"
+        v-on:opened="drawerToggleOpened($event)"
         v-on:topic="poolTopic = $event"
         scroll-target="pool-drawer")
 
@@ -297,6 +301,10 @@ export default {
       this.drawerPoolOpened = true
     },
 
+    drawerToggleOpened ($event) {
+      this.drawerPoolOpened = $event
+    },
+
     openAppMenuDrawer () {
       this.drawerAppMenuOpened = true
     },
@@ -336,7 +344,13 @@ export default {
 <style lang="stylus">
 @import '~@/assets/styles/everything'
 
-.minota-table
+.minota-screen_table
+  // &.minota-screen
+  //   flex-direction row
+  //
+  // .minota-screen__header
+  // .minota-screen__footer
+  //   align-items flex-start
   .minota-bar
     .topic
       display none
@@ -352,7 +366,7 @@ export default {
       @media (min-width screen-sm)
         display none
 
-  .minota-screen-main
+  .minota-screen__main
     justify-content center
     flex-wrap wrap
 

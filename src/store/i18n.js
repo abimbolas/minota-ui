@@ -69,6 +69,10 @@ export const simplePhrases = {
     ru: 'удалить',
     en: 'delete'
   },
+  'cancel': {
+    ru: 'отмена',
+    en: 'cancel'
+  },
   'areYouSureTo': {
     ru: 'вы уверены, что хотите',
     en: 'are you sure to'

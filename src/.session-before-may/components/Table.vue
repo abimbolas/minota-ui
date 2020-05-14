@@ -3,24 +3,23 @@
     //- Header
     header.minota-screen__header
       //- h4 Header
+      //- span &nbsp;
       //- .button.icon-button
         i.material-icons more_horiz
 
-      //- bar-component(target="window"
-        v-bind:extended-on-sticky="false")
+      bar-component(target="window" v-bind:extended-on-sticky="false")
         template
           //- .button.icon-button(v-on:click="openAppMenuDrawer()")
             i.material-icons menu
-          .button.icon-button(v-on:click="openPoolDrawer()")
+          //- .button.icon-button(v-on:click="openPoolDrawer()")
             i.material-icons folder_open
-          .title &nbsp;
+          //- .title &nbsp;
             //- topic-breadcrumbs-component.text-overline(
               v-if="getContext"
               v-bind:topic="getContext"
               v-on:set-topic="openPoolDrawer($event)")
             //- .topic.text-h6(v-if="focusedNoteTitle") {{ focusedNoteTitle }}
-
-          router-link.button.icon-button(to="/new" title="New note")
+          //- router-link.button.icon-button(to="/new" title="New note")
             i.material-icons add
           .button.icon-button(v-on:click="openPoolDrawer()")
             i.material-icons menu
@@ -36,6 +35,7 @@
             i.material-icons more_vert
 
     footer.minota-screen__footer
+      //- span &nbsp;
       //- .button.icon-button
         i.material-icons add
 
@@ -373,23 +373,28 @@ export default {
   .minota-note
     flex-grow 1
     min-width 0
+    margin 0.25rem
+    @media (min-width screen-sm)
+      margin 0.5rem
+    @media (min-width screen-md)
+      margin 1rem
 
-    & + .minota-note
-      margin-top 1rem
-      position relative
-      &:before
-        content ''
-        display block
-        height 1px
-        position absolute
-        top -0.5rem
-        left 0
-        right 0
-        background-color border-color
-      @media (min-width screen-sm)
-        margin-top 0.5rem
-        &:before
-          content none
-      @media (min-width screen-md)
-        margin-top 1rem
+    // & + .minota-note
+    //   margin-top 1rem
+    //   position relative
+    //   &:before
+    //     content ''
+    //     display block
+    //     height 1px
+    //     position absolute
+    //     top -0.5rem
+    //     left 0
+    //     right 0
+    //     background-color border-color
+    //   @media (min-width screen-sm)
+    //     margin-top 0.5rem
+    //     &:before
+    //       content none
+    //   @media (min-width screen-md)
+    //     margin-top 1rem
 </style>

@@ -20,21 +20,21 @@ describe('Workspace', () => {
   })
 
   it('Can add to example area', () => {
-    w.addTo('example', obj)
-    expect(w.isIn('example', obj)).to.be.true
+    w._addTo('example', obj)
+    expect(w._isIn('example', obj)).to.be.true
     expect(w['example'].length).to.equal(1)
-    w.removeFrom('example', obj)
+    w._removeFrom('example', obj)
     expect(w['example'].length).to.equal(0)
   })
 
   it('Do not add same to example area twice', () => {
-    w.addTo('example', obj)
-    w.addTo('example', obj)
+    w._addTo('example', obj)
+    w._addTo('example', obj)
     expect(w['example'].length).to.equal(1)
   })
 
   it('Remove from focus fail silently', () => {
-    w.removeFrom('example', obj)
+    w._removeFrom('example', obj)
     assert.isOk(true)
   })
 
@@ -66,7 +66,7 @@ describe('Workspace', () => {
     expect(w.isInFocus(obj)).to.be.true
 
     const obj2 = createObj()
-    w.setFocusCapacity(2)
+    w.focusCapacity = 2
     w.addToFocus(obj2)
     expect(w.isInFocus(obj)).to.be.true
     expect(w.isInFocus(obj2)).to.be.true
@@ -90,7 +90,7 @@ describe('Workspace', () => {
   it('Move focus content to blur and vice versa', () => {
     const obj2 = createObj()
     const obj3 = createObj()
-    w.setFocusCapacity(3)
+    w.focusCapacity = 3
     w.addToFocus(obj)
     w.addToFocus(obj2)
     w.addToFocus(obj3)
@@ -115,7 +115,7 @@ describe('Workspace', () => {
   describe('Focus capacity', () => {
     // it('Can be removed', () => {
     //   const w2 = new Workspace()
-    //   w2.setFocusCapacity(1)
+    //   w2.focusCapacity = 1
     //   expect(w2.focusCapacity).to.equal(1)
     //   w2.removeFocusCapacity()
     //   expect(w2.focusCapacity).to.be.undefined
@@ -129,7 +129,7 @@ describe('Workspace', () => {
     })
 
     it('While moving into focus which capacity is 1, blur focus', () => {
-      w.setFocusCapacity(1)
+      w.focusCapacity = 1
       w.addToFocus(obj)
       const obj2 = createObj()
       w.addToFocus(obj2)

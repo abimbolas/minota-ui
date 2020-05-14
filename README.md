@@ -1,4 +1,4 @@
-# minota-ui
+# User Interface for Minotá
 
 ## Project setup
 ```

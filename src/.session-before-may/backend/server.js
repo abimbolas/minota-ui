@@ -18,7 +18,7 @@ export default class ServerBackend extends BackendAPI {
   }
 
   getNotes () {
-    return this.resource.get('/notes/all')
+    return this.resource.get('/notes')
       .then(this.parseNotes)
   }
 

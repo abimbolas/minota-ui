@@ -1,29 +1,21 @@
 <template lang="pug">
   .minota-app
     .minota-actions
-      a(v-on:click.prevent="onCreateNote" href) Создать заметку
+      a(v-on:click.prevent="onCreate" href) Создать
 
-      a(v-if="focus.length === 1" v-on:click.prevent="onRemoveNotes" href)
-        span Убрать заметку
+      a(v-on:click.prevent="onRemove" href) Убрать
 
-      a(v-if="focus.length > 1" v-on:click.prevent="onRemoveNotes" href)
-        span Убрать заметки
-
-      a(v-if="blur.length === 1" v-on:click.prevent="onGetNotes" href)
-        span Достать заметку
-
-      a(v-if="blur.length > 1" v-on:click.prevent="onGetNotes" href)
-        span Достать заметки ({{ blur.length }})
+      a(v-on:click.prevent="onGet" href) Достать ({{ workspace.blur.length }})
 
     note-component(
-      v-if="focus.length"
-      v-for="note in focus"
+      v-if="workspace.focus.length"
+      v-for="note in workspace.focus"
       v-bind:key="note.id"
-      v-bind:note="note"
-      v-on:click="onFocusNote(note)")
+      v-bind:note="note")
 </template>
 
 <script>
+import Workspace from '@/models/workspace'
 import NoteComponent from '@/components/Note'
 export default {
   name: 'App',
@@ -34,8 +26,10 @@ export default {
 
   data () {
     return {
-      focus: [],
-      blur: []
+      workspace: new Workspace(),
+      behaviorType: {
+        create: 'replace'
+      }
     }
   },
 
@@ -48,28 +42,35 @@ export default {
   },
 
   methods: {
-    onCreateNote () {
-      this.onRemoveNotes()
-      this.focus.push({
-        content: ``,
-        id: parseInt(Math.random() * 1000000, 10)
-      })
-      console.log('Note created', this.note)
+    onCreate () {
+      if (this.behaviorType.create === 'replace') {
+        // remove all
+        this.workspace.blurFocus()
+        // add new lonely to focus
+        this.workspace.addToFocus({
+          content: '',
+          id: parseInt(Math.random() * 100000, 10)
+        })
+      } else if (this.behaviorType.create === 'add') {
+        // add to focus, extending capacity
+        this.workspace.addToFocus({
+          content: '',
+          id: parseInt(Math.random() * 100000, 10)
+        }, { extendFocusCapacity: true })
+      }
+      console.log('Note created', this.workspace.focus.slice(-1)[0])
     },
 
-    onRemoveNotes () {
-      while (this.focus.length) {
-        this.blur.push(this.focus.pop())
-      }
-      console.log('Note(s) removed')
+    onRemove () {
+      const l = this.workspace.focus.length
+      this.workspace.blurFocus()
+      console.log(`Note${l > 1 ? 's' : ''} removed`)
     },
 
-    onGetNotes () {
-      this.onRemoveNotes()
-      while (this.blur.length) {
-        this.focus.push(this.blur.pop())
-      }
-      console.log('Note(s) got')
+    onGet () {
+      const l = this.workspace.blur.length
+      this.workspace.focusBlur()
+      console.log(`Note${l > 1 ? 's' : ''} got`)
     }
   }
 }

@@ -162,5 +162,22 @@ describe('Workspace', () => {
       expect(w3.isInFocus(objs[1])).to.be.false
       expect(w3.isInBlur(objs[1])).to.be.true
     })
+
+    it('Keeping order', () => {
+      const w = new Workspace()
+      w.addToFocus(1)
+      w.blurFocus()
+      w.addToFocus(2)
+      w.blurFocus()
+      w.addToFocus(3)
+      w.blurFocus()
+      expect(w.blur[0]).to.equal(3)
+      expect(w.blur[1]).to.equal(2)
+      expect(w.blur[2]).to.equal(1)
+      w.focusBlur()
+      expect(w.focus[0]).to.equal(3)
+      expect(w.focus[1]).to.equal(2)
+      expect(w.focus[2]).to.equal(1)
+    })
   })
 })

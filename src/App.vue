@@ -1,22 +1,40 @@
 <template lang="pug">
   .minota-app
     .minota-actions
-      a(v-on:click.prevent="onCreate" href) Создать
+      a(
+        v-on:click.prevent="onCreate"
+        href) Создать
 
-      a(v-on:click.prevent="onRemove" href) Убрать
+      a(
+        v-if="notespace.focus.length"
+        v-on:click.prevent="onRemove"
+        href) Убрать
 
-      a(v-on:click.prevent="onGet" href) Достать ({{ workspace.blur.length }})
+      a(
+        v-if="notespace.blur.length"
+        v-on:click.prevent="onGet"
+        href) Достать ({{ notespace.blur.length }})
 
     note-component(
-      v-if="workspace.focus.length"
-      v-for="note in workspace.focus"
+      v-if="notespace.focus.length"
+      v-for="note in notespace.focus"
       v-bind:key="note.id"
-      v-bind:note="note")
+      v-bind:note="note"
+      v-on:update="onUpdate"
+      v-on:focus="onFocus"
+      v-on:delete="onDelete")
 </template>
 
 <script>
-import Workspace from '@/models/workspace'
+import Notespace from '@/models/notespace'
+import Note from '@/models/note'
 import NoteComponent from '@/components/Note'
+import Backend from '@/backend'
+
+const backend = new Backend({
+  baseURL: 'http://localhost:1234'
+})
+
 export default {
   name: 'App',
 
@@ -26,14 +44,29 @@ export default {
 
   data () {
     return {
-      workspace: new Workspace(),
+      notespace: new Notespace(),
       behaviorType: {
         create: 'replace'
       }
     }
   },
 
+  computed: {
+    emptyFocus () {
+      return this.notespace.focus.every(item => !item.content)
+    }
+  },
+
   created () {
+    backend
+      .getNotes()
+      .then(notes => {
+        if (notes.length) {
+          this.notespace.blur = notes.reverse()
+          // console.log('Notes loaded')
+        }
+      })
+
     console.log('Minotá UI created')
   },
 
@@ -44,33 +77,54 @@ export default {
   methods: {
     onCreate () {
       if (this.behaviorType.create === 'replace') {
-        // remove all
-        this.workspace.blurFocus()
-        // add new lonely to focus
-        this.workspace.addToFocus({
-          content: '',
-          id: parseInt(Math.random() * 100000, 10)
-        })
+        this.notespace.blurFocus()
+        this.notespace.addToFocus(new Note())
       } else if (this.behaviorType.create === 'add') {
-        // add to focus, extending capacity
-        this.workspace.addToFocus({
-          content: '',
-          id: parseInt(Math.random() * 100000, 10)
-        }, { extendFocusCapacity: true })
+        this.notespace.addToFocus(new Note(), { extendFocusCapacity: true })
       }
-      console.log('Note created', this.workspace.focus.slice(-1)[0])
     },
 
     onRemove () {
-      const l = this.workspace.focus.length
-      this.workspace.blurFocus()
-      console.log(`Note${l > 1 ? 's' : ''} removed`)
+      this.notespace.blurFocus()
     },
 
     onGet () {
-      const l = this.workspace.blur.length
-      this.workspace.focusBlur()
-      console.log(`Note${l > 1 ? 's' : ''} got`)
+      this.notespace.focusBlur()
+      // this.notespace.focus.sort((a, b) => {
+      //   if (a.id === b.id) {
+      //     throw new Error('Duplicate items in Notespace')
+      //   } else {
+      //     return a.id < b.id ? 1 : -1
+      //   }
+      // })
+    },
+
+    onUpdate (note) {
+      backend
+        .postNote(note)
+        // .then(note => {
+        //   console.log(`Note ${note.id} updated`)
+        // })
+    },
+
+    onFocus (note) {
+      if (this.notespace.focus.length > 1) {
+        this.notespace.focus.slice().forEach(focused => {
+          if (focused.id !== note.id) {
+            this.notespace.blurFocus(focused)
+          }
+        })
+      }
+    },
+
+    onDelete (note) {
+      this.notespace.removeFromFocus(note)
+      this.notespace.removeFromBlur(note)
+      backend
+        .deleteNote(note)
+        // .then(success => {
+        //   console.log(`Note ${note.id} deleted`)
+        // })
     }
   }
 }

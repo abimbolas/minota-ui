@@ -29,6 +29,16 @@ export default class Backend {
       .then(this._parseSuccess)
   }
 
+  deleteNotes (notes) {
+    return this.resource
+      .delete('/notes', {
+        params: {
+          notes: notes.map(note => note.id)
+        }
+      })
+      .then(this._parseSuccess)
+  }
+
   _parseNotes (response) {
     return Promise.resolve(response.data.map(note => new Note(note)))
   }

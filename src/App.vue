@@ -1,28 +1,59 @@
 <template lang="pug">
   .minota-app
     .minota-actions
-      a(
-        v-on:click.prevent="onCreate"
-        href) Создать
+      .minota-actions__section-left(v-if="!editMode")
+        a(
+          v-show="!selected.focus.length"
+          v-on:click.prevent="onCreate()"
+          href) Создать
 
-      a(
-        v-if="notespace.focus.length"
-        v-on:click.prevent="onRemove"
-        href) Убрать
+        a(
+          v-show="!selected.focus.length"
+          v-bind:disabled="!notespace.focus.length"
+          v-on:click.prevent="onRemove()"
+          href) Убрать<span v-if="notespace.focus.length > 0"> ({{ notespace.focus.length }})</span>
 
-      a(
-        v-if="notespace.blur.length"
-        v-on:click.prevent="onGet"
-        href) Достать ({{ notespace.blur.length }})
+        a(
+          v-show="!selected.focus.length"
+          v-bind:disabled="!notespace.blur.length"
+          v-on:click.prevent="onGet()"
+          href) Достать<span v-if="notespace.blur.length"> ({{ notespace.blur.length }})</span>
+
+      .minota-actions__section-left(v-if="editMode")
+        a(
+          v-bind:disabled="!selected.focus.length"
+          v-on:click.prevent="onDeleteSelected()"
+          href) Удалить<span v-if="selected.focus.length > 0"> ({{selected.focus.length}})</span>
+
+        a(
+          v-show="selected.focus.length"
+          v-on:click.prevent="selected.clearFocus()"
+          href) Сбросить выделение
+
+      .minota-actions__section-right(v-if="notespace.focus.length")
+        a(
+          v-if="!editMode"
+          v-bind:disabled="!notespace.focus.length"
+          v-on:click.prevent="editMode = true"
+          href) &#9998;
+        a(
+          v-if="editMode"
+          v-on:click.prevent="editMode = false"
+          href) Отмена
 
     note-component(
       v-if="notespace.focus.length"
       v-for="note in notespace.focus"
       v-bind:key="note.id"
       v-bind:note="note"
-      v-on:update="onUpdate"
-      v-on:focus="onFocus"
-      v-on:delete="onDelete")
+      v-bind:mode="editMode ? 'edit' : ''"
+      v-bind:selected="selected.isInFocus(note)"
+      v-on:focus="onFocus(note)"
+      v-on:select="onSelect(note)"
+      v-on:update="onUpdate(note)")
+
+    .minota-status
+      strong.minota-status__item(v-if="editMode") edit mode
 </template>
 
 <script>
@@ -47,13 +78,18 @@ export default {
       notespace: new Notespace(),
       behaviorType: {
         create: 'replace'
-      }
+      },
+      editMode: false,
+      selected: new Notespace()
     }
   },
 
-  computed: {
-    emptyFocus () {
-      return this.notespace.focus.every(item => !item.content)
+  watch: {
+    'editMode' (editMode) {
+      // set mode to whole app
+      this.$el.ownerDocument.body.classList[editMode ? 'add' : 'remove']('minota-mode__edit')
+      // clear selected
+      this.selected.clearFocus()
     }
   },
 
@@ -63,7 +99,6 @@ export default {
       .then(notes => {
         if (notes.length) {
           this.notespace.blur = notes.reverse()
-          // console.log('Notes loaded')
         }
       })
 
@@ -79,32 +114,24 @@ export default {
       if (this.behaviorType.create === 'replace') {
         this.notespace.blurFocus()
         this.notespace.addToFocus(new Note())
+        this.editMode = false
       } else if (this.behaviorType.create === 'add') {
         this.notespace.addToFocus(new Note(), { extendFocusCapacity: true })
       }
     },
 
-    onRemove () {
-      this.notespace.blurFocus()
+    onRemove (note) {
+      this.notespace.blurFocus(note)
+      this.editMode = false
     },
 
     onGet () {
+      this.notespace.blurFocus()
       this.notespace.focusBlur()
-      // this.notespace.focus.sort((a, b) => {
-      //   if (a.id === b.id) {
-      //     throw new Error('Duplicate items in Notespace')
-      //   } else {
-      //     return a.id < b.id ? 1 : -1
-      //   }
-      // })
     },
 
     onUpdate (note) {
-      backend
-        .postNote(note)
-        // .then(note => {
-        //   console.log(`Note ${note.id} updated`)
-        // })
+      backend.postNote(note)
     },
 
     onFocus (note) {
@@ -115,16 +142,41 @@ export default {
           }
         })
       }
+      this.editMode = false
     },
 
     onDelete (note) {
       this.notespace.removeFromFocus(note)
       this.notespace.removeFromBlur(note)
-      backend
-        .deleteNote(note)
-        // .then(success => {
-        //   console.log(`Note ${note.id} deleted`)
-        // })
+      backend.deleteNote(note)
+      this.editMode = false
+    },
+
+    onSelect (note) {
+      if (this.selected.isInFocus(note)) {
+        this.selected.removeFromFocus(note)
+      } else {
+        this.selected.addToFocus(note, { extendFocusCapacity: true })
+      }
+    },
+
+    onFocusSelected () {
+      this.notespace.blurFocus()
+      this.selected.focus.forEach(item => this.notespace.addToFocus(item, { extendFocusCapacity: true }))
+      this.editMode = false
+    },
+
+    onDeleteSelected () {
+      this.selected.focus.forEach(item => {
+        this.notespace.removeFromFocus(item)
+        this.notespace.removeFromBlur(item)
+      })
+      backend.deleteNotes(this.selected.focus)
+      this.editMode = false
+    },
+
+    capitalize (prop) {
+      return prop[0].toUpperCase() + prop.slice(1)
     }
   }
 }
@@ -141,8 +193,6 @@ body
   padding 0
 
 textarea
-input
-button
   display block
   font-family mono-family
   font-size inherit
@@ -154,10 +204,30 @@ button
   border solid gainsboro 1px
   box-sizing border-box
   min-height 300px
+input
+button
+  display block
+  font-family mono-family
+  font-size inherit
+  line-height inherit
+  outline none
+  box-sizing border-box
+  cursor pointer
 
 .minota-actions
   margin 1rem 0
+  display flex
   a
     margin 0 0.5rem
+    &[disabled]
+      pointer-events none
+      opacity low-emphasis
+  .minota-actions__section-right
+    margin-left auto
+    margin-right 0
+
+.minota-status__item
+  margin 0 0.5rem
+  font-size smaller
 
 </style>

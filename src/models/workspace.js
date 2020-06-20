@@ -8,10 +8,10 @@ export default class Workspace {
 
   addToFocus (obj, { focusCapacity = 1 } = {}) {
     this._removeFrom('blur', obj)
-    this._addTo('focus', obj)
-    while (this.focus.length > focusCapacity) {
+    while (this.focus.length >= focusCapacity) {
       this.blurFocus(this.focus.slice(-1)[0])
     }
+    this._addTo('focus', obj)
   }
 
   isInFocus (obj) {

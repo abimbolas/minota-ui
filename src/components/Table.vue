@@ -1,22 +1,30 @@
 <template lang="pug">
   .minota-view
-    .minota-actions
-      .minota-section-left
+    .minota-actions.minota-actions_sticky
+
+      //- Regular mode
+      .minota-section-left(v-if="mode !== 'edit'")
         a.minota-actions__action(
-          v-if="mode !== 'edit'"
           v-on:click.prevent="onCreate()" href)
           strong Создать
 
         a.minota-actions__action(
-          v-if="mode !== 'edit' && table.length === 1"
+          v-if="table.length === 1"
           v-on:click.prevent="onDelete()" href)
           strong Удалить
 
         a.minota-actions__action(
-          v-if="mode !== 'edit' && table.length > 1"
+          v-if="table.length > 1"
           v-on:click.prevent="onEdit()" href)
           strong Редактировать
 
+        //- a.minota-actions__action(
+          v-show="focused.focus.length"
+          v-on:click.prevent="onOpenLastFocused()" href)
+          strong Открыть
+
+      //- Edit mode
+      .minota-section-left(v-if="mode === 'edit'")
         a.minota-actions__action(
           v-if="mode === 'edit' && table.length"
           v-on:click.prevent="onDoneEdit()" href)
@@ -31,7 +39,7 @@
         a.minota-actions__action(
           v-if="mode !== 'edit' && table.length"
           v-on:click.prevent="onDone()" href)
-          small Убрать <span v-if="table.length > 1">всё</span> ({{ table.length }})
+          small Убрать ({{ table.length }})
 
         a.minota-actions__action(
           v-if="mode === 'edit' && selected.focus.length"
@@ -57,6 +65,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import bus from '@/event-bus'
 import Note from '@/models/note'
 import NoteComponent from '@/components/Note'
 import NoteListItemComponent from '@/components/NoteListItem'
@@ -178,3 +187,7 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+@import '~@/assets/styles/common'
+</style>

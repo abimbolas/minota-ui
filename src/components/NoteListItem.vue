@@ -68,7 +68,6 @@ export default {
   overflow-y hidden
   cursor pointer
   display flex
-  // font-family mono-family
   & + &
     margin-top 1rem
 

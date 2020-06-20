@@ -1,15 +1,15 @@
 <template lang="pug">
-  .minota-note
-    textarea(placeholder="Что в голове?" v-model="note.content")
-    //- .minota-actions_vertical
-      a.minota-actions__action_icon(
-        v-on:click.prevent="onClose()"
-        href)
-        span(style="font-size: 110%;") &times;
+  .minota-note(on)
+    textarea(
+      placeholder="Что в голове?"
+      v-model="note.content"
+      v-on:focus="onFocus()"
+      v-on:blur="onBlur()")
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import bus from '@/event-bus'
 import Note from '@/models/note'
 
 export default {
@@ -32,14 +32,20 @@ export default {
     }
   },
 
-  mounted () {
-    // this.$el.querySelector('textarea').focus()
+  created () {
+    bus.$on(`focus-${this.note.id}`, () => {
+      this.$el.querySelector('textarea').focus();
+    })
   },
 
   methods: {
-    // onClose () {
-    //   this.$emit('close', this.note)
-    // },
+    onFocus () {
+      this.$emit('focus', this.note)
+    },
+
+    onBlur () {
+      this.$emit('blur', this.note)
+    },
 
     ...mapActions([
       'updateNoteAction'

@@ -2,7 +2,7 @@
   .minota-view
     .minota-actions.minota-actions_sticky
 
-      //- Regular mode
+      //- LEFT: Regular mode
       .minota-section-left(v-if="mode !== 'edit'")
         a.minota-actions__action(
           v-on:click.prevent="onCreate()" href)
@@ -18,31 +18,32 @@
           v-on:click.prevent="onEdit()" href)
           strong Редактировать
 
-        //- a.minota-actions__action(
-          v-show="focused.focus.length"
-          v-on:click.prevent="onOpenLastFocused()" href)
-          strong Открыть
-
-      //- Edit mode
+      //- LEFT: Edit mode
       .minota-section-left(v-if="mode === 'edit'")
         a.minota-actions__action(
-          v-if="mode === 'edit' && table.length"
+          v-if="table.length"
           v-on:click.prevent="onDoneEdit()" href)
           small Отменить редактирование
 
-      .minota-section-right
+      //- RIGHT: Regular mode
+      .minota-section-right(v-if="mode !== 'edit'")
         a.minota-actions__action(
-          v-if="mode !== 'edit' && !table.length && other.length"
-          v-on:click.prevent="onGet()" href)
-          small Достать ({{ other.length }})
-
-        a.minota-actions__action(
-          v-if="mode !== 'edit' && table.length"
+          v-if="table.length"
           v-on:click.prevent="onDone()" href)
           small Убрать ({{ table.length }})
 
         a.minota-actions__action(
-          v-if="mode === 'edit' && selected.focus.length"
+          v-if="otherLength()"
+          v-on:click.prevent="onGet()" href)
+          small Достать ({{ otherLength() }})
+
+      //- RIGHT: Edit mode
+      .minota-section-right(v-if="mode === 'edit' && selected.focus.length")
+        a.minota-actions__action(
+          v-on:click.prevent="onOpenSelected()" href)
+          strong Открыть <span v-show="selected.focus.length">({{ selected.focus.length }})</span>
+
+        a.minota-actions__action(
           v-on:click.prevent="onDeleteSelected()" href)
           strong Удалить <span v-show="selected.focus.length">({{ selected.focus.length }})</span>
 
@@ -88,7 +89,10 @@ export default {
 
   computed: {
     other () {
-      return this.drawer.filter(note => !this.isOnTable(note))
+      return this.drawer.filter(note => {
+        console.log('is on table', note.id, this.isOnTable(note))
+        return !this.isOnTable(note)
+      })
     },
 
     ...mapGetters([
@@ -170,6 +174,16 @@ export default {
       this.removeFromDrawer({ notes })
       this.removeFromTable({ notes })
       this.onDoneEdit()
+    },
+
+    onOpenSelected () {
+      let notes = this.selected.focus.slice(0)
+      this.replaceOnTable({ notes })
+      this.onDoneEdit()
+    },
+
+    otherLength () {
+      return this.drawer.filter(note => !this.isOnTable(note)).length
     },
 
     ...mapMutations([

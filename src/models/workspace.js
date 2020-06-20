@@ -1,21 +1,16 @@
 export default class Workspace {
-  constructor ({ focusCapacity = 1, blur = [], focus = [] } = {}) {
+  constructor ({ blur = [], focus = [] } = {}) {
     this.blur = blur
     this.focus = focus
-    this.focusCapacity = focusCapacity
   }
 
   // Focus
 
-  addToFocus (obj, { extendFocusCapacity = false } = {}) {
+  addToFocus (obj, { focusCapacity = 1 } = {}) {
     this._removeFrom('blur', obj)
     this._addTo('focus', obj)
-    if (extendFocusCapacity) {
-      this.focusCapacity = this.focus.length + 1
-    } else {
-      while (this.focus.length > this.focusCapacity) {
-        this.blurFocus(this.focus.slice(-1)[0])
-      }
+    while (this.focus.length > focusCapacity) {
+      this.blurFocus(this.focus.slice(-1)[0])
     }
   }
 
@@ -39,16 +34,6 @@ export default class Workspace {
 
   clearFocus () {
     this._clear('focus')
-  }
-
-  // Capacity
-
-  get focusCapacity () {
-    return this._focusCapacity
-  }
-
-  set focusCapacity (size) {
-    this._focusCapacity = parseInt(size, 10)
   }
 
   // Blur
@@ -85,6 +70,8 @@ export default class Workspace {
   _addTo (type, obj) {
     if (!this._isIn(type, obj)) {
       this[type].unshift(obj)
+    } else {
+      this._replaceIn(type, obj)
     }
   }
 

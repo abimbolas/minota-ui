@@ -168,6 +168,7 @@ export default {
   },
 
   created () {
+    console.log('created')
     // React to context change
     const mutations = {
       setContext: payload => {

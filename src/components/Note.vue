@@ -1,18 +1,17 @@
 <template lang="pug">
-  .minota-note(v-bind:mode="mode" v-bind:selected="selected")
-    textarea(
-      placeholder="Что в голове?"
-      v-model="note.content"
-      v-on:focus="onFocus"
-      v-on:click="onClick")
-    input(
-      type="checkbox"
-      v-show="mode === 'edit'"
-      v-bind:value="selected"
-      v-on:input="onSelectInput()")
+  .minota-note
+    textarea(placeholder="Что в голове?" v-model="note.content")
+    //- .minota-actions_vertical
+      a.minota-actions__action_icon(
+        v-on:click.prevent="onClose()"
+        href)
+        span(style="font-size: 110%;") &times;
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import Note from '@/models/note'
+
 export default {
   name: 'Note',
 
@@ -21,76 +20,61 @@ export default {
       type: Object,
       required: true,
       default () {
-        return {}
+        return new Note()
       }
-    },
-    mode: {
-      type: String,
-      required: false,
-      default: ''
-    },
-    selected: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
-
-  data () {
-    return {
-      checked: false
     }
   },
 
   watch: {
     'note.content' () {
       this.$emit('update', this.note)
-    },
-    'selected' (selected) {
-      this.$el.querySelector('input[type="checkbox"]').checked = selected
+      this.updateNoteAction({ note: this.note })
     }
   },
 
+  mounted () {
+    // this.$el.querySelector('textarea').focus()
+  },
+
   methods: {
-    onFocus () {
-      if (this.mode !== 'edit') {
-        this.$emit('focus', this.note)
-        setTimeout(() => {
-          this.$el.querySelector('textarea').focus()
-        })
-      }
-    },
+    // onClose () {
+    //   this.$emit('close', this.note)
+    // },
 
-    onClick () {
-      if (this.mode === 'edit') {
-        this.onSelectInput()
-      }
-    },
-
-    onSelectInput () {
-      this.$emit('select', this.note)
-    }
+    ...mapActions([
+      'updateNoteAction'
+    ])
   }
 }
 </script>
 
 <style lang="stylus">
+@import '~@/assets/styles/variables'
+
 .minota-note
-  margin 0.5rem 0
-  &[mode="edit"]
-    display flex
-    justify-content flex-start
-    input
-      width 2rem
-      height 2rem
-      margin 0 0.5rem
-    textarea
-      cursor pointer
+  margin 1rem 0
+  display flex
+  position relative
+  textarea
+    width 100%
+    margin 0
+    max-width none
+    border-radius 0.25rem
+    min-height 21rem
+    font-family sans-family
+    padding-right 2rem
 
-.minota-note__actions
-  font-size 80%
-  display none
-  a
-    margin-left 1rem
+.minota-actions_vertical
+  display flex
+  flex-direction column
+  margin-left 0.5rem
+  position absolute
+  right 0
+  top 0
 
+.minota-actions__action_icon
+  width 1.5rem
+  height 1.5rem
+  text-align center
+  line-height 1.5rem
 </style>

@@ -66,7 +66,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import bus from '@/event-bus'
+// import bus from '@/event-bus'
 import Note from '@/models/note'
 import NoteComponent from '@/components/Note'
 import NoteListItemComponent from '@/components/NoteListItem'
@@ -132,7 +132,7 @@ export default {
     },
 
     onDone () {
-      this.clearTable()
+      this.moveToDrawer()
       this.syncDrawerAction()
     },
 
@@ -190,7 +190,7 @@ export default {
       'addToTable',
       'replaceOnTable',
       'removeFromTable',
-      'clearTable',
+      'moveToDrawer',
       'addToDrawer',
       'removeFromDrawer'
     ]),

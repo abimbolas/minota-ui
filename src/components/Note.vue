@@ -34,7 +34,7 @@ export default {
 
   created () {
     bus.$on(`focus-${this.note.id}`, () => {
-      this.$el.querySelector('textarea').focus();
+      this.$el.querySelector('textarea').focus()
     })
   },
 

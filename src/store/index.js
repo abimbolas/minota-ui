@@ -53,7 +53,11 @@ export default new Vuex.Store({
       })
     },
 
-    clearTable (state) {
+    moveToDrawer (state, payload = {}) {
+      let notes = payload.notes || (payload.note && [payload.note]) || state.table
+      notes.forEach(note => {
+        drawer.addToFocus(note, { focusCapacity: Number.POSITIVE_INFINITY })
+      })
       table.clearFocus()
     },
 
@@ -83,7 +87,7 @@ export default new Vuex.Store({
       return new LastPromise({
         type: `sync-drawer`,
         promise: backend.getNotes().then(notes => {
-          context.commit('addToDrawer', { notes })
+          context.commit('addToDrawer', { notes: notes.slice(0).reverse() })
         }),
         registry
       })

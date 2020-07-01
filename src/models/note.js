@@ -15,4 +15,13 @@ export default class Note {
   set id (id) {
     this.config.id = id
   }
+
+  update ({ content = null, config = null } = {}) {
+    if (content !== null) {
+      this.content = content
+    }
+    if (config !== null) {
+      this.config = Object.assign(this.config, config)
+    }
+  }
 }

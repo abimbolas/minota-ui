@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from 'vuex-persistedstate'
 
 import Backend from '@/backend'
 import LastPromise from '@/utils/last-promise'
 
+import Note from '@/models/note'
 import Notespace from '@/models/notespace'
 
 Vue.use(Vuex)
@@ -34,7 +36,8 @@ export default new Vuex.Store({
     addToTable (state, payload) {
       (payload.notes || [payload.note]).forEach(note => {
         table.addToFocus(note, {
-          focusCapacity: payload.focusCapacity || 1
+          focusCapacity: payload.focusCapacity || 1,
+          append: payload.append
         })
       })
     },
@@ -71,6 +74,13 @@ export default new Vuex.Store({
       (payload.notes || [payload.note]).forEach(note => {
         drawer.removeFromFocus(note)
       })
+    },
+
+    updateOnTable (state, payload) {
+      let note = state.table.find(note => note.id === payload.note.id)
+      if (note) {
+        note.update(payload.note)
+      }
     }
   },
 
@@ -92,5 +102,24 @@ export default new Vuex.Store({
         registry
       })
     }
-  }
+  },
+
+  plugins: [
+    createPersistedState({
+      key: 'minota-store',
+      storage: localStorage,
+      paths: ['table', 'drawer'],
+      arrayMerger (store, saved) {
+        // 'store' is actual table.focus and drawer.focus arrays, so
+        // we need to keep them as store
+        while (store.length) {
+          store.pop()
+        }
+        saved.forEach(item => {
+          store.push(new Note(item))
+        })
+        return store
+      }
+    })
+  ]
 })

@@ -1,10 +1,8 @@
 <template lang="pug">
-  .minota-note(on)
-    textarea(
-      placeholder="Что в голове?"
-      v-model="note.content"
-      v-on:focus="onFocus()"
-      v-on:blur="onBlur()")
+  .minota-note
+    .minota-note__editor(
+      contenteditable
+      v-on:input="onInput($event)")
 </template>
 
 <script>
@@ -33,18 +31,27 @@ export default {
   },
 
   created () {
-    bus.$on(`focus-${this.note.id}`, () => {
-      this.$el.querySelector('textarea').focus()
-    })
+    bus.$on(`focus-start-${this.note.id}`, this.onFocusStart.bind(this))
+  },
+
+  mounted () {
+    this.$el.querySelector('[contenteditable]').innerText = this.note.content || ''
   },
 
   methods: {
-    onFocus () {
-      this.$emit('focus', this.note)
+    onInput (event) {
+      this.note.content = event.target.innerText
     },
 
-    onBlur () {
-      this.$emit('blur', this.note)
+    onFocusStart () {
+      this.$el.querySelector('[contenteditable]').focus()
+      setTimeout(() => {
+        this.$el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'start'
+        })
+      })
     },
 
     ...mapActions([
@@ -58,29 +65,20 @@ export default {
 @import '~@/assets/styles/variables'
 
 .minota-note
-  margin 1rem 0
-  display flex
-  position relative
-  textarea
-    width 100%
-    margin 0
-    max-width none
-    border-radius 0.25rem
-    min-height 21rem
-    font-family sans-family
-    padding-right 2rem
-
-.minota-actions_vertical
   display flex
   flex-direction column
-  margin-left 0.5rem
-  position absolute
-  right 0
-  top 0
+  position relative
+  border-radius 0.25rem
+  font-family sans-family
+  font-size 18px
+  padding 2rem
+  padding-bottom 3rem
+  background-color white
+  box-sizing border-box
+  box-shadow 0px 1px 2px 0px alpha(black, 0.1), 0px 0px 10px 0px alpha(black, 0.05)
 
-.minota-actions__action_icon
-  width 1.5rem
-  height 1.5rem
-  text-align center
-  line-height 1.5rem
+.minota-note__editor
+  width 100%
+  flex-grow 1
+  outline none
 </style>

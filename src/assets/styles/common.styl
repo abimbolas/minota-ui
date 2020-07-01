@@ -1,4 +1,5 @@
 @import '~@/assets/styles/variables'
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons')
 
 html
 body
@@ -7,6 +8,11 @@ body
   font-family sans-family
   margin 0
   padding 0
+  overflow visible
+  min-height 100vh
+
+html
+  background-color #efefef
 
 textarea
   display block
@@ -33,24 +39,48 @@ button
 input
   cursor text
 
+a
+a:hover
+a:visited
+a:active
+  color steelblue
+
 // Actions
 
 .minota-actions
   display flex
-  margin-bottom 1rem
   justify-content space-between
+  padding 1rem
+  box-sizing border-box
+  transition all 0.3s ease-out
+  &[hidden]
+    opacity 0
+    pointer-events none
+  &[disabled]
+    opacity 0
+    pointer-events none
 
-  &.minota-actions_sticky
-    position fixed
-    background-color white
-    z-index 10
-    left 0
-    top 0
-    width 100%
-    padding 1rem
-    box-sizing border-box
-    & + *
-      margin-top 3rem;
+  &.minota-actions_top
+    padding-bottom 0.5rem
+  &.minota-actions_bottom
+    padding-top 0.5rem
+
+  // &.minota-actions_sticky
+  //   position fixed
+  //   // background-color white
+  //   // box-shadow 0px 0px 10px 0px alpha(black, 0.125)
+  //   z-index 10
+  //   left 0
+  //   top 0
+  //   width 100%
+  //   padding-top 1rem
+  //   padding-bottom 1rem
+  //   &.minota-actions_top
+  //     top 0
+  //     bottom auto
+  //   &.minota-actions_bottom
+  //     bottom 0
+  //     top auto
 
 .minota-actions__action
   &[disabled]
@@ -59,7 +89,6 @@ input
 
 .minota-actions__action + .minota-actions__action
   margin-left 1rem
-
 
 // Sections
 
@@ -73,3 +102,13 @@ input
   margin-left auto
   display flex
   align-items center
+
+// Status
+
+.minota-status
+  // text-align right
+  margin-right 0
+  margin-left auto
+  font-size smaller
+  line-height 1.5rem
+  opacity low-emphasis

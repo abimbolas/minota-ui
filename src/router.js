@@ -5,7 +5,7 @@ import TableComponent from '@/components/Table'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -20,3 +20,12 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach(function (to, from, next) {
+  if (document && document.body) {
+    document.documentElement.setAttribute('name', to.name)
+  }
+  next()
+})
+
+export default router

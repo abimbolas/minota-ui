@@ -81,6 +81,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import fastdom from 'fastdom'
 
 import bus from '@/event-bus'
 import Note from '@/models/note'
@@ -165,6 +166,61 @@ export default {
       if (event.key === 'Control') {
         this.disableItemScroll = false
       }
+    })
+
+    let threshold = 5
+
+    let viewScrollData = {
+      scrollHeight: this.$el.scrollHeight,
+      height: this.$el.offsetHeight,
+      current: this.$el.scrollTop,
+      isAtTop: false,
+      isAtBottom: false
+    }
+
+    this.$el.addEventListener('scroll', event => {
+      let data = viewScrollData
+      let t = threshold || 0
+      fastdom.measure(() => {
+        data.scrollHeight = this.$el.scrollHeight
+        data.current = this.$el.scrollTop
+        data.isAtTop = data.current <= t
+        data.topHidden = data.current - 48 <= t
+        data.bottomHidden = Math.abs(data.scrollHeight - data.height - data.current - 48) <= t
+        data.isAtBottom = Math.abs(data.scrollHeight - data.height - data.current) <= t
+        if (data.bottomHidden) {
+          this.disableItemScroll = false
+        }
+      })
+    })
+
+    // Scroll content item
+
+    Array.from(this.$el.querySelectorAll('.minota-view__content-item')).forEach(item => {
+      let data = {
+        current: item.scrollTop,
+        scrollHeight: item.scrollHeight,
+        height: item.offsetHeight,
+        prev: item.scrollTop,
+        velocity: 0,
+        isAtTop: undefined,
+        isAtBottom: undefined
+      }
+
+      item.addEventListener('scroll', event => {
+        fastdom.measure(() => {
+          data.current = item.scrollTop
+          data.scrollHeight = item.scrollHeight
+          // fer
+          data.velocity = data.current - data.prev
+          data.prev = data.current
+          data.isAtTop = data.current <= (threshold || 0)
+          data.isAtBottom = data.scrollHeight - data.height - data.current <= (threshold || 0)
+          if (data.isAtBottom && data.velocity < 0 && viewScrollData.isAtBottom) {
+            this.disableItemScroll = true
+          }
+        })
+      })
     })
   },
 

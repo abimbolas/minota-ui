@@ -45,51 +45,6 @@ a:visited
 a:active
   color steelblue
 
-// Actions
-
-.minota-actions
-  display flex
-  justify-content space-between
-  padding 1rem
-  box-sizing border-box
-  transition all 0.3s ease-out
-  &[hidden]
-    opacity 0
-    pointer-events none
-  &[disabled]
-    opacity 0
-    pointer-events none
-
-  &.minota-actions_top
-    padding-bottom 0.5rem
-  &.minota-actions_bottom
-    padding-top 0.5rem
-
-  // &.minota-actions_sticky
-  //   position fixed
-  //   // background-color white
-  //   // box-shadow 0px 0px 10px 0px alpha(black, 0.125)
-  //   z-index 10
-  //   left 0
-  //   top 0
-  //   width 100%
-  //   padding-top 1rem
-  //   padding-bottom 1rem
-  //   &.minota-actions_top
-  //     top 0
-  //     bottom auto
-  //   &.minota-actions_bottom
-  //     bottom 0
-  //     top auto
-
-.minota-actions__action
-  &[disabled]
-    opacity low-emphasis
-    pointer-events none
-
-.minota-actions__action + .minota-actions__action
-  margin-left 1rem
-
 // Sections
 
 .minota-section-left

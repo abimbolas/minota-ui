@@ -1,5 +1,24 @@
 <template lang="pug">
-  .minota-view.minota-view__table.minota-view_only-bottom-actions(v-bind:intent="intent")
+  table-grid-component
+    template(v-slot:actions-top) Top actions
+    template(v-slot:actions-bottom)
+      .minota-section-left
+        .minota-status Create
+      .minota-section-right
+        a.minota-action(v-on:click.prevent="onRemoveVisible()" href) Убрать
+    template(v-slot:actions-left) Left actions
+    template(v-slot:actions-right) Right actions
+    template(v-slot:content)
+      table-grid-content-item-component(
+        v-for="note in table.slice(0).reverse()"
+        v-bind:key="note.id"
+        v-on:enter-view="onEnterView(note)"
+        v-on:exit-view="onExitView(note)")
+        note-component(v-bind:note="note")
+      table-grid-content-item-component
+        .minota-table__clean(v-on:click="onCreate()")
+          span (Кликните по столу чтобы создать новую заметку)
+  //- .minota-table-grid(v-bind:intent="intent")
     .minota-actions.minota-actions_bottom
       .minota-section-left
         //- .minota-status {{ intent | capitalize }}
@@ -63,38 +82,27 @@
         a.minota-actions__action(
           v-on:click.prevent="onOpenSelected()" href)
           strong Открыть <span v-show="selected.focus.length">({{ selected.focus.length }})</span>
-
-    .minota-view__content(
-      v-bind:disable-item-scroll="disableItemScroll")
-      .minota-view__content-item(v-for="note in table.slice(0).reverse()")
-        note-component(
-          v-bind:key="note.id"
-          v-bind:note="note"
-          v-bind:note-id="note.id"
-          v-on:update="onUpdate(note)")
-
-      .minota-view__content-item
-        .minota-table__clean(
-          v-on:click.prevent="onCreate()")
-          span (Кликните по столу, чтобы создать новую заметку)
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import fastdom from 'fastdom'
+// import fastdom from 'fastdom'
 
 import bus from '@/event-bus'
 import Note from '@/models/note'
-import NoteComponent from '@/components/Note'
-import NoteListItemComponent from '@/components/NoteListItem'
 import Notespace from '@/models/notespace'
+
+import NoteComponent from '@/components/Note'
+import TableGridComponent from '@/components/TableGrid'
+import TableGridContentItemComponent from '@/components/TableGridContentItem'
 
 export default {
   name: 'Table',
 
   components: {
     NoteComponent,
-    NoteListItemComponent
+    TableGridComponent,
+    TableGridContentItemComponent
   },
 
   data () {
@@ -123,106 +131,149 @@ export default {
     ])
   },
 
-  mounted () {
-    this.syncDrawerAction()
-    this.emptyPlaceholder = Math.floor((Math.random() * 2))
-
-    this.$el.querySelector('.minota-view__content').scrollIntoView({
-      block: 'center',
-      inline: 'center',
-      behavior: 'smooth'
-    })
-
-    let bottomActionsEl = this.$el.querySelector('.minota-actions_bottom')
-
-    let observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.target.classList.contains('minota-table__clean')) {
-          if (entry.isIntersecting) {
-            requestIdleCallback(() => {
-              // topActionsEl.setAttribute('disabled', true)
-              bottomActionsEl.setAttribute('disabled', true)
-            })
-          } else {
-            requestIdleCallback(() => {
-              // topActionsEl.removeAttribute('disabled')
-              bottomActionsEl.removeAttribute('disabled')
-            })
-          }
-        }
-      })
-    }, {
-      threshold: 0.5
-    })
-    observer.observe(this.$el.querySelector('.minota-table__clean'))
-
-    // Ctrl
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Control') {
-        this.disableItemScroll = true
-      }
-    })
-    document.addEventListener('keyup', event => {
-      if (event.key === 'Control') {
-        this.disableItemScroll = false
-      }
-    })
-
-    let threshold = 5
-
-    let viewScrollData = {
-      scrollHeight: this.$el.scrollHeight,
-      height: this.$el.offsetHeight,
-      current: this.$el.scrollTop,
-      isAtTop: false,
-      isAtBottom: false
-    }
-
-    this.$el.addEventListener('scroll', event => {
-      let data = viewScrollData
-      let t = threshold || 0
-      fastdom.measure(() => {
-        data.scrollHeight = this.$el.scrollHeight
-        data.current = this.$el.scrollTop
-        data.isAtTop = data.current <= t
-        data.topHidden = data.current - 48 <= t
-        data.bottomHidden = Math.abs(data.scrollHeight - data.height - data.current - 48) <= t
-        data.isAtBottom = Math.abs(data.scrollHeight - data.height - data.current) <= t
-        if (data.bottomHidden) {
-          this.disableItemScroll = false
-        }
-      })
-    })
-
-    // Scroll content item
-
-    Array.from(this.$el.querySelectorAll('.minota-view__content-item')).forEach(item => {
-      let data = {
-        current: item.scrollTop,
-        scrollHeight: item.scrollHeight,
-        height: item.offsetHeight,
-        prev: item.scrollTop,
-        velocity: 0,
-        isAtTop: undefined,
-        isAtBottom: undefined
-      }
-
-      item.addEventListener('scroll', event => {
-        fastdom.measure(() => {
-          data.current = item.scrollTop
-          data.scrollHeight = item.scrollHeight
-          // fer
-          data.velocity = data.current - data.prev
-          data.prev = data.current
-          data.isAtTop = data.current <= (threshold || 0)
-          data.isAtBottom = data.scrollHeight - data.height - data.current <= (threshold || 0)
-          if (data.isAtBottom && data.velocity < 0 && viewScrollData.isAtBottom) {
-            this.disableItemScroll = true
-          }
-        })
-      })
-    })
-  },
+  // mounted () {
+  //   this.syncDrawerAction()
+  //   this.emptyPlaceholder = Math.floor((Math.random() * 2))
+  //
+  //   this.$el.querySelector('.minota-view__content').scrollIntoView({
+  //     block: 'center',
+  //     inline: 'center',
+  //     behavior: 'smooth'
+  //   })
+  //
+  //   let currentVisibleItem = null
+  //   let isBottomVisible = false
+  //   let bottomActionsEl = this.$el.querySelector('.minota-actions_bottom')
+  //
+  //   let itemObserver = new IntersectionObserver((entries, observer) => {
+  //     entries.forEach(entry => {
+  //       if (entry.isIntersecting) {
+  //         currentVisibleItem = entry.target
+  //         if (isBottomVisible && currentVisibleItem.scrollTop > 0) {
+  //           bottomActionsEl.classList.add('minota-actions_solid')
+  //         } else {
+  //           bottomActionsEl.classList.remove('minota-actions_solid')
+  //         }
+  //       }
+  //     })
+  //   }, {
+  //     threshold: 0.875
+  //   })
+  //
+  //   Array.from(this.$el.querySelectorAll('.minota-view__content-item')).forEach(item => {
+  //     itemObserver.observe(item)
+  //   })
+  //
+  //   // let bottomActionsEl = this.$el.querySelector('.minota-actions_bottom')
+  //
+  //   let bottomObserver = new IntersectionObserver((entries, observer) => {
+  //     entries.forEach(entry => {
+  //       if (entry.isIntersecting) {
+  //         isBottomVisible = true
+  //         if (currentVisibleItem.scrollTop > 0) {
+  //           bottomActionsEl.classList.add('minota-actions_solid')
+  //         } else {
+  //           bottomActionsEl.classList.remove('minota-actions_solid')
+  //         }
+  //       } else {
+  //         isBottomVisible = false
+  //         bottomActionsEl.classList.remove('minota-actions_solid')
+  //       }
+  //     })
+  //   }, {
+  //     threshold: 0.75
+  //   })
+  //
+  //   bottomObserver.observe(bottomActionsEl)
+  //
+  //   let observer = new IntersectionObserver((entries, observer) => {
+  //     entries.forEach(entry => {
+  //       if (entry.target.classList.contains('minota-table__clean')) {
+  //         if (entry.isIntersecting) {
+  //           requestIdleCallback(() => {
+  //             // topActionsEl.setAttribute('disabled', true)
+  //             bottomActionsEl.setAttribute('disabled', true)
+  //           })
+  //         } else {
+  //           requestIdleCallback(() => {
+  //             // topActionsEl.removeAttribute('disabled')
+  //             bottomActionsEl.removeAttribute('disabled')
+  //           })
+  //         }
+  //       }
+  //     })
+  //   }, {
+  //     threshold: 0.5
+  //   })
+  //   observer.observe(this.$el.querySelector('.minota-table__clean'))
+  //
+  //   // Ctrl
+  //   document.addEventListener('keydown', event => {
+  //     if (event.key === 'Control') {
+  //       this.disableItemScroll = true
+  //     }
+  //   })
+  //   document.addEventListener('keyup', event => {
+  //     if (event.key === 'Control') {
+  //       this.disableItemScroll = false
+  //     }
+  //   })
+  //
+  //   let threshold = 5
+  //
+  //   let viewScrollData = {
+  //     scrollHeight: this.$el.scrollHeight,
+  //     height: this.$el.offsetHeight,
+  //     current: this.$el.scrollTop,
+  //     isAtTop: false,
+  //     isAtBottom: false
+  //   }
+  //
+  //   this.$el.addEventListener('scroll', event => {
+  //     let data = viewScrollData
+  //     let t = threshold || 0
+  //     fastdom.measure(() => {
+  //       data.scrollHeight = this.$el.scrollHeight
+  //       data.current = this.$el.scrollTop
+  //       data.isAtTop = data.current <= t
+  //       data.topHidden = data.current - 48 <= t
+  //       data.bottomHidden = Math.abs(data.scrollHeight - data.height - data.current - 48) <= t
+  //       data.isAtBottom = Math.abs(data.scrollHeight - data.height - data.current) <= t
+  //       if (data.bottomHidden) {
+  //         this.disableItemScroll = false
+  //       }
+  //     })
+  //   })
+  //
+  //   // Scroll content item
+  //
+  //   Array.from(this.$el.querySelectorAll('.minota-view__content-item')).forEach(item => {
+  //     let data = {
+  //       current: item.scrollTop,
+  //       scrollHeight: item.scrollHeight,
+  //       height: item.offsetHeight,
+  //       prev: item.scrollTop,
+  //       velocity: 0,
+  //       isAtTop: undefined,
+  //       isAtBottom: undefined
+  //     }
+  //
+  //     item.addEventListener('scroll', event => {
+  //       fastdom.measure(() => {
+  //         data.current = item.scrollTop
+  //         data.scrollHeight = item.scrollHeight
+  //         // fer
+  //         data.velocity = data.current - data.prev
+  //         data.prev = data.current
+  //         data.isAtTop = data.current <= (threshold || 0)
+  //         data.isAtBottom = data.scrollHeight - data.height - data.current <= (threshold || 0)
+  //         if (data.isAtBottom && data.velocity < 0 && viewScrollData.isAtBottom) {
+  //           this.disableItemScroll = true
+  //         }
+  //       })
+  //     })
+  //   })
+  // },
 
   methods: {
 
@@ -296,6 +347,14 @@ export default {
     //     this.focused = null
     //   }
     // },
+
+    onEnterView (note) {
+      console.log('on enter view', note.id)
+    },
+
+    onExitView (note) {
+      console.log('on exit view', note.id)
+    },
 
     onOpen (note) {
       this.replaceOnTable({ note })
@@ -394,64 +453,14 @@ export default {
 <style lang="stylus">
 @import '~@/assets/styles/common'
 
-.minota-view
-  height 100vh
-  overflow-y auto
-  scroll-snap-type both proximity
-
-.minota-actions
-  scroll-snap-align center start
-  scroll-snap-stop always
-
-.minota-view__table
-  display grid
-  grid-template-rows 3rem auto 3rem
-  grid-template-columns 3rem auto 3rem
-  grid-template-areas 'top-right top top-left' 'left main right' 'bottom-right bottom bottom-left'
-  &.minota-view_no-vert-actions
-    grid-template-rows 0rem auto 0rem
-    grid-template-columns 3rem auto 3rem
-  &.minota-view_no-horz-actions
-    grid-template-rows 3rem auto 3rem
-    grid-template-columns 0rem auto 0rem
-  &.minota-view_no-actions
-    grid-template-rows 0rem auto 0rem
-    grid-template-columns 0rem auto 0rem
-  &.minota-view_only-bottom-actions
-    grid-template-rows 0rem auto 3rem
-    grid-template-columns 0rem auto 0rem
-
-  .minota-note
-    min-height fullscreen-content-height
-    width fullscreen-content-width
-
-.minota-actions_top
-  grid-area top
-.minota-actions_bottom
-  grid-area bottom
-.minota-actions_left
-  justify-content center
-  grid-area left
-.minota-actions_right
-  justify-content center
-  grid-area right
-.minota-view__content
-  grid-area main
-  display flex
-  flex-direction row
-  align-items flex-start
-  width 100vw
-  height 100vh
-  overflow scroll
-  scroll-snap-align center start
-  scroll-snap-stop always
-  scroll-snap-type both proximity
+.minota-note
+  min-height fullscreen-content-height
+  width fullscreen-content-width
+  margin 0.5rem
 
 .minota-table__clean
   height content-height
   width content-width
-  flex-basis content-width
-  flex-shrink 0
   margin 3rem
   display flex
   flex-direction column
@@ -462,22 +471,4 @@ export default {
   cursor pointer
   border-radius 0.25rem
   box-shadow 0px 0px 0px 1px alpha(black, 0.125)
-  scroll-snap-align center
-  scroll-snap-stop always
-
-.minota-view__content-item
-  height 100vh
-  width 100vw
-  flex-basis 100vw
-  flex-shrink 0
-  // display table-cell
-  // vertical-align top
-  box-sizing border-box
-  padding 0.5rem
-  overflow scroll
-  scroll-snap-align start
-  // scroll-margin 0.5rem
-  scroll-snap-stop always
-  .minota-view__content[disable-item-scroll] &
-    pointer-events none
 </style>

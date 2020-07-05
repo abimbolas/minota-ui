@@ -12,23 +12,23 @@ export default {
 
   data () {
     return {
-      scroll: {}
+      scrollData: {}
     }
   },
 
   watch: {
-    'scroll' (scroll) {
-      bus.$emit('table-grid-content-item-scroll', scroll)
+    'scrollData' (scrollData) {
+      bus.$emit('table-grid-content-item-scroll', scrollData)
     }
   },
 
   mounted () {
-    this.scroll = this.analyzeScrollInit(this.$el)
+    this.scrollData = this.analyzeScrollInit(this.$el)
     this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           this.$emit('enter-view')
-          bus.$emit('table-grid-content-item-scroll', scroll)
+          bus.$emit('table-grid-content-item-scroll', Object.assign({}, this.scrollData))
         } else {
           this.$emit('exit-view')
         }
@@ -45,8 +45,8 @@ export default {
 
   methods: {
     onScroll (event) {
-      this.analyzeScrollTick(this.scroll, this.$el, data => {
-        this.scroll = data
+      this.analyzeScrollTick(this.scrollData, this.$el, data => {
+        this.scrollData = Object.assign(data, { event })
       })
     },
 
@@ -56,39 +56,11 @@ export default {
 </script>
 
 <style lang="stylus">
+@import '~@/assets/styles/common'
+
 .minota-table-grid__content-item
-  height 100vh
-  width 100vw
-  flex-basis 100vw
-  flex-shrink 0
-  box-sizing border-box
-  scroll-snap-align start
+  overflow auto
+  scroll-snap-align center
   scroll-snap-stop always
-  // scroll-snap-type both proximity
-  position relative
-  overflow scroll
-  // & > *:before
-  //   content ' '
-  //   position absolute
-  //   left 0
-  //   top 0
-  //   width 100%
-  //   height 50%
-  //   // background-color alpha(red, 0.125)
-  //   scroll-snap-align start
-  //   scroll-snap-stop always
-  //   scroll-margin-top 0.5rem
-  //   pointer-events none
-  // & > *:after
-  //   content ' '
-  //   position absolute
-  //   left 0
-  //   bottom 0
-  //   width 100%
-  //   height 50%
-  //   // background-color alpha(blue, 0.125)
-  //   scroll-snap-align end
-  //   scroll-snap-stop always
-  //   scroll-margin-bottom 0.5rem
-  //   pointer-events none
+  box-sizing border-box
 </style>

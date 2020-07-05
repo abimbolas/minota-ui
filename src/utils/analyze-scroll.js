@@ -1,5 +1,3 @@
-// import fastdom from 'fastdom'
-
 export default {
   analyzeScrollSlow (data = {}, element) {
     return Object.assign(data, {
@@ -29,13 +27,11 @@ export default {
   },
 
   analyzeScrollTick (data, element, callback) {
-    // fastdom.measure(() => {
     let dataCopy = Object.assign({}, data)
     clearTimeout(this.analyzeScrollSlowTimeout)
     this.analyzeScrollSlowTimeout = setTimeout(() => {
       this.analyzeScrollSlow(dataCopy, element)
-    }, 500)
+    }, 1500)
     callback(this.analyzeScrollFast(dataCopy, element))
-    // })
   }
 }

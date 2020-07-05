@@ -19,9 +19,13 @@ medium-emphasis = 0.6
 low-emphasis = 0.38
 hover-emphasis = 0.05
 
+// Colors
+background-main = #efefef
+
 // Sizes
-app-padding = 0.5rem
-fullscreen-content-height = calc(100vh - 1rem)
-fullscreen-content-width = calc(100vw - 1rem)
-content-height = calc(100vh - 6rem)
-content-width = calc(100vw - 6rem)
+bar-height = 3.5rem
+bar-width = 5rem
+content-width()
+  'calc(100vw - %s)' % (bar-width * 2)
+content-height()
+  'calc(100vh - %s)' % (bar-height * 2)

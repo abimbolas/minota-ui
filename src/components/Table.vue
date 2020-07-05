@@ -1,13 +1,15 @@
 <template lang="pug">
-  table-grid-component
-    template(v-slot:actions-top) Top actions
+  table-grid-component.minota-table
+    template(v-slot:actions-top) Top
     template(v-slot:actions-bottom)
-      .minota-section-left
+      //- .minota-section-left
         .minota-status Create
       .minota-section-right
         a.minota-action(v-on:click.prevent="onRemoveVisible()" href) Убрать
-    template(v-slot:actions-left) Left actions
-    template(v-slot:actions-right) Right actions
+    template(v-slot:actions-left)
+      strong L
+    template(v-slot:actions-right)
+      strong R
     template(v-slot:content)
       table-grid-content-item-component(
         v-for="note in table.slice(0).reverse()"
@@ -17,7 +19,7 @@
         note-component(v-bind:note="note")
       table-grid-content-item-component
         .minota-table__clean(v-on:click="onCreate()")
-          span (Кликните по столу чтобы создать новую заметку)
+          .minota-table__clean-text (Кликните по столу чтобы создать новую заметку)
   //- .minota-table-grid(v-bind:intent="intent")
     .minota-actions.minota-actions_bottom
       .minota-section-left
@@ -281,10 +283,10 @@ export default {
 
     onCreate () {
       let note = new Note()
-      this.addToTable({
-        note,
-        focusCapacity: Number.POSITIVE_INFINITY
-      })
+      // this.addToTable({
+      //   note,
+      //   focusCapacity: Number.POSITIVE_INFINITY
+      // })
       this.intent = 'create'
       setTimeout(() => {
         bus.$emit(`focus-start-${note.id}`)
@@ -349,11 +351,11 @@ export default {
     // },
 
     onEnterView (note) {
-      console.log('on enter view', note.id)
+      // console.log('on enter view', note.id)
     },
 
     onExitView (note) {
-      console.log('on exit view', note.id)
+      // console.log('on exit view', note.id)
     },
 
     onOpen (note) {
@@ -453,22 +455,34 @@ export default {
 <style lang="stylus">
 @import '~@/assets/styles/common'
 
-.minota-note
-  min-height fullscreen-content-height
-  width fullscreen-content-width
-  margin 0.5rem
+.minota-table
+  .minota-table-grid
+    // grid-template-rows auto 1fr auto
+    // grid-template-columns auto 1fr auto
+  .minota-table-grid__content-item
+    padding 0.5rem
+  .minota-table-grid__actions
+    padding 1rem
+    box-sizing border-box
+  .minota-note
+    margin 0 auto
 
 .minota-table__clean
-  height content-height
-  width content-width
-  margin 3rem
+  width 100%
+  margin 0 auto
+  max-width 46rem
+  min-height 100%
   display flex
   flex-direction column
   justify-content center
   align-items center
-  text-align center
-  color rgba(black, low-emphasis)
   cursor pointer
   border-radius 0.25rem
   box-shadow 0px 0px 0px 1px alpha(black, 0.125)
+
+.minota-table__clean-text
+  width 80%
+  max-width 30rem
+  color rgba(black, low-emphasis)
+  text-align center
 </style>

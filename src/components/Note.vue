@@ -71,11 +71,18 @@ export default {
   border-radius 0.25rem
   font-family sans-family
   font-size 18px
+  width 100%
+  min-height 100%
   padding 2rem
+  max-width 42rem
   padding-bottom 3rem
   background-color white
   box-sizing border-box
-  box-shadow 0px 1px 2px 0px alpha(black, 0.1), 0px 0px 10px 0px alpha(black, 0.05)
+  box-shadow 0px 1px 2px 0px alpha(black, 0.25), 0px 0px 10px 0px alpha(black, 0.1)
+
+  @media (min-width screen-md)
+    padding 4rem 3rem
+    max-width 44rem
 
 .minota-note__editor
   width 100%

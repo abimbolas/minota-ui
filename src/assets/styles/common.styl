@@ -68,3 +68,19 @@ a:active
   font-size smaller
   line-height 1.5rem
   opacity low-emphasis
+
+// Dots
+
+.minota-dots
+  display flex
+  justify-content center
+
+.minota-dots__dot
+  width 0.375rem
+  height 0.5rem
+  border-radius 25%
+  background-color alpha(black, 0.1)
+  & + &
+    margin-left 0.125rem
+  &[active]
+    background-color alpha(black, medium-emphasis)

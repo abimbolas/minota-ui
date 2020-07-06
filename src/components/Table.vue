@@ -2,13 +2,20 @@
   table-grid-component.minota-table
     template(v-slot:actions-top) Top
     template(v-slot:actions-bottom)
-      //- .minota-section-left
-        .minota-status Create
+      .minota-section-left
+        .minota-status {{ intent }}
+      .minota-section-center
+        .minota-dots
+          .minota-dots__dot(
+            v-for="note in table.slice(0).reverse()"
+            v-bind:active="note.id === visible")
       .minota-section-right
-        a.minota-action(v-on:click.prevent="onRemoveVisible()" href) Убрать
-    template(v-slot:actions-left)
+        a.minota-action(
+          v-bind:disabled="!visible"
+          v-on:click.prevent="onRemoveVisible()" href) Убрать
+    //- template(v-slot:actions-left)
       strong L
-    template(v-slot:actions-right)
+    //- template(v-slot:actions-right)
       strong R
     template(v-slot:content)
       table-grid-content-item-component(
@@ -17,7 +24,8 @@
         v-on:enter-view="onEnterView(note)"
         v-on:exit-view="onExitView(note)")
         note-component(v-bind:note="note")
-      table-grid-content-item-component
+      table-grid-content-item-component(
+        v-on:enter-view="onEnterView(null)")
         .minota-table__clean(v-on:click="onCreate()")
           .minota-table__clean-text (Кликните по столу чтобы создать новую заметку)
   //- .minota-table-grid(v-bind:intent="intent")
@@ -88,7 +96,6 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-// import fastdom from 'fastdom'
 
 import bus from '@/event-bus'
 import Note from '@/models/note'
@@ -111,10 +118,8 @@ export default {
     return {
       mode: '',
       selected: new Notespace(),
-      emptyPlaceholder: 0,
-      intent: 'clear',
-      created: false,
-      disableItemScroll: false
+      visible: null,
+      intent: 'clear'
     }
   },
 
@@ -133,149 +138,9 @@ export default {
     ])
   },
 
-  // mounted () {
-  //   this.syncDrawerAction()
-  //   this.emptyPlaceholder = Math.floor((Math.random() * 2))
-  //
-  //   this.$el.querySelector('.minota-view__content').scrollIntoView({
-  //     block: 'center',
-  //     inline: 'center',
-  //     behavior: 'smooth'
-  //   })
-  //
-  //   let currentVisibleItem = null
-  //   let isBottomVisible = false
-  //   let bottomActionsEl = this.$el.querySelector('.minota-actions_bottom')
-  //
-  //   let itemObserver = new IntersectionObserver((entries, observer) => {
-  //     entries.forEach(entry => {
-  //       if (entry.isIntersecting) {
-  //         currentVisibleItem = entry.target
-  //         if (isBottomVisible && currentVisibleItem.scrollTop > 0) {
-  //           bottomActionsEl.classList.add('minota-actions_solid')
-  //         } else {
-  //           bottomActionsEl.classList.remove('minota-actions_solid')
-  //         }
-  //       }
-  //     })
-  //   }, {
-  //     threshold: 0.875
-  //   })
-  //
-  //   Array.from(this.$el.querySelectorAll('.minota-view__content-item')).forEach(item => {
-  //     itemObserver.observe(item)
-  //   })
-  //
-  //   // let bottomActionsEl = this.$el.querySelector('.minota-actions_bottom')
-  //
-  //   let bottomObserver = new IntersectionObserver((entries, observer) => {
-  //     entries.forEach(entry => {
-  //       if (entry.isIntersecting) {
-  //         isBottomVisible = true
-  //         if (currentVisibleItem.scrollTop > 0) {
-  //           bottomActionsEl.classList.add('minota-actions_solid')
-  //         } else {
-  //           bottomActionsEl.classList.remove('minota-actions_solid')
-  //         }
-  //       } else {
-  //         isBottomVisible = false
-  //         bottomActionsEl.classList.remove('minota-actions_solid')
-  //       }
-  //     })
-  //   }, {
-  //     threshold: 0.75
-  //   })
-  //
-  //   bottomObserver.observe(bottomActionsEl)
-  //
-  //   let observer = new IntersectionObserver((entries, observer) => {
-  //     entries.forEach(entry => {
-  //       if (entry.target.classList.contains('minota-table__clean')) {
-  //         if (entry.isIntersecting) {
-  //           requestIdleCallback(() => {
-  //             // topActionsEl.setAttribute('disabled', true)
-  //             bottomActionsEl.setAttribute('disabled', true)
-  //           })
-  //         } else {
-  //           requestIdleCallback(() => {
-  //             // topActionsEl.removeAttribute('disabled')
-  //             bottomActionsEl.removeAttribute('disabled')
-  //           })
-  //         }
-  //       }
-  //     })
-  //   }, {
-  //     threshold: 0.5
-  //   })
-  //   observer.observe(this.$el.querySelector('.minota-table__clean'))
-  //
-  //   // Ctrl
-  //   document.addEventListener('keydown', event => {
-  //     if (event.key === 'Control') {
-  //       this.disableItemScroll = true
-  //     }
-  //   })
-  //   document.addEventListener('keyup', event => {
-  //     if (event.key === 'Control') {
-  //       this.disableItemScroll = false
-  //     }
-  //   })
-  //
-  //   let threshold = 5
-  //
-  //   let viewScrollData = {
-  //     scrollHeight: this.$el.scrollHeight,
-  //     height: this.$el.offsetHeight,
-  //     current: this.$el.scrollTop,
-  //     isAtTop: false,
-  //     isAtBottom: false
-  //   }
-  //
-  //   this.$el.addEventListener('scroll', event => {
-  //     let data = viewScrollData
-  //     let t = threshold || 0
-  //     fastdom.measure(() => {
-  //       data.scrollHeight = this.$el.scrollHeight
-  //       data.current = this.$el.scrollTop
-  //       data.isAtTop = data.current <= t
-  //       data.topHidden = data.current - 48 <= t
-  //       data.bottomHidden = Math.abs(data.scrollHeight - data.height - data.current - 48) <= t
-  //       data.isAtBottom = Math.abs(data.scrollHeight - data.height - data.current) <= t
-  //       if (data.bottomHidden) {
-  //         this.disableItemScroll = false
-  //       }
-  //     })
-  //   })
-  //
-  //   // Scroll content item
-  //
-  //   Array.from(this.$el.querySelectorAll('.minota-view__content-item')).forEach(item => {
-  //     let data = {
-  //       current: item.scrollTop,
-  //       scrollHeight: item.scrollHeight,
-  //       height: item.offsetHeight,
-  //       prev: item.scrollTop,
-  //       velocity: 0,
-  //       isAtTop: undefined,
-  //       isAtBottom: undefined
-  //     }
-  //
-  //     item.addEventListener('scroll', event => {
-  //       fastdom.measure(() => {
-  //         data.current = item.scrollTop
-  //         data.scrollHeight = item.scrollHeight
-  //         // fer
-  //         data.velocity = data.current - data.prev
-  //         data.prev = data.current
-  //         data.isAtTop = data.current <= (threshold || 0)
-  //         data.isAtBottom = data.scrollHeight - data.height - data.current <= (threshold || 0)
-  //         if (data.isAtBottom && data.velocity < 0 && viewScrollData.isAtBottom) {
-  //           this.disableItemScroll = true
-  //         }
-  //       })
-  //     })
-  //   })
-  // },
+  mounted () {
+    this.syncDrawerAction()
+  },
 
   methods: {
 
@@ -283,10 +148,10 @@ export default {
 
     onCreate () {
       let note = new Note()
-      // this.addToTable({
-      //   note,
-      //   focusCapacity: Number.POSITIVE_INFINITY
-      // })
+      this.addToTable({
+        note,
+        focusCapacity: Number.POSITIVE_INFINITY
+      })
       this.intent = 'create'
       setTimeout(() => {
         bus.$emit(`focus-start-${note.id}`)
@@ -337,30 +202,16 @@ export default {
       this.clearSelection()
     },
 
-    // Focus & open
-
-    // onFocus (note) {
-    //   let rect = this.$el.querySelector('.minota-view__content').getBoundingClientRect()
-    //   console.log(rect)
-    // },
-
-    // onBlur (note) {
-    //   if (this.focused && this.focused.id === note.id) {
-    //     this.focused = null
-    //   }
-    // },
+    // Current view
 
     onEnterView (note) {
-      // console.log('on enter view', note.id)
+      this.visible = note ? note.id : null
     },
 
     onExitView (note) {
-      // console.log('on exit view', note.id)
-    },
-
-    onOpen (note) {
-      this.replaceOnTable({ note })
-      this.intent = 'open'
+      if (this.visible === note.id) {
+        this.visible = null
+      }
     },
 
     // Select
@@ -389,23 +240,9 @@ export default {
     // Visible actions
 
     onRemoveVisible () {
-      let visibleNote = Array.from(this.$el.querySelectorAll('.minota-note')).find(element => {
-        return Math.abs(element.getBoundingClientRect().left) < 10
-      })
-      if (visibleNote) {
-        let id = visibleNote.getAttribute('note-id')
-        let table = this.table.slice(0).reverse()
-        let previousNote = this.$el.querySelector(
-          '[note-id="' + table[table.findIndex(note => note.id === id) - 1].id + '"]'
-        )
-        this.removeFromTable({
-          notes: this.table.filter(note => note.id === id)
-        })
-        if (previousNote) {
-          previousNote.scrollIntoView({
-            behavior: 'smooth'
-          })
-        }
+      let note = this.table.find(note => note.id === this.visible)
+      if (note) {
+        this.removeFromTable({ note })
       }
     },
 
@@ -485,4 +322,13 @@ export default {
   max-width 30rem
   color rgba(black, low-emphasis)
   text-align center
+
+.minota-section-center
+  text-align center
+  align-self center
+
+.minota-action[disabled]
+  opacity low-emphasis
+  pointer-events none
+  user-select none
 </style>

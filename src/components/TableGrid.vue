@@ -123,7 +123,6 @@ export default {
 
     closeBar (event) {
       if (event.target.classList.contains('minota-table-grid__actions')) {
-        console.log(event.target)
         this.scrollHome()
       }
     },
@@ -190,7 +189,7 @@ export default {
     content ' '
     border-radius 30%
     width calc(100% - 1rem)
-    max-width 46rem
+    max-width 54rem
     height 1.5rem
     left 50%
     bottom 0
@@ -207,7 +206,7 @@ export default {
     transform translateX(-50%)
     height 100%
     width 100%
-    max-width 48rem
+    max-width 56rem
     background-color background-main
     z-index -1
     pointer-events none
@@ -221,7 +220,7 @@ export default {
     border-radius 30%
     position absolute
     width calc(100% - 1rem)
-    max-width 46rem
+    max-width 54rem
     height 1.5rem
     top 0px
     left 50%
@@ -237,7 +236,7 @@ export default {
     transform translateX(-50%)
     height 100%
     width 100%
-    max-width 48rem
+    max-width 56rem
     background-color background-main
     z-index -1
     pointer-events none

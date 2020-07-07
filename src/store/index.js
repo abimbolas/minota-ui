@@ -44,9 +44,8 @@ export default new Vuex.Store({
 
     replaceOnTable (state, payload) {
       let notes = payload.notes || [payload.note]
-      let focusCapacity = notes.length
       notes.forEach(note => {
-        table.addToFocus(note, { focusCapacity })
+        table.replaceInFocus(note)
       })
     },
 
@@ -54,6 +53,13 @@ export default new Vuex.Store({
       (payload.notes || [payload.note]).forEach(note => {
         table.removeFromFocus(note)
       })
+    },
+
+    updateOnTable (state, payload) {
+      let note = state.table.find(note => note.id === payload.note.id)
+      if (note) {
+        note.update(payload.note)
+      }
     },
 
     moveToDrawer (state, payload = {}) {
@@ -76,11 +82,8 @@ export default new Vuex.Store({
       })
     },
 
-    updateOnTable (state, payload) {
-      let note = state.table.find(note => note.id === payload.note.id)
-      if (note) {
-        note.update(payload.note)
-      }
+    clearDrawer (state, payload) {
+      drawer.clearFocus()
     }
   },
 
@@ -95,9 +98,15 @@ export default new Vuex.Store({
 
     syncDrawerAction (context, payload) {
       return new LastPromise({
-        type: `sync-drawer`,
+        type: 'sync-drawer',
         promise: backend.getNotes().then(notes => {
+          context.commit('clearDrawer')
           context.commit('addToDrawer', { notes: notes.slice(0).reverse() })
+          context.commit('replaceOnTable', {
+            notes: notes.filter(note => {
+              return context.getters.table.find(item => item.id === note.id)
+            })
+          })
         }),
         registry
       })
@@ -108,7 +117,7 @@ export default new Vuex.Store({
     createPersistedState({
       key: 'minota-store',
       storage: localStorage,
-      paths: ['table', 'drawer'],
+      paths: ['table'],
       arrayMerger (store, saved) {
         // 'store' is actual table.focus and drawer.focus arrays, so
         // we need to keep them as store

@@ -1,10 +1,10 @@
 <template lang="pug">
   table-grid-component.minota-table
-    template(v-slot:actions-top) Top
+    //- template(v-slot:actions-top) Top
     template(v-slot:actions-bottom)
-      .minota-section-left
+      //- .minota-section-left
         .minota-status {{ intent }}
-      .minota-section-center
+      //- .minota-section-center
         .minota-dots
           .minota-dots__dot(
             v-for="note in table.slice(0).reverse()"
@@ -19,11 +19,13 @@
       strong R
     template(v-slot:content)
       table-grid-content-item-component(
-        v-for="note in table.slice(0).reverse()"
+        v-for="note in table"
         v-bind:key="note.id"
         v-on:enter-view="onEnterView(note)"
         v-on:exit-view="onExitView(note)")
-        note-component(v-bind:note="note")
+        note-component(
+          v-bind:note="note"
+          v-on:update="onUpdate(note)")
       table-grid-content-item-component(
         v-on:enter-view="onEnterView(null)")
         .minota-table__clean(v-on:click="onCreate()")
@@ -150,7 +152,8 @@ export default {
       let note = new Note()
       this.addToTable({
         note,
-        focusCapacity: Number.POSITIVE_INFINITY
+        focusCapacity: Number.POSITIVE_INFINITY,
+        append: true
       })
       this.intent = 'create'
       setTimeout(() => {
@@ -197,6 +200,7 @@ export default {
     onEdit () {
       this.mode = 'edit'
     },
+
     onDoneEdit () {
       this.mode = ''
       this.clearSelection()
@@ -307,7 +311,7 @@ export default {
 .minota-table__clean
   width 100%
   margin 0 auto
-  max-width 46rem
+  max-width 50rem
   min-height 100%
   display flex
   flex-direction column

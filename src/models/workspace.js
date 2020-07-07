@@ -6,12 +6,20 @@ export default class Workspace {
 
   // Focus
 
-  addToFocus (obj, { focusCapacity = 1 } = {}) {
+  addToFocus (obj, { focusCapacity = 1, append = false } = {}) {
+    if (this._isIn('focus', obj)) {
+      this._replaceIn('focus', obj)
+    }
     this._removeFrom('blur', obj)
     while (this.focus.length >= focusCapacity) {
-      this.blurFocus(this.focus.slice(-1)[0])
+      console.log('focus capacity')
+      this.blurFocus(append ? this.focus[0] : this.focus.slice(-1)[0])
     }
-    this._addTo('focus', obj)
+    this._addTo('focus', obj, { append })
+  }
+
+  replaceInFocus (obj) {
+    this._replaceIn('focus', obj)
   }
 
   isInFocus (obj) {
@@ -22,14 +30,8 @@ export default class Workspace {
     this._removeFrom('focus', obj)
   }
 
-  blurFocus (obj) {
-    if (obj) {
-      this._move('focus', 'blur', obj)
-    } else {
-      while (this.focus.length > 0) {
-        this.blurFocus(this.focus.slice(-1)[0])
-      }
-    }
+  blurFocus (obj = null, { append = false } = {}) {
+    this._move('focus', 'blur', obj, { append })
   }
 
   clearFocus () {
@@ -38,9 +40,16 @@ export default class Workspace {
 
   // Blur
 
-  addToBlur (obj) {
+  addToBlur (obj, { append = false } = {}) {
+    if (this._isIn('blur', obj)) {
+      this._replaceIn('blur', obj)
+    }
     this._removeFrom('focus', obj)
-    this._addTo('blur', obj)
+    this._addTo('blur', obj, { append })
+  }
+
+  replaceInBlur (obj) {
+    this._replaceIn('blur', obj)
   }
 
   removeFromBlur (obj) {
@@ -51,14 +60,8 @@ export default class Workspace {
     return this._isIn('blur', obj)
   }
 
-  focusBlur (obj) {
-    if (obj) {
-      this._move('blur', 'focus', obj)
-    } else {
-      while (this.blur.length > 0) {
-        this.focusBlur(this.blur.slice(-1)[0])
-      }
-    }
+  focusBlur (obj = null, { append = false } = {}) {
+    this._move('blur', 'focus', obj, { append })
   }
 
   clearBlur () {
@@ -67,9 +70,9 @@ export default class Workspace {
 
   // Universal
 
-  _addTo (type, obj) {
+  _addTo (type, obj, { append = false } = {}) {
     if (!this._isIn(type, obj)) {
-      this[type].unshift(obj)
+      this[type][append ? 'push' : 'unshift'](obj)
     } else {
       this._replaceIn(type, obj)
     }
@@ -103,13 +106,14 @@ export default class Workspace {
     return this[type].indexOf(obj)
   }
 
-  _move (from, to, obj) {
+  _move (from, to, obj, { append = false } = {}) {
     if (obj) {
       this._removeFrom(from, obj)
-      this._addTo(to, obj)
+      this._addTo(to, obj, { append })
     } else {
       while (this[from].length > 0) {
-        this._addTo(to, this[from].shift())
+        this._clear(from)
+        this._addTo(to, this[from][append ? 'shift' : 'pop'](), { append })
       }
     }
   }

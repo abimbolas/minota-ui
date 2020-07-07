@@ -73,16 +73,16 @@ export default {
   font-size 18px
   width 100%
   min-height 100%
-  padding 2rem
-  max-width 42rem
-  padding-bottom 3rem
+  padding 8vh 8vw 10vh 8vw
+  max-width calc(47rem + 8vw)
   background-color white
   box-sizing border-box
   box-shadow 0px 1px 2px 0px alpha(black, 0.25), 0px 0px 10px 0px alpha(black, 0.1)
 
-  @media (min-width screen-md)
-    padding 4rem 3rem
-    max-width 44rem
+  @media (min-width screen-lg)
+    max-width 52rem
+    padding-left 5.5rem
+    padding-right 5.5rem
 
 .minota-note__editor
   width 100%

@@ -66,8 +66,7 @@ describe('Workspace', () => {
     expect(w.isInFocus(obj)).to.be.true
 
     const obj2 = createObj()
-    w.focusCapacity = 2
-    w.addToFocus(obj2)
+    w.addToFocus(obj2, { focusCapacity: 2 })
     expect(w.isInFocus(obj)).to.be.true
     expect(w.isInFocus(obj2)).to.be.true
     w.addToBlur(obj2)
@@ -91,9 +90,10 @@ describe('Workspace', () => {
     const obj2 = createObj()
     const obj3 = createObj()
     w.focusCapacity = 3
-    w.addToFocus(obj)
-    w.addToFocus(obj2)
-    w.addToFocus(obj3)
+    let options = { focusCapacity: 3 }
+    w.addToFocus(obj, options)
+    w.addToFocus(obj2, options)
+    w.addToFocus(obj3, options)
     expect(w.focus.length).to.equal(3)
     w.blurFocus(obj)
     expect(w.focus.length).to.equal(2)
@@ -121,18 +121,11 @@ describe('Workspace', () => {
     //   expect(w2.focusCapacity).to.be.undefined
     // })
 
-    it('Can be initially set', () => {
-      const w2 = new Workspace({
-        focusCapacity: 2
-      })
-      expect(w2.focusCapacity).to.equal(2)
-    })
-
     it('While moving into focus which capacity is 1, blur focus', () => {
       w.focusCapacity = 1
-      w.addToFocus(obj)
+      w.addToFocus(obj, { focusCapacity: 1 })
       const obj2 = createObj()
-      w.addToFocus(obj2)
+      w.addToFocus(obj2, { focusCapacity: 1 })
       expect(w.focus.length).to.equal(1)
       expect(w.isInFocus(obj)).to.be.false
       expect(w.blur.length).to.equal(1)
@@ -141,20 +134,20 @@ describe('Workspace', () => {
     })
 
     it('While using capacity 3, blur when adding 4th', () => {
-      const w3 = new Workspace({ focusCapacity: 3 })
+      const w3 = new Workspace()
       const objs = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(() => createObj())
       objs.slice(0, 3).forEach(i => {
-        w3.addToFocus(i)
+        w3.addToFocus(i, { focusCapacity: 3 })
       })
       expect(w3.focus.length).to.equal(3)
       expect(w3.isInFocus(objs[0])).to.be.true
       expect(w3.isInFocus(objs[1])).to.be.true
       expect(w3.isInFocus(objs[2])).to.be.true
-      w3.addToFocus(objs[3])
+      w3.addToFocus(objs[3], { focusCapacity: 3 })
       expect(w3.focus.length).to.equal(3)
       expect(w3.isInFocus(objs[0])).to.be.false
       expect(w3.isInBlur(objs[0])).to.be.true
-      w3.addToFocus(objs[4])
+      w3.addToFocus(objs[4], { focusCapacity: 3 })
       expect(w3.focus.length).to.equal(3)
       expect(w3.blur.length).to.equal(2)
       expect(w3.isInFocus(objs[0])).to.be.false
@@ -178,6 +171,40 @@ describe('Workspace', () => {
       expect(w.focus[0]).to.equal(3)
       expect(w.focus[1]).to.equal(2)
       expect(w.focus[2]).to.equal(1)
+    })
+
+    it('should be able to prepend and append focus items', () => {
+      const w = new Workspace()
+      let options = { focusCapacity: Number.POSITIVE_INFINITY }
+      w.addToFocus(1, options)
+      w.addToFocus(2, options)
+      expect(w.focus[0]).to.equal(2)
+      expect(w.focus[1]).to.equal(1)
+      w.addToFocus(3, Object.assign(options, { append: true }))
+      expect(w.focus[2]).to.equal(3)
+      w.addToFocus(4, Object.assign(options, { append: true }))
+      expect(w.focus[3]).to.equal(4)
+      w.blurFocus(null, { append: true })
+      expect(w.blur[0]).to.equal(2)
+      expect(w.blur[3]).to.equal(4)
+      expect(w.focus.length).to.equal(0)
+      w.focusBlur()
+      expect(w.focus[0]).to.equal(2)
+      expect(w.focus[2]).to.equal(3)
+      w.addToBlur(5, { append: true })
+      w.addToBlur(6, { append: true })
+      expect(w.blur[0]).to.equal(5)
+      expect(w.blur[1]).to.equal(6)
+      w.focusBlur()
+      expect(w.focus[0]).to.equal(5)
+      w.addToBlur(7, { append: true })
+      w.addToBlur(8, { append: true })
+      expect(w.blur[0]).to.equal(7)
+      expect(w.blur[1]).to.equal(8)
+      w.focusBlur(null, { append: true })
+      expect(w.focus[0]).to.equal(5)
+      expect(w.focus.slice(-1)[0]).to.equal(8)
+
     })
   })
 })

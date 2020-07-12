@@ -1,13 +1,29 @@
-import Workspace from '@/models/workspace'
+import uuid from 'uuid/v1'
+import Workspace from './workspace'
 
 export default class Notespace extends Workspace {
-  _search (type, note) {
-    // search by reference
-    let id = this[type].indexOf(note)
-    // search by id
-    if (id < 0) {
-      id = this[type].findIndex(item => item.id === note.id)
+  constructor ({ focus = [], blur = [], content = '', config } = {}) {
+    super({ focus, blur })
+    this.content = content
+    this.config = Object.assign({
+      id: uuid()
+    }, config)
+  }
+
+  get id () {
+    return this.config.id
+  }
+
+  set id (id) {
+    this.config.id = id
+  }
+
+  update ({ content = null, config = null } = {}) {
+    if (content !== null) {
+      this.content = content
     }
-    return id
+    if (config !== null) {
+      this.config = Object.assign(this.config, config)
+    }
   }
 }

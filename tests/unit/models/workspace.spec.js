@@ -204,7 +204,6 @@ describe('Workspace', () => {
       w.focusBlur(null, { append: true })
       expect(w.focus[0]).to.equal(5)
       expect(w.focus.slice(-1)[0]).to.equal(8)
-
     })
   })
 })

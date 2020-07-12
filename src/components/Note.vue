@@ -78,6 +78,38 @@ export default {
   background-color white
   box-sizing border-box
   box-shadow 0px 1px 2px 0px alpha(black, 0.25), 0px 0px 10px 0px alpha(black, 0.1)
+  .minota-table-grid__content-item_scroll-snapped &
+    position relative
+    &:before
+      content ' '
+      position absolute
+      left 0
+      top 0
+      right 0
+      height 50%
+      background-color alpha(yellow, 0.25)
+      display block
+      z-index 1
+      scroll-snap-align start
+      scroll-snap-stop always
+      scroll-margin-top 0.5rem
+      pointer-events none
+      // visibility hidden
+    &:after
+      content ' '
+      position absolute
+      left 0
+      bottom 0
+      right 0
+      height 50%
+      background-color alpha(limegreen, 0.25)
+      display block
+      z-index 1
+      scroll-snap-align end
+      scroll-snap-stop always
+      scroll-margin-bottom 0.5rem
+      pointer-events none
+      // visibility hidden
 
   @media (min-width screen-lg)
     max-width 52rem

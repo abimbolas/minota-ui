@@ -12,7 +12,6 @@ export default class Workspace {
     }
     this._removeFrom('blur', obj)
     while (this.focus.length >= focusCapacity) {
-      console.log('focus capacity')
       this.blurFocus(append ? this.focus[0] : this.focus.slice(-1)[0])
     }
     this._addTo('focus', obj, { append })
@@ -102,8 +101,21 @@ export default class Workspace {
     return this._search(type, obj) > -1
   }
 
-  _search (type, obj) {
-    return this[type].indexOf(obj)
+  _search (type, note) {
+    // early abort
+    if (!note) {
+      return -1
+    }
+    // search by reference
+    if (!note.id) {
+      return this[type].indexOf(note)
+    }
+    // search by id
+    if (note && note.id) {
+      return this[type].findIndex(item => {
+        return item.id && item.id === note.id
+      })
+    }
   }
 
   _move (from, to, obj, { append = false } = {}) {
@@ -112,7 +124,6 @@ export default class Workspace {
       this._addTo(to, obj, { append })
     } else {
       while (this[from].length > 0) {
-        this._clear(from)
         this._addTo(to, this[from][append ? 'shift' : 'pop'](), { append })
       }
     }

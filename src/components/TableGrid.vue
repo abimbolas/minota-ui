@@ -122,7 +122,10 @@ export default {
     },
 
     closeBar (event) {
-      if (event.target.classList.contains('minota-table-grid__actions')) {
+      if (
+        event.target.classList.contains('minota-table-grid__actions') ||
+        event.target.classList.contains('minota-sections_note-width')
+      ) {
         this.scrollHome()
       }
     },
@@ -174,7 +177,7 @@ export default {
 
 .minota-table-grid__content
   grid-area main
-  scroll-snap-type both proximity
+  scroll-snap-type inline proximity
   scroll-snap-align center
   scroll-snap-stop always
   display grid

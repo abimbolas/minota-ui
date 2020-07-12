@@ -1,99 +1,60 @@
 <template lang="pug">
   table-grid-component.minota-table
-    //- template(v-slot:actions-top) Top
-    template(v-slot:actions-bottom)
-      //- .minota-section-left
-        .minota-status {{ intent }}
-      //- .minota-section-center
-        .minota-dots
-          .minota-dots__dot(
-            v-for="note in table.slice(0).reverse()"
-            v-bind:active="note.id === visible")
+    //- Top
+    template(v-slot:actions-top)
       .minota-section-right
         a.minota-action(
-          v-bind:disabled="!visible"
-          v-on:click.prevent="onRemoveVisible()" href) Убрать
+          v-bind:disabled="visible === 'createNote'"
+          v-on:click.prevent="onRemove()" href)
+          | Убрать всё со стола
+        a.minota-action(
+          v-if="visible === 'createNote' && drawer.length"
+          v-on:click.prevent="onGet()" href)
+          | Достать всё на стол ({{ drawer.length }})
+
+    //- Bottom
+    template(v-slot:actions-bottom)
+      .minota-sections_note-width
+        .minota-section-left
+          a.minota-action.minota-action_danger(
+            v-bind:disabled="!(visible && visible.id)"
+            v-on:click.prevent="onDeleteVisible()" href)
+            i.material-icons delete
+            span Скомкать эту и выкинуть в корзину
+        .minota-section-right
+          a.minota-action(
+            v-bind:disabled="!(visible && visible.id)"
+            v-on:click.prevent="onRemoveVisible()" href)
+            | Убрать эту чтоб не мешала, со стола
+          a.minota-action(
+            v-if="visible === 'createNote' && drawer.length"
+            v-on:click.prevent="onGetRecent()" href)
+            | Достать последнюю убранную заметку
+
     //- template(v-slot:actions-left)
       strong L
     //- template(v-slot:actions-right)
       strong R
+
+    //- Content
     template(v-slot:content)
       table-grid-content-item-component(
-        v-for="note in table"
+        v-for="(note, index) in table"
         v-bind:key="note.id"
+        v-bind:note-id="note.id"
+        v-bind:class="visible && visible.id === note.id && contentItemClass"
+        v-bind:update-scroll-data-on="'update-note-' + note.id + '-scroll-data'"
         v-on:enter-view="onEnterView(note)"
         v-on:exit-view="onExitView(note)")
         note-component(
           v-bind:note="note"
           v-on:update="onUpdate(note)")
+        .minota-content-item-index {{ index + 1 }}
+
       table-grid-content-item-component(
-        v-on:enter-view="onEnterView(null)")
+        v-on:enter-view="onEnterView('createNote')")
         .minota-table__clean(v-on:click="onCreate()")
           .minota-table__clean-text (Кликните по столу чтобы создать новую заметку)
-  //- .minota-table-grid(v-bind:intent="intent")
-    .minota-actions.minota-actions_bottom
-      .minota-section-left
-        //- .minota-status {{ intent | capitalize }}
-      .minota-section-right
-        a.minota-actions__action(
-          v-on:click.prevent="onRemoveVisible()" href)
-          span Убрать
-
-    //- .minota-actions.minota-actions_top.minota-actions_sticky
-      //- LEFT: Regular mode
-      .minota-section-left(v-if="mode !== 'edit'")
-        //- a.minota-actions__action(
-          v-if="!table.length || true"
-          v-on:click.prevent="onCreate()" href)
-          small Создать
-
-        //- a.minota-actions__action(
-          v-if="table.length === 1"
-          v-on:click.prevent="onDelete()" href)
-          strong Удалить
-
-        //- a.minota-actions__action(
-          v-if="table.length > 2 && intent === 'get'"
-          v-on:click.prevent="onEdit()" href)
-          small Изменить
-
-        //- a.minota-actions__action(
-          v-if="intent === 'get' && focused"
-          v-on:click.prevent="onOpen(focused)" href)
-          strong Открыть (1)</small>
-
-      //- LEFT: Edit mode
-      .minota-section-left(v-if="mode === 'edit'")
-        a.minota-actions__action(
-          v-if="table.length"
-          v-on:click.prevent="onDoneEdit()" href)
-          small Отменить редактирование
-
-      //- RIGHT: Regular mode
-      .minota-section-right(v-if="mode !== 'edit'")
-        //- a.minota-actions__action(
-          v-if="table.length"
-          v-on:click.prevent="onDone()" href)
-          small Убрать ({{ table.length }})
-
-        //- a.minota-actions__action(
-          v-if="!table.length && otherLength() || true"
-          v-on:click.prevent="onGet()" href)
-          small Достать ({{ otherLength() }})
-
-      //- RIGHT: Edit mode
-      .minota-section-right(v-if="mode === 'edit' && selected.focus.length")
-        a.minota-actions__action(
-          v-on:click.prevent="onDeleteSelected()" href)
-          span Удалить <span v-show="selected.focus.length">({{ selected.focus.length }})</span>
-
-        a.minota-actions__action(
-          v-on:click.prevent="onRemoveSelected()" href)
-          strong Убрать <span v-show="selected.focus.length">({{ selected.focus.length }})</span>
-
-        a.minota-actions__action(
-          v-on:click.prevent="onOpenSelected()" href)
-          strong Открыть <span v-show="selected.focus.length">({{ selected.focus.length }})</span>
 </template>
 
 <script>
@@ -101,7 +62,8 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 import bus from '@/event-bus'
 import Note from '@/models/note'
-import Notespace from '@/models/notespace'
+// import Workspace from '@/models/workspace'
+// import Notespace from '@/models/notespace'
 
 import NoteComponent from '@/components/Note'
 import TableGridComponent from '@/components/TableGrid'
@@ -118,10 +80,15 @@ export default {
 
   data () {
     return {
-      mode: '',
-      selected: new Notespace(),
       visible: null,
-      intent: 'clear'
+      noteScrollDataTimestamp: new Date().getTime(),
+      contentItemClass: {
+        'minota-table-grid__content-item_stick-top': true,
+        'minota-table-grid__content-item_stick-bottom': false
+      }
+      // mode: '',
+      // selected: new Workspace(),
+      // intent: 'clear'
     }
   },
 
@@ -146,7 +113,7 @@ export default {
 
   methods: {
 
-    //  Create / Delete
+    // Table-wide actions
 
     onCreate () {
       let note = new Note()
@@ -161,125 +128,156 @@ export default {
       }, 200)
     },
 
-    onDelete () {
-      let notes = this.table.slice(0)
-      this.backend.deleteNotes(notes)
-      this.removeFromDrawer({ notes })
-      this.removeFromTable({ notes })
+    onRemove () {
+      this.addToDrawer({ notes: this.table.slice(0) })
+      this.clearTable()
+    },
+
+    // onCompose () {
+    //   console.log('compose')
+    // },
+
+    onGet () {
+      this.addToTable({
+        notes: this.drawer.slice(0),
+        focusCapacity: Number.POSITIVE_INFINITY,
+        append: true
+      })
+      this.removeFromDrawer({ notes: this.drawer.slice(0) })
+      setTimeout(() => {
+        this.$el.querySelector('.minota-table-grid__content-item').scrollIntoView({
+          behavior: 'smooth'
+        })
+      }, 500)
+    },
+
+    // Note-wide actions
+
+    onRemoveVisible () {
+      if (this.visible && this.visible.id) {
+        let note = this.table.find(note => note.id === this.visible.id)
+        if (note) {
+          this.addToDrawer({ note })
+          this.removeFromTable({ note })
+        }
+      }
+    },
+
+    onDeleteVisible () {
+      if (this.visible && this.visible.id) {
+        let note = this.table.find(note => note.id === this.visible.id)
+        if (note) {
+          this.backend.deleteNote(note).then(ok => {
+            console.log('ok', ok)
+          })
+          this.removeFromDrawer({ note })
+          this.removeFromTable({ note })
+        }
+      }
+    },
+
+    onGetRecent () {
+      let note = this.drawer[0]
+      this.addToTable({
+        note,
+        focusCapacity: Number.POSITIVE_INFINITY,
+        append: true
+      })
+      this.removeFromDrawer({ note })
+      setTimeout(() => {
+        this.$el.querySelector(`.minota-table-grid__content-item[note-id="${note.id}"]`).scrollIntoView()
+      }, 500)
     },
 
     onUpdate (note) {
       clearTimeout(this.noteContent)
+      bus.$emit(`update-note-${note.id}-scroll-data`)
       this.noteContent = setTimeout(() => {
         this.updateOnTable({ note })
       }, 500)
     },
 
-    // Get / Done
-
-    onGet () {
-      this.replaceOnTable({ notes: this.drawer })
-      this.intent = 'get'
-      setTimeout(() => {
-        this.$el.querySelector('.minota-view__content').scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          inline: 'start'
-        })
-      })
-    },
-
-    onDone () {
-      this.moveToDrawer({ notes: this.table.filter(note => note.content) })
-      // this.syncDrawerAction()
-      this.intent = 'clear'
-    },
-
-    // Mode
-
-    onEdit () {
-      this.mode = 'edit'
-    },
-
-    onDoneEdit () {
-      this.mode = ''
-      this.clearSelection()
-    },
-
     // Current view
 
-    onEnterView (note) {
-      this.visible = note ? note.id : null
+    onEnterView (item) {
+      this.visible = item
     },
 
-    onExitView (note) {
-      if (this.visible === note.id) {
-        this.visible = null
+    onExitView (item) {
+      if (this.visible === item) {
+        this.visible = undefined
       }
+    },
+
+    onStickContentItem (event) {
+      // if (event === 'top') {
+      //   this.contentItemClass = {
+      //     'minota-table-grid__content-item_stick-top': true,
+      //     'minota-table-grid__content-item_stick-bottom': false
+      //   }
+      // } else if (event === 'bottom') {
+      //   this.contentItemClass = {
+      //     'minota-table-grid__content-item_stick-top': false,
+      //     'minota-table-grid__content-item_stick-bottom': true
+      //   }
+      // } else {
+      //   this.contentItemClass = {
+      //     'minota-table-grid__content-item_stick-top': false,
+      //     'minota-table-grid__content-item_stick-bottom': false
+      //   }
+      // }
     },
 
     // Select
 
-    isSelected (note) {
-      this.selected.isInFocus(note)
-    },
-
-    onSelect (note) {
-      if (this.mode !== 'edit') {
-        this.onEdit()
-      }
-      this.selected.addToFocus(note, {
-        focusCapacity: Number.POSITIVE_INFINITY
-      })
-    },
-
-    onUnselect (note) {
-      this.selected.removeFromFocus(note)
-    },
-
-    clearSelection () {
-      this.selected.clearFocus()
-    },
-
-    // Visible actions
-
-    onRemoveVisible () {
-      let note = this.table.find(note => note.id === this.visible)
-      if (note) {
-        this.removeFromTable({ note })
-      }
-    },
+    // isSelected (note) {
+    //   this.selected.isInFocus(note)
+    // },
+    //
+    // onSelect (note) {
+    //   if (this.mode !== 'edit') {
+    //     this.onEdit()
+    //   }
+    //   this.selected.addToFocus(note, {
+    //     focusCapacity: Number.POSITIVE_INFINITY
+    //   })
+    // },
+    //
+    // onUnselect (note) {
+    //   this.selected.removeFromFocus(note)
+    // },
+    //
+    // clearSelection () {
+    //   this.selected.clearFocus()
+    // },
 
     // Selection actions
 
-    onDeleteSelected () {
-      let notes = this.selected.focus.slice(0)
-      this.backend.deleteNotes(notes)
-      this.removeFromDrawer({ notes })
-      this.removeFromTable({ notes })
-      this.onDoneEdit()
-    },
+    // onDeleteSelected () {
+    //   let notes = this.selected.focus.slice(0)
+    //   this.backend.deleteNotes(notes)
+    //   this.removeFromDrawer({ notes })
+    //   this.removeFromTable({ notes })
+    //   this.onDoneEdit()
+    // },
 
-    onOpenSelected () {
-      let notes = this.selected.focus.slice(0)
-      this.replaceOnTable({ notes })
-      this.onDoneEdit()
-    },
-
-    onRemoveSelected () {
-      let notes = this.selected.focus.slice(0)
-      this.removeFromTable({ notes })
-      this.onDoneEdit()
-    },
-
-    otherLength () {
-      return this.drawer.filter(note => !this.isOnTable(note)).length
-    },
+    // onOpenSelected () {
+    //   let notes = this.selected.focus.slice(0)
+    //   this.replaceOnTable({ notes })
+    //   this.onDoneEdit()
+    // },
+    //
+    // onRemoveSelected () {
+    //   let notes = this.selected.focus.slice(0)
+    //   this.removeFromTable({ notes })
+    //   this.onDoneEdit()
+    // },
 
     ...mapMutations([
       'addToTable',
       'replaceOnTable',
       'removeFromTable',
+      'clearTable',
       'moveToDrawer',
       'addToDrawer',
       'removeFromDrawer',
@@ -300,13 +298,34 @@ export default {
   .minota-table-grid
     // grid-template-rows auto 1fr auto
     // grid-template-columns auto 1fr auto
-  .minota-table-grid__content-item
-    padding 0.5rem
-  .minota-table-grid__actions
-    padding 1rem
-    box-sizing border-box
   .minota-note
     margin 0 auto
+
+  .minota-table-grid__content-item
+    position relative
+    padding 0.5rem
+    .minota-actions
+      max-width calc(47rem + 8vw)
+
+    .minota-content-item-index
+      position absolute
+      top 1.25rem
+      right 1.5rem
+      opacity low-emphasis
+      font-size smaller
+
+    // &.minota-table-grid__content-item_stick-top
+    //   scroll-snap-type block mandatory
+    //   .minota-note
+    //     scroll-snap-align start
+    //     scroll-margin-top 1rem
+    //     scroll-snap-stop always
+    // &.minota-table-grid__content-item_stick-bottom
+    //   scroll-snap-type block mandatory
+    //   .minota-note
+    //     scroll-snap-align end
+    //     scroll-margin-bottom 1rem
+    //     scroll-snap-stop always
 
 .minota-table__clean
   width 100%
@@ -331,8 +350,19 @@ export default {
   text-align center
   align-self center
 
+.minota-action
+  transition all 0.3s ease-out
+  opacity 1
+  text-decoration none
+  .minota-table-grid__actions_bottom &
+    padding-top 0.75rem
+    padding-bottom 1.25rem
+
 .minota-action[disabled]
-  opacity low-emphasis
+  opacity 0
   pointer-events none
   user-select none
+  line-height 1.5rem
+.minota-action_danger
+  color brown !important
 </style>

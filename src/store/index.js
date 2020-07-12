@@ -6,7 +6,7 @@ import Backend from '@/backend'
 import LastPromise from '@/utils/last-promise'
 
 import Note from '@/models/note'
-import Notespace from '@/models/notespace'
+import Workspace from '@/models/workspace'
 
 Vue.use(Vuex)
 
@@ -15,8 +15,8 @@ const backend = new Backend({
 })
 
 const registry = {}
-const table = new Notespace()
-const drawer = new Notespace()
+const table = new Workspace()
+const drawer = new Workspace()
 
 export default new Vuex.Store({
   state: {
@@ -62,12 +62,17 @@ export default new Vuex.Store({
       }
     },
 
+    clearTable (state, payload) {
+      table.clearFocus()
+    },
+
     moveToDrawer (state, payload = {}) {
       let notes = payload.notes || (payload.note && [payload.note]) || state.table
       notes.forEach(note => {
         drawer.addToFocus(note, { focusCapacity: Number.POSITIVE_INFINITY })
       })
-      table.clearFocus()
+      // table.clearFocus()
+      // table.removeFromFocus(payload.notes)
     },
 
     addToDrawer (state, payload) {

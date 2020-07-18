@@ -1,118 +1,74 @@
 <template lang="pug">
-  .minota-table-grid__content-item(v-on:scroll="onScroll($event)")
+  .minota-table-grid__content-item(
+    v-bind:scroll-overflow="scrollOverflow"
+    v-on:scroll-overflow="scrollOverflow = $event.detail"
+    v-scroll-overflow)
     slot
 </template>
 
 <script>
-import bus from '@/event-bus'
-import analyzeScrollMixin from '@/utils/analyze-scroll'
+import scrollOverflow from '@/directives/scroll-overflow'
 
 export default {
   name: 'TableGridContentItem',
 
-  props: {
-    updateScrollDataOn: {
-      type: String,
-      required: false,
-      default: 'update-scroll-data'
-    }
+  directives: {
+    scrollOverflow
   },
 
   data () {
     return {
-      scrollData: {},
-      isVisible: false
+      scrollOverflow: '',
+      isVisible: null
     }
   },
 
   watch: {
-    'scrollData' (scrollData) {
-      if (this.isVisible) {
-        bus.$emit('table-grid-content-item-scroll', scrollData)
-        if (
-          scrollData.scrollBottom < scrollData.scrollTop &&
-          scrollData.scrollBottom < window.innerHeight * 0.25
-        ) {
-          this.$emit('stick-content-item', 'bottom')
-        } else if (
-          scrollData.scrollTop < scrollData.scrollBottom &&
-          scrollData.scrollTop < window.innerHeight * 0.25
-        ) {
-          this.$emit('stick-content-item', 'top')
-        } else {
-          this.$emit('stick-content-item', '')
-        }
-      }
-    },
-
-    'isVisible' (visible) {
-      if (visible) {
-        this.$emit('enter-view')
-        bus.$emit('table-grid-content-item-scroll', Object.assign({}, this.scrollData))
-      } else {
-        this.$emit('exit-view')
-      }
-    }
-  },
-
-  created () {
-    this.listeners = {
-      onAnalyzeScroll: this.onAnalyzeScroll.bind(this)
+    'isVisible' (isVisible) {
+      this.$emit(`${isVisible ? 'enter' : 'exit'}-view`)
     }
   },
 
   mounted () {
-    this.scrollData = this.analyzeScrollInit(this.$el)
-    // Notify when got into view
     if (this.observer) {
       this.observer.disconnect()
     }
     this.observer = new IntersectionObserver(entries => {
-      if (entries.length > 1) {
-        console.warn('TableGridContentItemComponent intersections > 2', entries)
-      }
-      entries.forEach(entry => {
-        this.isVisible = entry.isIntersecting
-      })
-    }, {
-      threshold: 0.625
-    })
+      this.isVisible = entries.find(entry => entry.isIntersecting) || false
+    }, { threshold: 0.625 })
     this.observer.observe(this.$el)
-    // update scroll on resize and other events
-    window.removeEventListener('resize', this.listeners.onAnalyzeScroll)
-    window.addEventListener('resize', this.listeners.onAnalyzeScroll)
-    bus.$off(this.updateScrollDataOn, this.listeners.onAnalyzeScroll)
-    bus.$on(this.updateScrollDataOn, this.listeners.onAnalyzeScroll)
-  },
-
-  beforeDestroy () {
-    this.observer.disconnect()
-    bus.$off(this.updateScrollDataOn, this.listeners.onAnalyzeScroll)
-    window.removeEventListener('resize', this.listeners.onAnalyzeScroll)
-  },
-
-  methods: {
-    onScroll (event) {
-      this.analyzeScrollTick(this.scrollData, this.$el, data => {
-        this.scrollData = Object.assign(data, { event })
-      })
-    },
-
-    onAnalyzeScroll () {
-      this.scrollData = this.analyzeScrollInit(this.$el)
-    },
-
-    ...analyzeScrollMixin
   }
 }
 </script>
 
 <style lang="stylus">
-@import '~@/assets/styles/common'
+@import '~@/assets/styles/table'
 
 .minota-table-grid__content-item
-  overflow auto
-  scroll-snap-align center
-  scroll-snap-stop always
-  box-sizing border-box
+  &[scroll-overflow*="top"]:before
+    content ' '
+    z-index 1
+    display block
+    position sticky
+    top -0.5rem
+    margin-left -0.25rem
+    width calc(100% + 0.5rem)
+    height 0px
+    box-shadow 0px 0px 0px 2px alpha(black, 0.125)
+    @media (min-width 55rem)
+      margin-left calc(50% - 23.5rem - 4vw - 1rem)
+      width calc(47rem + 8vw + 2rem)
+  &[scroll-overflow*="bottom"]:after
+    content ' '
+    z-index 1
+    display block
+    position sticky
+    bottom -0.5rem
+    margin-left -0.25rem
+    width calc(100% + 0.5rem)
+    height 0px
+    box-shadow 0px 0px 0px 2px alpha(black, 0.125)
+    @media (min-width 55rem)
+      margin-left calc(50% - 23.5rem - 4vw - 1rem)
+      width calc(47rem + 8vw + 2rem)
 </style>

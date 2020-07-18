@@ -60,6 +60,7 @@ a:active
 
 .minota-sections_note-width
   display flex
+  align-items baseline
   width 100%
   max-width note-width
   margin 0 auto
@@ -77,24 +78,27 @@ a:active
   margin-left auto
   margin-right auto
 
+// Actions
+
 .minota-action
   padding 1rem
   text-decoration none
   display flex
   align-items center
   justify-content center
+  color steelblue
+
   .material-icons + *
     margin-left 0.25rem
 
-.minota-action_danger
-  color brown
+  button&
+    border none
+    background-color transparent
+    font-family inherit
 
-// Status
+  &[disabled]
+    pointer-events none
+    opacity low-emphasis
 
-.minota-status
-  // text-align right
-  margin-right 0
-  margin-left auto
-  font-size smaller
-  line-height 1.5rem
-  opacity low-emphasis
+  &[danger]
+    color brown

@@ -2,31 +2,26 @@
   .minota-table-grid(v-on:scroll="onGridScroll($event)")
     //- Top
     .minota-table-grid__actions.minota-table-grid__actions_top(
-      v-bind:class="{ 'minota-table-grid__actions_overflow_top': contentOverflow.top }"
       v-on:click="closeBar($event)")
       slot(name="actions-top")
 
     //- Bottom
     .minota-table-grid__actions.minota-table-grid__actions_bottom(
-      v-bind:class="{ 'minota-table-grid__actions_overflow_bottom': contentOverflow.bottom }"
       v-on:click="closeBar($event)")
       slot(name="actions-bottom")
 
     //- Left
     .minota-table-grid__actions.minota-table-grid__actions_left(
-      v-bind:class="{ 'minota-table-grid__actions_overflow_left': contentOverflow.left }"
       v-on:click="closeBar($event)")
       slot(name="actions-left")
 
     //- Right
     .minota-table-grid__actions.minota-table-grid__actions_right(
-      v-bind:class="{ 'minota-table-grid__actions_overflow_right': contentOverflow.right }"
       v-on:click="closeBar($event)")
       slot(name="actions-right")
-
     //- Content
-    .minota-table-grid__content(v-on:scroll="onGridContentScroll($event)")
-      slot(name="content")
+    //- .minota-table-grid__content(v-on:scroll="onGridContentScroll($event)")
+    slot(name="content")
 </template>
 
 <script>
@@ -88,7 +83,7 @@ export default {
 
   mounted () {
     this.scrollGrid = this.analyzeScrollInit(this.$el)
-    this.scrollContent = this.analyzeScrollInit(this.$el.querySelector('.minota-table-grid__content'))
+    // this.scrollContent = this.analyzeScrollInit(this.$el.querySelector('.minota-table-grid__content'))
     this.actions = {
       top: this.$el.querySelector('.minota-table-grid__actions_top').offsetHeight,
       bottom: this.$el.querySelector('.minota-table-grid__actions_bottom').offsetHeight,
@@ -114,11 +109,11 @@ export default {
     },
 
     scrollHome () {
-      setTimeout(() => {
-        this.$el.querySelector('.minota-table-grid__content').scrollIntoView({
-          behavior: 'smooth'
-        })
-      }, 50)
+      // setTimeout(() => {
+      //   this.$el.querySelector('.minota-table-grid__content').scrollIntoView({
+      //     behavior: 'smooth'
+      //   })
+      // }, 50)
     },
 
     closeBar (event) {
@@ -183,7 +178,7 @@ export default {
   display grid
   overflow auto
   grid-auto-columns 100%
-  grid-auto-flow column
+  // grid-auto-flow column
 
 .minota-table-grid__actions_overflow_top
   position relative

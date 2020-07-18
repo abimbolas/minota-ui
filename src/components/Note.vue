@@ -1,5 +1,5 @@
 <template lang="pug">
-  .minota-note
+  .minota-note(v-on:click="onClick($event)")
     .minota-note__editor(
       contenteditable
       v-on:input="onInput($event)")
@@ -31,7 +31,7 @@ export default {
   },
 
   created () {
-    bus.$on(`focus-start-${this.note.id}`, this.onFocusStart.bind(this))
+    bus.$on(`focus-note-${this.note.id}`, this.onFocusNote.bind(this))
   },
 
   mounted () {
@@ -43,7 +43,11 @@ export default {
       this.note.content = event.target.innerText
     },
 
-    onFocusStart () {
+    onClick (event) {
+      this.$emit('click', event)
+    },
+
+    onFocusNote () {
       this.$el.querySelector('[contenteditable]').focus()
       setTimeout(() => {
         this.$el.scrollIntoView({
@@ -77,7 +81,8 @@ export default {
   max-width calc(47rem + 8vw)
   background-color white
   box-sizing border-box
-  box-shadow 0px 1px 2px 0px alpha(black, 0.25), 0px 0px 10px 0px alpha(black, 0.1)
+  // box-shadow 0px 1px 2px 0px alpha(black, 0.125), 0px 0px 5px 0px alpha(black, 0.1)
+  box-shadow 0px 0px 0px 2px alpha(black, 0.05)
   .minota-table-grid__content-item_scroll-snapped &
     position relative
     &:before

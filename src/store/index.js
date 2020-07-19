@@ -36,7 +36,7 @@ export default new Vuex.Store({
     addToTable (state, payload) {
       (payload.notes || [payload.note]).forEach(note => {
         table.addToFocus(note, {
-          focusCapacity: payload.focusCapacity || 1,
+          focusCapacity: payload.focusCapacity || Number.POSITIVE_INFINITY,
           append: payload.append
         })
       })
@@ -132,11 +132,15 @@ export default new Vuex.Store({
         type: 'sync-drawer',
         promise: backend.getNotes().then(notes => {
           context.commit('clearDrawer')
-          context.commit('addToDrawer', { notes: notes.slice(0).reverse() })
           context.commit('replaceOnTable', {
             notes: notes.filter(note => {
               return context.getters.table.find(item => item.id === note.id)
             })
+          })
+          context.commit('addToDrawer', {
+            notes: notes.filter(note => {
+              return !context.getters.table.find(item => item.id === note.id)
+            }).slice(0).reverse()
           })
         }),
         registry

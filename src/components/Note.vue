@@ -95,4 +95,7 @@ export default {
   width 100%
   flex-grow 1
   outline none
+  &:empty:before
+    content '(Заметка девственно чиста)'
+    opacity low-emphasis
 </style>

@@ -1,53 +1,66 @@
 <template lang="pug">
-  .minota-table-grid
+  .minota-table-grid(
+    v-bind:taken="taken"
+    v-bind:control="control"
+    v-bind:focused="focused")
     //- Top
     //- .minota-table-grid__panel(position="top")
       .minota-section-right
         //- button.minota-action(v-on:click="onRemove()") Убрать всё
         button.minota-action(v-on:click="onGet()") Достать всё
 
-    //- Bottom
-    .minota-table-grid__panel(position="bottom")
+    //- Bottom if everything is usual
+    .minota-table-grid__panel(position="bottom" v-if="usual")
       .minota-section-left
         button.minota-action(
-          v-if="!taken"
           danger
           v-bind:disabled="!focused"
           v-on:click="onDelete(focused)")
           i.material-icons delete
           span Удалить
+      .minota-section-right
         button.minota-action(
-          v-if="taken"
+          v-bind:disabled="!focused"
+          v-on:click="onTake()")
+          span Переложить
+        button.minota-action(
+          v-bind:disabled="!focused"
+          v-on:click="onRemove()")
+          span Убрать
+
+    //- Bottom if something is taken
+    .minota-table-grid__panel(position="bottom" v-if="taken")
+      .minota-section-left
+        button.minota-action(
           v-bind:disabled="!focused"
           v-on:click="onPutBefore()")
           span Положить слева
       .minota-section-center
         button.minota-action(
-          v-if="taken"
+          v-bind:disabled="!focused"
           v-on:click="onCancelPut()")
           span Отмена
       .minota-section-right
         button.minota-action(
-          v-if="taken"
           v-bind:disabled="!focused"
           v-on:click="onPutAfter()")
-          span Положить справа
+          span Положить
+
+    //- Bottom for control
+    .minota-table-grid__panel(position="bottom" v-if="control")
+      .minota-section-right
         button.minota-action(
-          v-if="!taken"
-          v-bind:disabled="!focused"
-          v-on:click="onTake()")
-          span Переложить
+          v-bind:disabled="!drawer.length"
+          v-on:click="onGet()")
+          span Достать&nbsp;
+          span(v-if="drawer.length") ({{ getFromDrawerCount }})
 
     //- Left
     //- .minota-table-grid__panel(position="left") Left
 
-    //- Right
-    .minota-table-grid__panel(
-      position="right"
-      v-bind:class="{ 'minota-table-grid__panel_with-taken': taken }")
-      table-grid-content-item-component(
-        v-if="taken"
-        v-bind:taken="taken && taken.id")
+    //- Right if something is taken
+    .minota-table-grid__panel(position="right" v-if="taken")
+      table-grid-content-item-component(v-bind:taken="taken && taken.id")
         note-component(v-bind:note="taken")
 
     //- Content
@@ -56,7 +69,7 @@
       table-grid-content-item-component(
         v-for="note in table"
         v-bind:key="note.id"
-        v-bind:note-id="note.id"
+        v-bind:content-item-id="note.id"
         v-on:enter-view="onEnterView(note)"
         v-on:exit-view="onExitView(note)"
         v-bind:taken-mirror="taken && taken.id === note.id && taken.id")
@@ -64,7 +77,11 @@
           v-bind:note="note"
           v-on:update="onUpdate(note)")
       //- Create
-      table-grid-content-item-component(v-if="!taken")
+      table-grid-content-item-component(
+        v-if="!taken"
+        content-item-id="control"
+        v-on:enter-view="control = true"
+        v-on:exit-view="control = false")
         .minota-create-note(
           v-on:click="onCreate()"
           title="Кликните чтобы создать заметку")
@@ -72,11 +89,10 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 
-import bus from '@/event-bus'
+// import bus from '@/event-bus'
 import Note from '@/models/note'
-// import Workspace from '@/models/workspace'
 
 import InspireComponent from '@/components/Inspire'
 import NoteComponent from '@/components/Note'
@@ -94,58 +110,56 @@ export default {
   data () {
     return {
       focused: null,
-      taken: null
+      taken: null,
+      control: false
     }
   },
 
   computed: {
+    usual () {
+      return !this.taken && !this.control
+    },
+
+    getFromDrawerCount () {
+      return this.drawer.length <= 7 ? this.drawer.length : `7 из ${this.drawer.length}`
+    },
+
     ...mapGetters([
       'table',
-      // 'drawer',
+      'drawer',
       'backend'
     ])
   },
 
-  // mounted () {
-  //   this.syncDrawerAction()
-  // },
+  mounted () {
+    this.syncDrawerAction()
+  },
 
   methods: {
 
     // Content item actions
 
     onDelete () {
-      let note = this.table.find(item => item.id === this.focused.id)
-      if (note) {
-        this.backend.deleteNote(note)
-        // this.removeFromDrawer({ note })
-        this.removeFromTable({ note })
-      } else {
-        console.warn('Table.vue, onDelete(), focused note not found:', this.focused)
-      }
+      this.backend.deleteNote(this.focused)
+      this.removeFromTable({ note: this.focused })
+    },
+
+    onRemove () {
+      this.removeFromTable({ note: this.focused })
+      this.addToDrawer({ note: this.focused })
     },
 
     onTake () {
-      let note = this.table.find(item => item.id === this.focused.id)
-      if (note) {
-        this.taken = note
-        let sibling
-        let siblingAfter = this.table.indexOf(note) + 1
-        let siblingBefore = this.table.indexOf(note) - 1
-        if (siblingAfter < this.table.length) {
-          sibling = siblingAfter
-        } else if (siblingBefore > -1) {
-          sibling = siblingBefore
-        }
-        if (sibling) {
-          requestAnimationFrame(() => {
-            this.$el.querySelector(`*[note-id="${this.table[sibling].id}"]`).scrollIntoView({
-              behavior: 'smooth'
-            })
-          })
-        }
-      } else {
-        console.warn('Table.vue, onTake(), focused note not found:', this.focused)
+      this.taken = this.focused
+      let index = this.table.findIndex(note => note.id === this.focused.id)
+      let siblingId
+      if (index + 1 < this.table.length) {
+        siblingId = this.table[index + 1].id
+      } else if (index - 1 > -1) {
+        siblingId = this.table[index - 1].id
+      }
+      if (siblingId) {
+        this.scrollContentItemIntoView(siblingId)
       }
     },
 
@@ -154,13 +168,8 @@ export default {
         put: this.taken,
         before: this.focused
       })
-      let id = this.taken.id
+      this.scrollContentItemIntoView(this.taken.id)
       this.taken = null
-      requestAnimationFrame(() => {
-        this.$el.querySelector(`*[note-id="${id}"]`).scrollIntoView({
-          behavior: 'smooth'
-        })
-      })
     },
 
     onPutAfter () {
@@ -168,23 +177,13 @@ export default {
         put: this.taken,
         after: this.focused
       })
-      let id = this.taken.id
+      this.scrollContentItemIntoView(this.taken.id)
       this.taken = null
-      requestAnimationFrame(() => {
-        this.$el.querySelector(`*[note-id="${id}"]`).scrollIntoView({
-          behavior: 'smooth'
-        })
-      })
     },
 
     onCancelPut () {
-      let id = this.taken.id
+      this.scrollContentItemIntoView(this.taken.id)
       this.taken = null
-      requestAnimationFrame(() => {
-        this.$el.querySelector(`*[note-id="${id}"]`).scrollIntoView({
-          behavior: 'smooth'
-        })
-      })
     },
 
     // Content item events
@@ -205,9 +204,21 @@ export default {
         focusCapacity: Number.POSITIVE_INFINITY,
         append: true
       })
-      setTimeout(() => {
-        bus.$emit(`focus-note-${note.id}`)
-      }, 300)
+      this.scrollContentItemIntoView(note.id)
+      // setTimeout(() => {
+      //   bus.$emit(`focus-note-${note.id}`)
+      // }, 2000)
+    },
+
+    onGet () {
+      if (this.drawer.length) {
+        this.addToTable({
+          notes: this.drawer.slice(0, 7),
+          append: true
+        })
+        this.scrollContentItemIntoView(this.drawer[0].id)
+        this.clearDrawer()
+      }
     },
 
     // UI helper events
@@ -223,66 +234,29 @@ export default {
       }
     },
 
-    //
-    // // Table-wide notes actions
-    //
-    // onRemove () {
-    //   this.addToDrawer({ notes: this.table.slice(0) })
-    //   this.clearTable()
-    // },
-    //
-    // onGet () {
-    //   this.addToTable({
-    //     notes: this.drawer.slice(0),
-    //     focusCapacity: Number.POSITIVE_INFINITY,
-    //     append: true
-    //   })
-    //   this.removeFromDrawer({ notes: this.drawer.slice(0) })
-    //   setTimeout(() => {
-    //     this.$el.querySelector('.minota-table-grid__content-item').scrollIntoView({
-    //       behavior: 'smooth'
-    //     })
-    //   }, 500)
-    // },
-    //
-    // // Note-wide actions
-    //
-    // onRemoveVisible () {
-    //   if (this.visible && this.visible.id) {
-    //     let note = this.table.find(note => note.id === this.visible.id)
-    //     if (note) {
-    //       this.addToDrawer({ note })
-    //       this.removeFromTable({ note })
-    //     }
-    //   }
-    // },
-    //
-    // onKeepVisible () {
-    //   if (this.visible && this.visible.id) {
-    //     let notes = this.table.filter(note => note.id !== this.visible.id)
-    //     if (notes.length) {
-    //       this.addToDrawer({ notes })
-    //       this.removeFromTable({ notes })
-    //     }
-    //   }
-    // },
+    // UI helper actions
+
+    scrollContentItemIntoView (id) {
+      requestAnimationFrame(() => {
+        this.$el.querySelector(`*[content-item-id="${id}"]`).scrollIntoView({
+          behavior: 'smooth'
+        })
+      })
+    },
 
     ...mapMutations([
       'addToTable',
       'removeFromTable',
       'putOnTableBefore',
       'putOnTableAfter',
-      'updateOnTable'
-      // 'replaceOnTable',
-      // 'clearTable',
-      // 'moveToDrawer',
-      // 'addToDrawer',
-      // 'removeFromDrawer',
-    ])
+      'updateOnTable',
+      'addToDrawer',
+      'clearDrawer'
+    ]),
 
-    // ...mapActions([
-    //   'syncDrawerAction'
-    // ])
+    ...mapActions([
+      'syncDrawerAction'
+    ])
   }
 }
 </script>
@@ -291,8 +265,10 @@ export default {
 @import '~@/assets/styles/table'
 
 .minota-table-grid
-  grid-template-rows auto 1fr auto
+  grid-template-rows auto 100vh auto
   grid-template-columns auto 1fr auto
+  &[taken]
+    grid-template-rows auto 1fr auto
 
 .minota-table-grid__content-item
   .minota-note
@@ -307,7 +283,7 @@ export default {
     align-items center
     cursor pointer
 
-.minota-table-grid__panel_with-taken
+.minota-table-grid__panel[position="right"]
   width 25vw
   overflow hidden
 

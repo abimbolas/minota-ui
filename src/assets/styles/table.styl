@@ -4,7 +4,7 @@
   display grid
   grid-template-rows auto 100vh auto
   grid-template-columns auto 100vw auto
-  grid-template-areas 'top-left top top-right' 'left main right' 'bottom-right bottom bottom-left'
+  grid-template-areas 'top-left top right' 'left main right' 'bottom-left bottom right'
   height 100vh
   width 100vw
 
@@ -28,10 +28,11 @@
     scroll-snap-align start
     scroll-snap-stop always
   &[position="right"]
-    background-color alpha(green, 0.25)
+    // background-color alpha(green, 0.25)
     grid-area right
     scroll-snap-align end
     scroll-snap-stop always
+    position relative
   &[position="center"]
     width 100%
     margin 0 auto

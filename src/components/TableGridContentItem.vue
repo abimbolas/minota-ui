@@ -45,6 +45,7 @@ export default {
 @import '~@/assets/styles/table'
 
 .minota-table-grid__content-item
+  padding 0.5rem
   &[scroll-overflow*="top"]:before
     content ' '
     z-index 1
@@ -56,8 +57,8 @@ export default {
     height 0px
     box-shadow 0px 0px 0px 2px alpha(black, 0.125)
     @media (min-width 55rem)
-      margin-left calc(50% - 23.5rem - 4vw - 1rem)
-      width calc(47rem + 8vw + 2rem)
+      margin-left calc(50% - 21rem - 8% - 0.5rem)
+      width calc(42rem + 16% + 1rem)
   &[scroll-overflow*="bottom"]:after
     content ' '
     z-index 1
@@ -69,6 +70,6 @@ export default {
     height 0px
     box-shadow 0px 0px 0px 2px alpha(black, 0.125)
     @media (min-width 55rem)
-      margin-left calc(50% - 23.5rem - 4vw - 1rem)
-      width calc(47rem + 8vw + 2rem)
+      margin-left calc(50% - 21rem - 8% - 0.5rem)
+      width calc(42rem + 16% + 1rem)
 </style>

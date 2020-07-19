@@ -62,6 +62,32 @@ export default new Vuex.Store({
       }
     },
 
+    putOnTableBefore (state, payload) {
+      if (!table.isInFocus(payload.before)) {
+        console.warn('putOnTableAfter: payload.before not found on table:', payload.before)
+      } else {
+        table.removeFromFocus(payload.put)
+        table.focus.splice(
+          state.table.findIndex(note => note.id === payload.before.id),
+          0,
+          payload.put
+        )
+      }
+    },
+
+    putOnTableAfter (state, payload) {
+      if (!table.isInFocus(payload.after)) {
+        console.warn('putOnTableAfter: payload.after not found on table:', payload.after)
+      } else {
+        table.removeFromFocus(payload.put)
+        table.focus.splice(
+          state.table.findIndex(note => note.id === payload.after.id) + 1,
+          0,
+          payload.put
+        )
+      }
+    },
+
     clearTable (state, payload) {
       table.clearFocus()
     },

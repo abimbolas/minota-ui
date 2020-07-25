@@ -3,6 +3,8 @@
     .minota-note__editor(
       contenteditable
       v-on:input="onInput($event)")
+    .minota-note__config
+      pre(style="font-size: 13px;") {{ note.config }}
 </template>
 
 <script>
@@ -28,9 +30,11 @@ export default {
       this.syncEditor()
     },
 
-    'note.content' () {
-      this.$emit('update', this.note)
-      this.updateNoteAction({ note: this.note })
+    'note.content' (content) {
+      let innerText = this.$el.querySelector('[contenteditable]').innerText
+      if (content !== innerText) {
+        console.warn('note out of sync', content, innerText)
+      }
     }
   },
 
@@ -44,7 +48,12 @@ export default {
 
   methods: {
     onInput (event) {
-      this.note.content = event.target.innerText
+      this.updateNoteAction({
+        note: this.note,
+        update: {
+          content: event.target.innerText
+        }
+      })
     },
 
     onClick (event) {

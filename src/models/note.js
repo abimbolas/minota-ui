@@ -16,12 +16,7 @@ export default class Note {
     this.config.id = id
   }
 
-  update ({ content = null, config = null } = {}) {
-    if (content !== null) {
-      this.content = content
-    }
-    if (config !== null) {
-      this.config = Object.assign(this.config, config)
-    }
+  syncWith (note) {
+    return note.config.updated < this.config.updated ? this : note
   }
 }

@@ -20,7 +20,7 @@
           span Удалить
       .minota-section-right
         button.minota-action(
-          v-bind:disabled="!focused"
+          v-bind:disabled="!focused || table.length === 1"
           v-on:click="onTake()")
           span Переложить
         button.minota-action(
@@ -50,10 +50,10 @@
     .minota-table-grid__panel(position="bottom" v-if="control")
       .minota-section-right
         button.minota-action(
-          v-bind:disabled="!drawer.length"
+          v-bind:disabled="!notesNotOnTable.length"
           v-on:click="onGet()")
           span Достать&nbsp;
-          span(v-if="drawer.length") ({{ getFromDrawerCount }})
+          span(v-if="notesNotOnTable.length") ({{ notesNotOnTableCount }})
 
     //- Left
     //- .minota-table-grid__panel(position="left") Left
@@ -73,9 +73,8 @@
         v-on:enter-view="onEnterView(note)"
         v-on:exit-view="onExitView(note)"
         v-bind:taken-mirror="taken && taken.id === note.id && taken.id")
-        note-component(
-          v-bind:note="note"
-          v-on:update="onUpdate(note)")
+        note-component(v-bind:note="note")
+
       //- Create
       table-grid-content-item-component(
         v-if="!taken"
@@ -86,12 +85,20 @@
           v-on:click="onCreate()"
           title="Кликните чтобы создать заметку")
           inspire-component
+      //- Storages
+      table-grid-content-item-component(v-if="!taken")
+        h3 Storages
+        p(v-for="storage in storageNodes")
+          em(v-if="storage.isSupported && !storage.isActive" style="color: grey;") (inactive)&nbsp;
+          em(v-if="!storage.isSupported" style="color: brown;") (unsupported)&nbsp;
+          strong(v-if="storage.isSupported && storage.isDefault") (default)&nbsp;
+          span {{ storage.href }}&nbsp;
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
-// import bus from '@/event-bus'
+import bus from '@/event-bus'
 import Note from '@/models/note'
 
 import InspireComponent from '@/components/Inspire'
@@ -111,7 +118,8 @@ export default {
     return {
       focused: null,
       taken: null,
-      control: false
+      control: false,
+      tableCapacity: 5
     }
   },
 
@@ -120,19 +128,38 @@ export default {
       return !this.taken && !this.control
     },
 
-    getFromDrawerCount () {
-      return this.drawer.length <= 7 ? this.drawer.length : `7 из ${this.drawer.length}`
+    notesNotOnTable () {
+      return Object.keys(this.storageNotes)
+        .map(key => this.storageNotes[key])
+        .filter(note => !this.table.find(item => item.id === note.id))
+    },
+
+    notesNotOnTableCount () {
+      return this.notesNotOnTable.length >= this.tableCapacity
+        ? `${this.tableCapacity} из ${this.notesNotOnTable.length}`
+        : this.notesNotOnTable.length
     },
 
     ...mapGetters([
       'table',
-      'drawer',
-      'backend'
+      'storageNodes',
+      'storageNotes'
     ])
   },
 
+  created () {
+    const mutations = {
+      addNotes: payload => {
+        this.replaceOnTable(payload)
+      }
+    }
+    this.$store.subscribe(mutation => {
+      mutations[mutation.type] && mutations[mutation.type](mutation.payload)
+    })
+  },
+
   mounted () {
-    this.syncDrawerAction()
+    this.getNotesAction()
   },
 
   methods: {
@@ -140,13 +167,12 @@ export default {
     // Content item actions
 
     onDelete () {
-      this.backend.deleteNote(this.focused)
+      this.deleteNoteAction({ note: this.focused })
       this.removeFromTable({ note: this.focused })
     },
 
     onRemove () {
       this.removeFromTable({ note: this.focused })
-      this.addToDrawer({ note: this.focused })
     },
 
     onTake () {
@@ -188,13 +214,6 @@ export default {
 
     // Content item events
 
-    onUpdate (note) {
-      clearTimeout(this.updateOnTableTimeout)
-      this.updateOnTableTimeout = setTimeout(() => {
-        this.updateOnTable({ note })
-      }, 500)
-    },
-
     // Control panel
 
     onCreate () {
@@ -205,19 +224,19 @@ export default {
         append: true
       })
       this.scrollContentItemIntoView(note.id)
-      // setTimeout(() => {
-      //   bus.$emit(`focus-note-${note.id}`)
-      // }, 2000)
+      setTimeout(() => {
+        bus.$emit(`focus-note-${note.id}`)
+      }, 2000)
     },
 
     onGet () {
-      if (this.drawer.length) {
+      if (this.notesNotOnTable.length) {
+        let notes = this.notesNotOnTable.slice(0, this.tableCapacity)
         this.addToTable({
-          notes: this.drawer.slice(0, 7),
+          notes,
           append: true
         })
-        this.scrollContentItemIntoView(this.drawer[0].id)
-        this.clearDrawer()
+        this.scrollContentItemIntoView(notes[0].id)
       }
     },
 
@@ -246,16 +265,15 @@ export default {
 
     ...mapMutations([
       'addToTable',
+      'replaceOnTable',
       'removeFromTable',
       'putOnTableBefore',
-      'putOnTableAfter',
-      'updateOnTable',
-      'addToDrawer',
-      'clearDrawer'
+      'putOnTableAfter'
     ]),
 
     ...mapActions([
-      'syncDrawerAction'
+      'getNotesAction',
+      'deleteNoteAction'
     ])
   }
 }

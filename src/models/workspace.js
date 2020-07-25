@@ -7,14 +7,15 @@ export default class Workspace {
   // Focus
 
   addToFocus (obj, { focusCapacity = 1, append = false } = {}) {
+    this._removeFrom('blur', obj)
     if (this._isIn('focus', obj)) {
       this._replaceIn('focus', obj)
+    } else {
+      this._addTo('focus', obj, { append })
     }
-    this._removeFrom('blur', obj)
     while (this.focus.length >= focusCapacity) {
       this.blurFocus(append ? this.focus[0] : this.focus.slice(-1)[0])
     }
-    this._addTo('focus', obj, { append })
   }
 
   replaceInFocus (obj) {
@@ -40,11 +41,12 @@ export default class Workspace {
   // Blur
 
   addToBlur (obj, { append = false } = {}) {
+    this._removeFrom('focus', obj)
     if (this._isIn('blur', obj)) {
       this._replaceIn('blur', obj)
+    } else {
+      this._addTo('blur', obj, { append })
     }
-    this._removeFrom('focus', obj)
-    this._addTo('blur', obj, { append })
   }
 
   replaceInBlur (obj) {

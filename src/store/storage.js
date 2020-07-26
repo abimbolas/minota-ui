@@ -33,7 +33,8 @@ export default {
 
   getters: {
     storageNodes: state => state.nodes,
-    storageNotes: state => state.notes
+    storageNotes: state => state.notes,
+    storageNotesList: state => Object.keys(state.notes).map(key => state.notes[key])
   },
 
   mutations: {
@@ -119,7 +120,7 @@ export default {
       try {
         storage = payload.note.config.storage || payload.update.config.storage
       } catch (error) {
-        console.warn(error)
+        console.warn('No storage to update to', error, payload)
       }
       if (!storage || !storage.length) {
         payload.update.config = {
@@ -148,19 +149,30 @@ export default {
     },
 
     deleteNoteAction (context, payload) {
-      const storage = payload.note.config.storage || context.state.notes[payload.note.id].config.storage
-      if (!storage || !storage.length) {
-        console.warn('deleteNoteAction no storage to delete from')
-      } else {
-        storage.forEach(href => {
-          const node = context.state.nodes.find(node => node.href === href)
-          if (node.isActive && node.isSupported) {
-            getStorage(node).deleteNote(payload.note)
-          } else {
-            console.warn('Storage Node is not supported or inactive', payload.note, node)
+      context.dispatch('updateNoteAction', {
+        note: payload.note,
+        update: {
+          config: {
+            deleted: true
           }
-        })
-      }
+        }
+      })
+      // let storage = (
+      //   payload.note.config.storage ||
+      //   (context.state.notes[payload.note.id] && context.state.notes[payload.note.id].config.storage)
+      // )
+      // if (!storage || !storage.length) {
+      //   console.warn('No storage to delete from', payload)
+      // } else {
+      //   storage.forEach(href => {
+      //     const node = context.state.nodes.find(node => node.href === href)
+      //     if (node.isActive && node.isSupported) {
+      //       getStorage(node).deleteNote(payload.note)
+      //     } else {
+      //       console.warn('Storage Node is not supported or inactive', payload.note, node)
+      //     }
+      //   })
+      // }
     }
   }
 }

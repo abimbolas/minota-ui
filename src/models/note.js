@@ -6,6 +6,16 @@ export default class Note {
     this.config = Object.assign({
       id: uuid()
     }, config)
+
+    // Setup date
+    if (!this.config.date) {
+      this.config.date = new Date()
+    } else {
+      this.config.date = new Date(this.config.date)
+    }
+    if (this.config.updated) {
+      this.config.updated = new Date(this.config.updated)
+    }
   }
 
   get id () {

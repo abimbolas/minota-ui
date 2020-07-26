@@ -2,8 +2,10 @@
   .minota-note(v-on:click="onClick($event)")
     .minota-note__editor(
       contenteditable
-      v-on:input="onInput($event)")
-    .minota-note__config
+      v-on:input="onInput($event)"
+      v-cursor-position
+      v-on:cursor-position="onCursorPosition($event.detail)")
+    //- .minota-note__config
       pre(style="font-size: 13px;") {{ note.config }}
 </template>
 
@@ -11,9 +13,14 @@
 import { mapActions } from 'vuex'
 import bus from '@/event-bus'
 import Note from '@/models/note'
+import cursorPosition from '@/directives/cursor-position'
 
 export default {
   name: 'Note',
+
+  directives: {
+    cursorPosition
+  },
 
   props: {
     note: {
@@ -21,6 +28,15 @@ export default {
       required: true,
       default () {
         return new Note()
+      }
+    }
+  },
+
+  data () {
+    return {
+      threshold: {
+        nearStart: 100,
+        nearEnd: 200
       }
     }
   },
@@ -51,7 +67,10 @@ export default {
       this.updateNoteAction({
         note: this.note,
         update: {
-          content: event.target.innerText
+          content: event.target.innerText,
+          config: {
+            updated: new Date()
+          }
         }
       })
     },
@@ -69,6 +88,14 @@ export default {
           inline: 'start'
         })
       })
+    },
+
+    onCursorPosition (position) {
+      if (position.fromStart <= this.threshold.nearStart) {
+        this.$emit('cursor-near-start')
+      } else if (position.fromEnd <= this.threshold.nearEnd) {
+        this.$emit('cursor-near-end')
+      }
     },
 
     syncEditor () {

@@ -48,6 +48,9 @@
 
     //- Bottom for control
     .minota-table-grid__panel(position="bottom" v-if="control")
+      .minota-section-left
+        .minota-action(v-if="notesDeleted.length")
+          span Корзина ({{ notesDeleted.length }})
       .minota-section-right
         button.minota-action(
           v-bind:disabled="!notesNotOnTable.length"
@@ -73,7 +76,10 @@
         v-on:enter-view="onEnterView(note)"
         v-on:exit-view="onExitView(note)"
         v-bind:taken-mirror="taken && taken.id === note.id && taken.id")
-        note-component(v-bind:note="note")
+        note-component(
+          v-bind:note="note"
+          v-on:cursor-near-end="scrollContentItemBottom(note.id)"
+          v-on:cursor-near-start="scrollContentItemTop(note.id)")
 
       //- Create
       table-grid-content-item-component(
@@ -86,7 +92,7 @@
           title="Кликните чтобы создать заметку")
           inspire-component
       //- Storages
-      table-grid-content-item-component(v-if="!taken")
+      //- table-grid-content-item-component(v-if="!taken")
         h3 Storages
         p(v-for="storage in storageNodes")
           em(v-if="storage.isSupported && !storage.isActive" style="color: grey;") (inactive)&nbsp;
@@ -129,9 +135,9 @@ export default {
     },
 
     notesNotOnTable () {
-      return Object.keys(this.storageNotes)
-        .map(key => this.storageNotes[key])
-        .filter(note => !this.table.find(item => item.id === note.id))
+      return this.storageNotesList.filter(note => {
+        return !note.config.deleted && !this.table.find(item => item.id === note.id)
+      })
     },
 
     notesNotOnTableCount () {
@@ -140,10 +146,14 @@ export default {
         : this.notesNotOnTable.length
     },
 
+    notesDeleted () {
+      return this.storageNotesList.filter(item => item.config.deleted)
+    },
+
     ...mapGetters([
       'table',
       'storageNodes',
-      'storageNotes'
+      'storageNotesList'
     ])
   },
 
@@ -167,6 +177,7 @@ export default {
     // Content item actions
 
     onDelete () {
+      console.log(this.focused)
       this.deleteNoteAction({ note: this.focused })
       this.removeFromTable({ note: this.focused })
     },
@@ -257,9 +268,28 @@ export default {
 
     scrollContentItemIntoView (id) {
       requestAnimationFrame(() => {
-        this.$el.querySelector(`*[content-item-id="${id}"]`).scrollIntoView({
+        let element = this.$el.querySelector(`*[content-item-id="${id}"]`)
+        element.scrollIntoView({
           behavior: 'smooth'
         })
+      })
+    },
+
+    scrollContentItemTop (id) {
+      requestAnimationFrame(() => {
+        let element = this.$el.querySelector(`*[content-item-id="${id}"]`)
+        let top = 0
+        let behavior = 'smooth'
+        element.scroll({ top, behavior })
+      })
+    },
+
+    scrollContentItemBottom (id) {
+      requestAnimationFrame(() => {
+        let element = this.$el.querySelector(`*[content-item-id="${id}"]`)
+        let top = element.scrollHeight
+        let behavior = 'smooth'
+        element.scroll({ top, behavior })
       })
     },
 

@@ -52,6 +52,11 @@ export default {
       if (state.nodes.length === 1) {
         node.isDefault = true
       }
+      if (node.isDefault && state.nodes.length > 1) {
+        state.nodes.filter(item => item.href !== node.href).forEach(item => {
+          item.isDefault = false
+        })
+      }
       initStorage(node)
     },
 
@@ -134,10 +139,10 @@ export default {
       }
       context.commit('updateNote', payload)
       // Save to remove storage, with small debounce
-      const note = context.state.notes[payload.note.id]
       clearTimeout(updateTimeout[payload.note.id])
       updateTimeout[payload.note.id] = setTimeout(() => {
-        storage.forEach(href => {
+        const note = context.state.notes[payload.note.id]
+        note.config.storage.forEach(href => {
           const node = context.state.nodes.find(node => node.href === href)
           if (node.isActive && node.isSupported) {
             getStorage(node).postNote(note)
@@ -148,31 +153,45 @@ export default {
       }, 500)
     },
 
-    deleteNoteAction (context, payload) {
-      context.dispatch('updateNoteAction', {
-        note: payload.note,
-        update: {
-          config: {
-            deleted: true
+    // deleteNoteAction (context, payload) {
+    //   context.dispatch('updateNoteAction', {
+    //     note: payload.note,
+    //     update: {
+    //       config: {
+    //         deleted: true
+    //       }
+    //     }
+    //   })
+    //   let storage = (
+    //     payload.note.config.storage ||
+    //     (context.state.notes[payload.note.id] && context.state.notes[payload.note.id].config.storage)
+    //   )
+    //   if (!storage || !storage.length) {
+    //     console.warn('No storage to delete from', payload)
+    //   } else {
+    //     storage.forEach(href => {
+    //       const node = context.state.nodes.find(node => node.href === href)
+    //       if (node.isActive && node.isSupported) {
+    //         getStorage(node).deleteNote(payload.note)
+    //       } else {
+    //         console.warn('Storage Node is not supported or inactive', payload.note, node)
+    //       }
+    //     })
+    //   }
+    // },
+
+    deleteNotesAction (context, payload) {
+      let notes = payload.notes || [payload.note]
+      return Promise.all(notes.map(note => {
+        return context.dispatch('updateNoteAction', {
+          note,
+          update: {
+            config: {
+              deleted: true
+            }
           }
-        }
-      })
-      // let storage = (
-      //   payload.note.config.storage ||
-      //   (context.state.notes[payload.note.id] && context.state.notes[payload.note.id].config.storage)
-      // )
-      // if (!storage || !storage.length) {
-      //   console.warn('No storage to delete from', payload)
-      // } else {
-      //   storage.forEach(href => {
-      //     const node = context.state.nodes.find(node => node.href === href)
-      //     if (node.isActive && node.isSupported) {
-      //       getStorage(node).deleteNote(payload.note)
-      //     } else {
-      //       console.warn('Storage Node is not supported or inactive', payload.note, node)
-      //     }
-      //   })
-      // }
+        })
+      }))
     }
   }
 }

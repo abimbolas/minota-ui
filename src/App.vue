@@ -22,12 +22,13 @@ export default {
 
     this.addStorage({
       href: 'file:///Users/antivitla/Projects/Personal/Minota/.minota',
-      isActive: false
+      isActive: true
     })
 
     this.addStorage({
       href: 'file:///Users/antivitla/Dropbox/Notes',
-      isActive: false
+      isActive: true,
+      isDefault: true
     })
 
     this.addStorage({

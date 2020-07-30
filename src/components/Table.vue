@@ -2,7 +2,8 @@
   .minota-table-grid(
     v-bind:taken="taken"
     v-bind:control="control"
-    v-bind:focused="focused")
+    v-bind:focused="Boolean(focused)"
+    v-bind:selected="selected.focus.length")
     //- Top
     //- .minota-table-grid__panel(position="top")
       .minota-section-right
@@ -21,11 +22,52 @@
       .minota-section-right
         button.minota-action(
           v-bind:disabled="!focused || table.length === 1"
-          v-on:click="onTake()")
+          v-on:click="onSelect(focused)")
+          span Выделить
+        button.minota-action(
+          v-bind:disabled="!focused || table.length === 1"
+          v-on:click="onTake(focused)")
           span Переложить
         button.minota-action(
+          v-bind:disabled="!focused || table.length === 1"
+          v-on:click="onKeep(focused)")
+          span Оставить
+        button.minota-action(
           v-bind:disabled="!focused"
-          v-on:click="onRemove()")
+          v-on:click="onRemove(focused)")
+          span Убрать
+
+    //- Bottom is something is selected
+    .minota-table-grid__panel(position="bottom" v-if="selected.focus.length && !control")
+      .minota-section-left
+        .minota-action.minota-action_text
+          span {{ getNoun(selected.focus.length, 'Выбрана', 'Выбраны', 'Выбраны')}}&nbsp;
+          span {{ selected.focus.length }}&nbsp;
+          span {{ getNoun(selected.focus.length, 'заметка', 'заметки', 'заметок')}}
+      .minota-section-right
+        button.minota-action(
+          v-on:click="selected.clearFocus()")
+          i.material-icons block
+          span Отмена
+        button.minota-action(
+          v-if="selected.isInFocus(focused)"
+          v-bind:disabled="!focused || table.length === 1"
+          v-on:click="onUnselect(focused)")
+          span Снять выделение
+        button.minota-action(
+          v-if="!selected.isInFocus(focused)"
+          v-bind:disabled="!focused || table.length === 1"
+          v-on:click="onSelect(focused)")
+          span Выделить
+        button.minota-action(
+          danger
+          v-on:click="onDelete(selected.focus)")
+          span Удалить
+        button.minota-action(
+          v-on:click="onKeep(selected.focus)")
+          span Оставить
+        button.minota-action(
+          v-on:click="onRemove(selected.focus)")
           span Убрать
 
     //- Bottom if something is taken
@@ -33,7 +75,7 @@
       .minota-section-left
         button.minota-action(
           v-bind:disabled="!focused"
-          v-on:click="onPutBefore()")
+          v-on:click="onPutBefore(focused)")
           span Положить слева
       .minota-section-center
         button.minota-action(
@@ -43,20 +85,24 @@
       .minota-section-right
         button.minota-action(
           v-bind:disabled="!focused"
-          v-on:click="onPutAfter()")
+          v-on:click="onPutAfter(focused)")
           span Положить
 
     //- Bottom for control
     .minota-table-grid__panel(position="bottom" v-if="control")
       .minota-section-left
-        .minota-action(v-if="notesDeleted.length")
+        .minota-action.minota-action_text(v-if="notesDeleted.length")
           span Корзина ({{ notesDeleted.length }})
       .minota-section-right
+        //- button.minota-action(
+          v-bind:disabled="!notesNotOnTable.length"
+          v-on:click="onGetPile()")
+          span Достать ({{ notesNotOnTable.length }})
         button.minota-action(
           v-bind:disabled="!notesNotOnTable.length"
-          v-on:click="onGet()")
-          span Достать&nbsp;
-          span(v-if="notesNotOnTable.length") ({{ notesNotOnTableCount }})
+          v-on:click="onGet(5)")
+          span Разложить&nbsp;
+          span(v-if="notesNotOnTable.length") 5 из {{ notesNotOnTable.length }}
 
     //- Left
     //- .minota-table-grid__panel(position="left") Left
@@ -78,9 +124,12 @@
         v-bind:taken-mirror="taken && taken.id === note.id && taken.id")
         note-component(
           v-bind:note="note"
+          v-bind:selected="selected.isInFocus(note)"
           v-on:cursor-near-end="scrollContentItemBottom(note.id)"
           v-on:cursor-near-start="scrollContentItemTop(note.id)")
-
+      //- Bundle debug
+      //- table-grid-content-item-component
+        notes-bundle-component(v-bind:notes="storageNotesList")
       //- Create
       table-grid-content-item-component(
         v-if="!taken"
@@ -91,6 +140,7 @@
           v-on:click="onCreate()"
           title="Кликните чтобы создать заметку")
           inspire-component
+        //- notes-bundle-component(v-bind:notes="notesNotOnTable")
       //- Storages
       //- table-grid-content-item-component(v-if="!taken")
         h3 Storages
@@ -106,9 +156,11 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 import bus from '@/event-bus'
 import Note from '@/models/note'
+import Notespace from '@/models/notespace'
 
 import InspireComponent from '@/components/Inspire'
 import NoteComponent from '@/components/Note'
+import NotesBundleComponent from '@/components/NotesBundle'
 import TableGridContentItemComponent from '@/components/TableGridContentItem'
 
 export default {
@@ -117,6 +169,7 @@ export default {
   components: {
     InspireComponent,
     NoteComponent,
+    NotesBundleComponent,
     TableGridContentItemComponent
   },
 
@@ -125,25 +178,19 @@ export default {
       focused: null,
       taken: null,
       control: false,
-      tableCapacity: 5
+      selected: new Notespace()
     }
   },
 
   computed: {
     usual () {
-      return !this.taken && !this.control
+      return !this.taken && !this.control && !this.selected.focus.length
     },
 
     notesNotOnTable () {
       return this.storageNotesList.filter(note => {
         return !note.config.deleted && !this.table.find(item => item.id === note.id)
       })
-    },
-
-    notesNotOnTableCount () {
-      return this.notesNotOnTable.length >= this.tableCapacity
-        ? `${this.tableCapacity} из ${this.notesNotOnTable.length}`
-        : this.notesNotOnTable.length
     },
 
     notesDeleted () {
@@ -176,19 +223,29 @@ export default {
 
     // Content item actions
 
-    onDelete () {
-      console.log(this.focused)
-      this.deleteNoteAction({ note: this.focused })
-      this.removeFromTable({ note: this.focused })
+    onDelete (data) {
+      let notes = Array.isArray(data) ? data : [data]
+      this.deleteNotesAction({ notes })
+      this.removeFromTable({ notes })
+      this.selected.clearFocus()
     },
 
-    onRemove () {
-      this.removeFromTable({ note: this.focused })
+    onRemove (data) {
+      let notes = Array.isArray(data) ? data : [data]
+      this.removeFromTable({ notes })
+      this.selected.clearFocus()
     },
 
-    onTake () {
-      this.taken = this.focused
-      let index = this.table.findIndex(note => note.id === this.focused.id)
+    onKeep (data) {
+      let notes = Array.isArray(data) ? data : [data]
+      this.clearTable()
+      this.addToTable({ notes })
+      this.selected.clearFocus()
+    },
+
+    onTake (note) {
+      this.taken = note
+      let index = this.table.findIndex(item => item.id === this.taken.id)
       let siblingId
       if (index + 1 < this.table.length) {
         siblingId = this.table[index + 1].id
@@ -200,19 +257,30 @@ export default {
       }
     },
 
-    onPutBefore () {
+    onSelect (note) {
+      this.selected.addToFocus(note, {
+        focusCapacity: Number.POSITIVE_INFINITY,
+        append: true
+      })
+    },
+
+    onUnselect (note) {
+      this.selected.removeFromFocus(note)
+    },
+
+    onPutBefore (before) {
       this.putOnTableBefore({
         put: this.taken,
-        before: this.focused
+        before
       })
       this.scrollContentItemIntoView(this.taken.id)
       this.taken = null
     },
 
-    onPutAfter () {
+    onPutAfter (after) {
       this.putOnTableAfter({
         put: this.taken,
-        after: this.focused
+        after
       })
       this.scrollContentItemIntoView(this.taken.id)
       this.taken = null
@@ -240,15 +308,19 @@ export default {
       }, 2000)
     },
 
-    onGet () {
+    onGet (quantity) {
       if (this.notesNotOnTable.length) {
-        let notes = this.notesNotOnTable.slice(0, this.tableCapacity)
+        let notes = this.notesNotOnTable.slice(0, quantity)
         this.addToTable({
           notes,
           append: true
         })
         this.scrollContentItemIntoView(notes[0].id)
       }
+    },
+
+    onGetPile () {
+      console.log('get pile of', this.notesNotOnTable.length, 'notes')
     },
 
     // UI helper events
@@ -293,23 +365,41 @@ export default {
       })
     },
 
+    getNoun (number, one, two, five) {
+      let n = Math.abs(number)
+      n %= 100
+      if (n >= 5 && n <= 20) {
+        return five
+      }
+      n %= 10
+      if (n === 1) {
+        return one
+      }
+      if (n >= 2 && n <= 4) {
+        return two
+      }
+      return five
+    },
+
     ...mapMutations([
       'addToTable',
       'replaceOnTable',
       'removeFromTable',
       'putOnTableBefore',
-      'putOnTableAfter'
+      'putOnTableAfter',
+      'clearTable'
     ]),
 
     ...mapActions([
       'getNotesAction',
-      'deleteNoteAction'
+      'deleteNotesAction'
     ])
   }
 }
 </script>
 
 <style lang="stylus">
+@import '~@/assets/styles/variables'
 @import '~@/assets/styles/table'
 
 .minota-table-grid
@@ -323,13 +413,16 @@ export default {
     margin 0 auto
   .minota-create-note
     width 100%
-    height 100%
+    height 87.5%
     border-radius 0.25rem
     display flex
     flex-direction column
     justify-content center
     align-items center
     cursor pointer
+  .minota-note[selected]
+    border dashed 5px alpha(black, medium-emphasis)
+    box-shadow none
 
 .minota-table-grid__panel[position="right"]
   width 25vw
@@ -352,5 +445,4 @@ export default {
 
 .minota-table-grid__content-item[taken-mirror]
   display none
-
 </style>

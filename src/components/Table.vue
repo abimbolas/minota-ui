@@ -108,9 +108,15 @@
     //- .minota-table-grid__panel(position="left") Left
 
     //- Right if something is taken
-    .minota-table-grid__panel(position="right" v-if="taken")
-      table-grid-content-item-component(v-bind:taken="taken && taken.id")
-        note-component(v-bind:note="taken")
+    .minota-table-grid__panel(
+      position="right"
+      v-bind:class="{'minota-table-grid__panel_taken': taken && taken.id }")
+      table-grid-content-item-component(
+        v-if="taken && taken.id"
+        v-bind:taken="taken && taken.id")
+        note-component(
+          v-bind:note="taken"
+          v-bind:taken="taken && taken.id")
 
     //- Content
     .minota-table-grid__content
@@ -155,6 +161,7 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 import bus from '@/event-bus'
+import { getNoun } from '@/utils/i18n'
 import Note from '@/models/note'
 import Notespace from '@/models/notespace'
 
@@ -365,21 +372,7 @@ export default {
       })
     },
 
-    getNoun (number, one, two, five) {
-      let n = Math.abs(number)
-      n %= 100
-      if (n >= 5 && n <= 20) {
-        return five
-      }
-      n %= 10
-      if (n === 1) {
-        return one
-      }
-      if (n >= 2 && n <= 4) {
-        return two
-      }
-      return five
-    },
+    getNoun,
 
     ...mapMutations([
       'addToTable',
@@ -420,13 +413,24 @@ export default {
     justify-content center
     align-items center
     cursor pointer
+
   .minota-note[selected]
     border dashed 5px alpha(black, medium-emphasis)
     box-shadow none
 
+  .minota-note[taken]
+    border dashed 4px alpha(black, medium-emphasis)
+    box-shadow none
+    padding-left 2rem
+    padding-right 2rem
+
 .minota-table-grid__panel[position="right"]
-  width 25vw
+  width 0
   overflow hidden
+  display block
+  transition all 0.2s ease-out
+  &.minota-table-grid__panel_taken
+    width 25vw
 
 .minota-table-grid__content-item[taken]
   position absolute
@@ -434,14 +438,6 @@ export default {
   left 0.5rem
   height calc(100% - 3.5rem)
   width calc(42rem + 16% + 1rem)
-  transform-origin 0 50%
-  transform perspective(90rem) rotateY(-30deg)
-  .minota-note
-    padding-left 2rem
-    padding-right 2rem
-    border dashed 5px alpha(black, 0.25)
-    box-shadow none
-    color alpha(black, medium-emphasis)
 
 .minota-table-grid__content-item[taken-mirror]
   display none

@@ -46,7 +46,7 @@
           span {{ getNoun(selected.focus.length, 'заметка', 'заметки', 'заметок')}}
       .minota-section-right
         button.minota-action(
-          v-on:click="selected.clearFocus()")
+          v-on:click="onCancelSelect()")
           i.material-icons block
           span Отмена
         button.minota-action(
@@ -94,10 +94,6 @@
         .minota-action.minota-action_text(v-if="notesDeleted.length")
           span Корзина ({{ notesDeleted.length }})
       .minota-section-right
-        //- button.minota-action(
-          v-bind:disabled="!notesNotOnTable.length"
-          v-on:click="onGetPile()")
-          span Достать ({{ notesNotOnTable.length }})
         button.minota-action(
           v-bind:disabled="!notesNotOnTable.length"
           v-on:click="onGet(5)")
@@ -273,6 +269,10 @@ export default {
 
     onUnselect (note) {
       this.selected.removeFromFocus(note)
+    },
+
+    onCancelSelect () {
+      this.selected.clearFocus()
     },
 
     onPutBefore (before) {

@@ -68,9 +68,6 @@
             .minota-section-left
               .minota-action(danger v-on:click="onDelete(note)")
                 | Удалить
-            //- .minota-section-right
-              .minota-action(v-on:click="onRemove(note)")
-                | Убрать
         notespace-component(
           v-if="isNotespace(note)"
           v-bind:note="note"
@@ -397,7 +394,6 @@ export default {
   padding 0.5rem
   padding-right 0
   display block
-  // background-color alpha(black, low-emphasis)
 
 .minota-table-grid__content-item[taken]
   position absolute
@@ -415,12 +411,11 @@ export default {
   // display flex
   // flex-direction column
   display block
-  // scroll-snap-type block mandatory
+  scroll-snap-type block mandatory
 
 .minota-create-note
   width 100%
   height 100%
-  // box-shadow 0px 0px 0px 2px alpha(black, 0.05)
   border-radius 0.25rem
   display flex
   flex-direction column
@@ -428,8 +423,8 @@ export default {
   align-items center
   cursor pointer
   flex-grow 1
-  // scroll-snap-stop always
-  // scroll-snap-align center
+  scroll-snap-stop always
+  scroll-snap-align center
 
 .minota-table-control
   width 100%
@@ -437,19 +432,12 @@ export default {
   display flex
   justify-content center
   align-items center
-  // border-radius 0.25rem
-  // box-shadow 0px 0px 0px 2px alpha(black, 0.05)
-  // margin 1rem 0
-  // scroll-snap-stop always
-  // scroll-snap-align center
 
 .minota-control-panel
   height 100%
-  // height auto
   display flex
   justify-content center
   align-items center
-  // border solid 1px gainsboro
   box-shadow 0px 0px 0px 2px alpha(black, 0.125)
   border-radius 0.25rem
   scroll-snap-stop always

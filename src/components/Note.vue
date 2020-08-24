@@ -147,8 +147,6 @@ export default {
   font-size 18px
   width 100%
   min-height 100%
-  // padding 8vh 8% 10vh 8%
-  // max-width calc(42rem + 16%)
   background-color white
   box-sizing border-box
   box-shadow 0px 0px 0px 2px alpha(black, 0.05)

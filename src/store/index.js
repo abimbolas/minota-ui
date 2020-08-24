@@ -6,6 +6,7 @@ import storage from '@/store/storage'
 
 import Note from '@/models/note'
 import Workspace from '@/models/workspace'
+import Notespace from '@/models/notespace'
 
 Vue.use(Vuex)
 
@@ -24,7 +25,13 @@ export default new Vuex.Store({
 
   mutations: {
     rehydrateTable (state) {
-      Table.focus = state.table.map(note => new Note(note))
+      Table.focus = state.table.map(item => {
+        if (item.notes) {
+          return new Notespace(item)
+        } else {
+          return new Note(item)
+        }
+      })
       state.table = Table.focus
     },
 

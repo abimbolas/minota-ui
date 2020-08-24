@@ -1,4 +1,5 @@
 @import '~@/assets/styles/variables'
+@import '~@/assets/styles/long-click'
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons')
 
 html
@@ -46,24 +47,8 @@ a:visited
 a:active
   color steelblue
 
-// Actions
-
-.minota-actions
-  display flex
-  width 100%
-  padding 1rem
-  margin-left auto
-  margin-right auto
-  box-sizing border-box
-
 // Sections
 
-.minota-sections_note-width
-  display flex
-  align-items baseline
-  width 100%
-  max-width note-width
-  margin 0 auto
 .minota-section-left
   margin-left 0
   margin-right auto
@@ -80,16 +65,42 @@ a:active
 
 // Actions
 
+.minota-actions
+  display flex
+
 .minota-action
-  padding 1rem
+  padding 0.5rem 1rem
   text-decoration none
   display flex
   align-items center
   justify-content center
-  color steelblue
+  color inherit
+  cursor pointer
+  // text-transform uppercase
+  font-weight bold
+  // font-style italic
+  color alpha(black, medium-emphasis)
+  border-radius 0.25rem
+  user-select none
+  &[primary]
+    background-color alpha(black, high-emphasis)
+    color alpha(white, high-emphasis)
+    &:hover
+      background-color alpha(black, 1)
+      color alpha(white, 1)
+
+  &:hover
+    background-color button-hover
 
   &.minota-action_text
     color inherit
+  &.minota-action_icon
+    padding 0.5rem
+  &.minota-action_block
+    width 100%
+    box-sizing border-box
+  &.minota-action_outline
+    box-shadow 0px 0px 0px 2px alpha(black, 0.05)
 
   .material-icons + *
     margin-left 0.25rem
@@ -105,3 +116,6 @@ a:active
 
   &[danger]
     color brown
+
+  &[danger]:hover
+    background-color alpha(brown, 0.125)

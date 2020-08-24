@@ -27,9 +27,7 @@ function startContentObserver (element, callback) {
     stopContentObserver(element)
   }
   element.contentObserver = new MutationObserver(() => {
-    requestAnimationFrame(() => {
-      callback()
-    })
+    requestAnimationFrame(callback)
   })
   element.contentObserver.observe(element, {
     characterData: true,
@@ -39,8 +37,10 @@ function startContentObserver (element, callback) {
 }
 
 function stopContentObserver (element) {
-  element.contentObserver.disconnect()
-  element.contentObserver = null
+  if (element.contentObserver) {
+    element.contentObserver.disconnect()
+    element.contentObserver = null
+  }
 }
 
 export default {
@@ -53,6 +53,7 @@ export default {
     el.observeOverflow = observeOverflow.bind(null, el, options)
     // Watch scroll, resize and children changes
     el.addEventListener('scroll', el.observeOverflow)
+    el.addEventListener('observe-overflow', el.observeOverflow)
     window.addEventListener('resize', el.observeOverflow)
     startContentObserver(el, el.observeOverflow)
     // Init

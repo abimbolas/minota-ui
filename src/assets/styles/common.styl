@@ -59,6 +59,7 @@ a:active
   margin-left auto
   display flex
   align-items center
+  justify-content flex-end
 .minota-section-center
   margin-left auto
   margin-right auto
@@ -80,6 +81,10 @@ a:active
   color alpha(black, medium-emphasis)
   border-radius 0.25rem
   user-select none
+
+  & + .minota-action
+    margin-left 0.5rem
+
   &[primary]
     background-color alpha(black, high-emphasis)
     color alpha(white, high-emphasis)
@@ -114,6 +119,11 @@ a:active
 
   &[danger]
     color brown
-
-  &[danger]:hover
-    background-color alpha(brown, 0.125)
+    &:hover
+      background-color alpha(brown, 0.125)
+  &[danger][primary]
+    background-color brown
+    color alpha(white, high-emphasis)
+    &:hover
+      background-color brown
+      color white

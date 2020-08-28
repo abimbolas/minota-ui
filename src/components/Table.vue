@@ -45,6 +45,13 @@
           v-bind:note="taken"
           v-bind:taken="taken && taken.id")
 
+    //- Bottom panel for DELETE mode
+    .minota-table-grid__panel(
+      position="bottom"
+      v-observe-view:threshold="1"
+      v-on:enter-view="onDelete(focused)")
+      .minota-action.minota-action_block(danger) Удалить
+
     //- Content
     .minota-table-grid__content
       //- Notes
@@ -52,7 +59,10 @@
         v-for="note in table"
         v-bind:key="note.id"
         v-bind:content-item-id="note.id"
-        v-bind:taken-mirror="taken && taken.id === note.id && taken.id")
+        v-bind:taken-mirror="taken && taken.id === note.id && taken.id"
+        v-observe-view:threshold="0.75"
+        v-on:enter-view="onContentItemEnterView(note)"
+        v-on:exit-view="onContentItemExitView(note)")
 
         note-component(
           v-if="isNote(note)"
@@ -64,9 +74,9 @@
             .minota-section-right
               .minota-action.minota-action_icon(v-on:click="onRemove(note)")
                 i.material-icons close
-          //- template(slot="footer-actions" v-if="mode")
-            .minota-section-left
-              .minota-action(danger v-on:click="onDelete(note)")
+          template(slot="footer-actions" v-if="isModeDelete")
+            .minota-section-right
+              .minota-action(danger primary v-on:click="onDelete(note)")
                 | Удалить
         notespace-component(
           v-if="isNotespace(note)"
@@ -121,13 +131,17 @@ export default {
       taken: null,
       control: false,
       selected: new Workspace(),
-      mode: false
+      mode: ''
     }
   },
 
   computed: {
     usual () {
       return !this.taken && !this.control && !this.selected.focus.length
+    },
+
+    isModeDelete () {
+      return this.mode === 'delete'
     },
 
     hasFocused () {
@@ -181,10 +195,20 @@ export default {
     // Content item actions
 
     onDelete (data) {
-      let notes = Array.isArray(data) ? data : [data]
-      this.deleteNotesAction({ notes })
-      this.removeFromTable({ notes })
-      this.selected.clearFocus()
+      this.openModalAction({
+        modal: {
+          component: 'PromptModal',
+          header: 'Удалить эту заметку?',
+          description: `${data.content.slice(0, 200)}...`,
+          ok: 'Удалить и забыть',
+          cancel: 'Отмена',
+          danger: true
+        }
+      }).then(() => {
+        let notes = Array.isArray(data) ? data : [data]
+        this.deleteNotesAction({ notes })
+        this.removeFromTable({ notes })
+      }).catch(() => {})
     },
 
     onRemove (data) {
@@ -250,6 +274,18 @@ export default {
     onCancelPut () {
       this.scrollContentItem(this.taken.id, 'view')
       this.taken = null
+    },
+
+    // Content item events
+
+    onContentItemEnterView (item) {
+      this.focused = item
+    },
+
+    onContentItemExitView (item) {
+      if (this.focused && this.focused.id === item.id) {
+        this.focused = null
+      }
     },
 
     // Table actions
@@ -333,7 +369,8 @@ export default {
 
     ...mapActions([
       'getNotesAction',
-      'deleteNotesAction'
+      'deleteNotesAction',
+      'openModalAction'
     ])
   }
 }
@@ -355,8 +392,15 @@ export default {
       height 100%
 
 .minota-table-grid__content-item
+
   .minota-note
     margin 0 auto
+    // position absolute
+    // left 0.5rem
+    // top 0.5rem
+    // width 40rem
+    // transform-origin 0 0
+    // transform scale(0.5)
 
   .minota-note[selected]
   .minota-notespace[selected]
@@ -368,6 +412,7 @@ export default {
     box-shadow none
     padding-left 2rem
     padding-right 2rem
+
   .minota-notespace[taken]
     border dashed 4px alpha(black, medium-emphasis)
 

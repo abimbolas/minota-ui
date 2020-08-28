@@ -1,13 +1,19 @@
 <template lang="pug">
   .minota-app
     router-view
+    modal-component
 </template>
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
+import ModalComponent from '@/components/Modal'
 
 export default {
   name: 'App',
+
+  components: {
+    ModalComponent
+  },
 
   computed: {
     ...mapGetters(['storages'])

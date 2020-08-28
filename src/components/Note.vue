@@ -43,9 +43,9 @@ export default {
     },
 
     mode: {
-      type: Boolean,
+      type: String,
       required: false,
-      default: false
+      default: ''
     }
   },
 
@@ -151,9 +151,9 @@ export default {
   box-sizing border-box
   box-shadow 0px 0px 0px 2px alpha(black, 0.05)
 
-  &[mode]
-    min-height 0
-    height 100%
+  // &[mode]
+  //   min-height 0
+  //   height 100%
 
 .minota-note__header
 .minota-note__footer
@@ -187,7 +187,7 @@ export default {
 .minota-note__main
   flex-shrink 1
   flex-grow 1
-  padding 0 8%
+  padding 0 7.25%
   overflow scroll
   padding-top 0rem
   padding-bottom 1.5rem

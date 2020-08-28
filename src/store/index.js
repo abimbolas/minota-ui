@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import createPersistedState from 'vuex-persistedstate'
+import modal from '@/store/modal'
 import storage from '@/store/storage'
 
 import Note from '@/models/note'
@@ -91,6 +92,7 @@ export default new Vuex.Store({
   },
 
   modules: {
+    modal,
     storage
   },
 

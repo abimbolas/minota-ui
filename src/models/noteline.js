@@ -1,8 +1,13 @@
 import NotePoint from './notepoint'
 
 export default class NoteLine extends NotePoint {
-  constructor () {
-    super()
-    this.line = []
+  constructor ({
+    content = '',
+    config,
+    note,
+    points = []
+  } = {}) {
+    super({ content, config, note })
+    this.points = points
   }
 }

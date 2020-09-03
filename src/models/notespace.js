@@ -1,8 +1,15 @@
 import NotePlane from './noteplane'
 
 export default class NoteSpace extends NotePlane {
-  constructor () {
-    super()
-    this.space = []
+  constructor ({
+    content = '',
+    config,
+    note,
+    points = [],
+    lines = [],
+    planes = []
+  } = {}) {
+    super({ content, config, note, points, lines })
+    this.planes = planes
   }
 }

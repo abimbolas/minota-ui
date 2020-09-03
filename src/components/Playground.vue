@@ -1,26 +1,50 @@
 <template lang="pug">
   .minota-playground
-    div Hey
-    note-point-component Hello point of note
-    note-line-component Hello line of notes
-    note-plane-component Hello plane of notes
-    note-space-component Hello space of notes
+    note-point-component(v-bind:point="notePoint")
+    note-line-component(v-bind:line="noteLine")
+    note-plane-component(v-bind:plane="notePlane")
 </template>
 
 <script>
-import NotePointComponent from '@/components/NotePoint'
+import { mapGetters } from 'vuex'
+import { Note, NoteLine, NotePlane, NotePoint } from '@/models'
 import NoteLineComponent from '@/components/NoteLine'
 import NotePlaneComponent from '@/components/NotePlane'
-import NoteSpaceComponent from '@/components/NoteSpace'
+import NotePointComponent from '@/components/NotePoint'
 
 export default {
   name: 'Playground',
 
   components: {
-    NotePointComponent,
     NoteLineComponent,
     NotePlaneComponent,
-    NoteSpaceComponent
+    NotePointComponent
+  },
+
+  computed: {
+    notePoint () {
+      return new NotePoint({
+        note: new Note({ content: 'NotePoint\'s note content' })
+      })
+    },
+
+    noteLine () {
+      return new NoteLine({
+        points: this.table.slice(0, 4).map(note => new NotePoint({ note }))
+      })
+    },
+
+    notePlane () {
+      return new NotePlane({
+        lines: [
+          new NoteLine({ points: this.table.slice(0, 4).map(note => new NotePoint({ note })) }),
+          new NoteLine({ points: this.table.slice(2, 4).map(note => new NotePoint({ note })) }),
+          new NoteLine({ points: this.table.slice(3, 9).map(note => new NotePoint({ note })) })
+        ]
+      })
+    },
+
+    ...mapGetters(['table'])
   }
 }
 </script>

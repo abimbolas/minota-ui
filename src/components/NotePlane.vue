@@ -1,12 +1,31 @@
 <template lang="pug">
   .minota-note-plane
-    strong
-      em Note Plane
+    note-line-component(
+      v-for="line in plane.lines"
+      v-bind:key="line.id"
+      v-bind:line="line")
 </template>
 
 <script>
+import { NotePlane } from '@/models'
+import NoteLineComponent from '@/components/NoteLine'
+
 export default {
-  name: 'NotePlane'
+  name: 'NotePlane',
+
+  components: {
+    NoteLineComponent
+  },
+
+  props: {
+    plane: {
+      type: Object,
+      required: true,
+      default () {
+        return new NotePlane()
+      }
+    }
+  }
 }
 </script>
 

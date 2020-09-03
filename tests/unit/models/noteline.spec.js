@@ -15,8 +15,8 @@ describe('NoteLine', () => {
     let keys = Object.keys(noteline).sort((a, b) => {
       return a > b ? 1 : a < b ? -1 : 0
     })
-    expect(keys.join()).to.equal('config,content,line,note')
-    expect(Array.isArray(noteline.line)).to.be.true
+    expect(keys.join()).to.equal('config,content,note,points')
+    expect(Array.isArray(noteline.points)).to.be.true
     expect(noteline instanceof NoteLine).to.be.true
     expect(noteline instanceof NotePoint).to.be.true
     expect(noteline instanceof Note).to.be.true

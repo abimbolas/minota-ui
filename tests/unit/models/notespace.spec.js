@@ -17,16 +17,16 @@ describe('NoteSpace', () => {
     let keys = Object.keys(notespace).sort((a, b) => {
       return a > b ? 1 : a < b ? -1 : 0
     })
-    expect(keys.join()).to.equal('config,content,line,note,plane,space')
+    expect(keys.join()).to.equal('config,content,lines,note,planes,points')
     expect(notespace instanceof NoteSpace).to.be.true
     expect(notespace instanceof NotePlane).to.be.true
     expect(notespace instanceof NoteLine).to.be.true
     expect(notespace instanceof NotePoint).to.be.true
     expect(notespace instanceof Note).to.be.true
     expect(notespace.note instanceof Note).to.be.true
-    expect(Array.isArray(notespace.space)).to.be.true
-    expect(Array.isArray(notespace.plane)).to.be.true
-    expect(Array.isArray(notespace.line)).to.be.true
+    expect(Array.isArray(notespace.planes)).to.be.true
+    expect(Array.isArray(notespace.lines)).to.be.true
+    expect(Array.isArray(notespace.points)).to.be.true
     expect(typeof notespace.content).to.equal('string')
     expect(notespace.id).to.not.equal(notespace.note.id)
     expect(notespace.config.date instanceof Date).to.be.true

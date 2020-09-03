@@ -10,6 +10,7 @@
       .minota-note__editor(
         contenteditable
         v-on:input="onInput($event)"
+        v-on:keydown="onKeydown($event)"
         v-cursor-position
         v-on:cursor-near-start="$emit('cursor-near-start')"
         v-on:cursor-near-end="$emit('cursor-near-end')")
@@ -101,6 +102,15 @@ export default {
           }
         }
       })
+    },
+
+    onKeydown (event) {
+      // If content is empty (or just whitespace, temporary until we get
+      // more decent editor) and we additionaly do delete input,
+      // send delete intent
+      if (!this.note.content.trim() && event.code.match(/Backspace|Delete/)) {
+        this.$emit('delete-note')
+      }
     },
 
     onFocusNote () {

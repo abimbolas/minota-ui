@@ -6,10 +6,6 @@ import store from './store'
 // import '@/Material'
 // import './registerServiceWorker';
 
-// Object.keys(filters).forEach(key => {
-//   Vue.filter(key, filters[key])
-// })
-
 // Register global components (uses webpack)
 // https://vuejs.org/v2/guide/components-registration.html
 const requireComponent = require.context('./components/global', false, /.+\.vue/)

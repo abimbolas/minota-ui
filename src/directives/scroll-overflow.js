@@ -63,6 +63,8 @@ export default {
   },
 
   unbind (el) {
+    el.removeEventListener('scroll', el.observeOverflow)
+    el.removeEventListener('observe-overflow', el.observeOverflow)
     window.removeEventListener('resize', el.observeOverflow)
     stopContentObserver(el)
   }

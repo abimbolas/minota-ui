@@ -13,7 +13,7 @@ export default class Workspace {
     } else {
       this._addTo('focus', obj, { append })
     }
-    while (this.focus.length >= focusCapacity) {
+    while (this.focus.length > focusCapacity) {
       this.blurFocus(append ? this.focus[0] : this.focus.slice(-1)[0])
     }
   }

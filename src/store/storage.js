@@ -96,7 +96,7 @@ export default {
 
     updateNote (state, payload) {
       let note = state.notes[payload.note.id]
-      if (payload.update.content) {
+      if (typeof payload.update.content === 'string') {
         Vue.set(note, 'content', payload.update.content)
       }
       if (payload.update.config) {

@@ -1,15 +1,15 @@
 import Note from './note'
+import NotePoint from './notepoint'
 import NoteLine from './noteline'
 import NotePlane from './noteplane'
-import NotePoint from './notepoint'
 import NoteSpace from './notespace'
 import Workspace from './workspace'
 
 export {
   Note,
+  NotePoint,
   NoteLine,
   NotePlane,
-  NotePoint,
   NoteSpace,
   Workspace
 }

@@ -1,5 +1,9 @@
 <template lang="pug">
   .minota-note-line
+    div
+      small {{ type }}
+      br
+      small {{ config.date }}
     note-point-component(
       v-for="point in line.points"
       v-bind:key="point.id"
@@ -8,7 +12,8 @@
 
 <script>
 import { NoteLine } from '@/models'
-import NotePointComponent from '@/components/NotePoint'
+import NotePointComponent from '@/components/notespace/NotePoint'
+import mixin from '@/components/notespace/mixin'
 
 export default {
   name: 'NoteLine',
@@ -16,6 +21,8 @@ export default {
   components: {
     NotePointComponent
   },
+
+  mixins: [mixin],
 
   props: {
     line: {

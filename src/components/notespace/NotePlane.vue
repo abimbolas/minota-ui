@@ -1,5 +1,9 @@
 <template lang="pug">
   .minota-note-plane
+    div
+      small {{ type }}
+      br
+      small {{ config.date }}
     note-line-component(
       v-for="line in plane.lines"
       v-bind:key="line.id"
@@ -8,7 +12,8 @@
 
 <script>
 import { NotePlane } from '@/models'
-import NoteLineComponent from '@/components/NoteLine'
+import NoteLineComponent from '@/components/notespace/NoteLine'
+import mixin from '@/components/notespace/mixin'
 
 export default {
   name: 'NotePlane',
@@ -16,6 +21,8 @@ export default {
   components: {
     NoteLineComponent
   },
+
+  mixins: [mixin],
 
   props: {
     plane: {
@@ -31,5 +38,5 @@ export default {
 
 <style lang="stylus">
 .minota-note-plane
-  background-color alpha(black, 0.1)
+  background-color alpha(lightblue, 0.1)
 </style>

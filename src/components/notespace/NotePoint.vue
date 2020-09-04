@@ -1,14 +1,20 @@
 <template lang="pug">
   .minota-note-point
-    .minota-note-point__note
-      small {{ noteContent }}
+    div
+      small {{ type }}
+      br
+      small {{ config.date }}
+    .minota-note-point__content {{ content }}
 </template>
 
 <script>
 import { NotePoint } from '@/models'
+import mixin from '@/components/notespace/mixin'
 
 export default {
   name: 'NotePoint',
+
+  mixins: [mixin],
 
   props: {
     point: {
@@ -17,12 +23,6 @@ export default {
       default () {
         return new NotePoint()
       }
-    }
-  },
-
-  computed: {
-    noteContent () {
-      return this.point.note.content.slice(0, 70)
     }
   }
 }
@@ -34,7 +34,7 @@ export default {
 .minota-note-point
   background-color alpha(brown, 0.1)
 
-.minota-note-point__note
+.minota-note-point__content
   width 140px
   height 180px
   border solid alpha(black, 0.125) 2px

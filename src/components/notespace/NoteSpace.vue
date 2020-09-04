@@ -1,6 +1,6 @@
 <template lang="pug">
   .minota-note-space
-    em Note Space
+    div Note Space
 </template>
 
 <script>

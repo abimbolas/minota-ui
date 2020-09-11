@@ -1,15 +1,15 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai'
 import Note from '@/models/note'
-import NotePoint from '@/models/notepoint'
-import NoteLine from '@/models/noteline'
-import NotePlane from '@/models/noteplane'
-import NoteSpace from '@/models/notespace'
+import Notepoint from '@/models/notepoint'
+import Noteline from '@/models/noteline'
+import Noteplane from '@/models/noteplane'
+import Notespace from '@/models/notespace'
 
-describe('NoteSpace', () => {
+describe('Notespace', () => {
   let notespace
   beforeEach(() => {
-    notespace = new NoteSpace()
+    notespace = new Notespace()
   })
 
   it('exists', () => {
@@ -17,11 +17,11 @@ describe('NoteSpace', () => {
     let keys = Object.keys(notespace).sort((a, b) => {
       return a > b ? 1 : a < b ? -1 : 0
     })
-    expect(keys.join()).to.equal('config,content,lines,note,planes,points')
-    expect(notespace instanceof NoteSpace).to.be.true
-    expect(notespace instanceof NotePlane).to.be.true
-    expect(notespace instanceof NoteLine).to.be.true
-    expect(notespace instanceof NotePoint).to.be.true
+    expect(keys.join()).to.equal('config,content,focusLine,focusPlane,focusPoint,lines,note,planes,points')
+    expect(notespace instanceof Notespace).to.be.true
+    expect(notespace instanceof Noteplane).to.be.true
+    expect(notespace instanceof Noteline).to.be.true
+    expect(notespace instanceof Notepoint).to.be.true
     expect(notespace instanceof Note).to.be.true
     expect(notespace.note instanceof Note).to.be.true
     expect(Array.isArray(notespace.planes)).to.be.true

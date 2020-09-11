@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai'
 import Note from '@/models/note'
-import NotePoint from '@/models/notepoint'
-import NoteLine from '@/models/noteline'
+import Notepoint from '@/models/notepoint'
+import Noteline from '@/models/noteline'
 
-describe('NoteLine', () => {
+describe('Noteline', () => {
   let noteline
   beforeEach(() => {
-    noteline = new NoteLine()
+    noteline = new Noteline()
   })
 
   it('exists', () => {
@@ -15,10 +15,10 @@ describe('NoteLine', () => {
     let keys = Object.keys(noteline).sort((a, b) => {
       return a > b ? 1 : a < b ? -1 : 0
     })
-    expect(keys.join()).to.equal('config,content,note,points')
+    expect(keys.join()).to.equal('config,content,focusPoint,note,points')
     expect(Array.isArray(noteline.points)).to.be.true
-    expect(noteline instanceof NoteLine).to.be.true
-    expect(noteline instanceof NotePoint).to.be.true
+    expect(noteline instanceof Noteline).to.be.true
+    expect(noteline instanceof Notepoint).to.be.true
     expect(noteline instanceof Note).to.be.true
     expect(noteline.note instanceof Note).to.be.true
     expect(typeof noteline.content).to.equal('string')

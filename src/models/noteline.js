@@ -1,13 +1,20 @@
-import NotePoint from './notepoint'
+import Notepoint from './notepoint'
 
-export default class NoteLine extends NotePoint {
+export default class Noteline extends Notepoint {
   constructor ({
-    content = '',
+    content = 'Noteline\'s content',
     config,
     note,
-    points = []
+    points = [],
+    focusPoint
   } = {}) {
     super({ content, config, note })
     this.points = points
+    this.focusPoint = focusPoint || points[0]
+  }
+
+  setPoints (points) {
+    // Replace if found, insert if not. Our points array
+    // is sorted by date
   }
 }

@@ -1,14 +1,17 @@
-import NoteLine from './noteline'
+import Noteline from './noteline'
 
-export default class NotePlane extends NoteLine {
+export default class Noteplane extends Noteline {
   constructor ({
-    content = '',
+    content = 'Noteplane\'s content',
     config,
     note,
-    points = [],
-    lines = []
+    points,
+    lines = [new Noteline()],
+    focusPoint,
+    focusLine
   } = {}) {
-    super({ content, config, note, points })
+    super({ content, config, note, points, focusPoint })
     this.lines = lines
+    this.focusLine = focusLine || this.lines[0]
   }
 }

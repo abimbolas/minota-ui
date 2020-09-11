@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapActions } from 'vuex'
 import ModalComponent from '@/components/Modal'
 
 export default {
@@ -15,32 +15,26 @@ export default {
     ModalComponent
   },
 
-  computed: {
-    ...mapGetters(['storages'])
-  },
-
   created () {
+    // this.addStorageAction({
+    //   url: 'file:///Users/antivitla/Projects/Personal/Minota/.minota-002'
+    // })
+    //
+    // this.addStorageAction({
+    //   url: 'file:///Users/antivitla/Projects/Personal/Minota/.minota'
+    // })
+    //
+    // this.addStorageAction({
+    //   url: 'file:///Users/antivitla/Dropbox/Notesss'
+    // })
+
+    // this.addStorageAction({
+    //   url: 'file:///Users/antivitla/zok'
+    // }).then(result => {
+    //   console.log('resolve', result)
+    // })
+
     console.log('Minotá UI created')
-
-    this.addStorage({
-      href: 'file:///Users/antivitla/Projects/Personal/Minota/.minota-002'
-    })
-
-    this.addStorage({
-      href: 'file:///Users/antivitla/Projects/Personal/Minota/.minota',
-      isActive: true
-    })
-
-    this.addStorage({
-      href: 'file:///Users/antivitla/Dropbox/Notes',
-      isActive: true,
-      isDefault: true
-    })
-
-    this.addStorage({
-      href: 'localstorage://minota/antivitla',
-      isActive: false
-    })
   },
 
   beforeDestroy () {
@@ -48,8 +42,9 @@ export default {
   },
 
   methods: {
-    ...mapMutations([
-      'addStorage'
+    ...mapActions([
+      'addStorageAction',
+      'removeStorageAction'
     ])
   }
 }

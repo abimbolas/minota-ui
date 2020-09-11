@@ -3,13 +3,13 @@ import Note from '@/models/note'
 import AbstractStorage from '@/backend/abstract'
 
 export default class FileStorage extends AbstractStorage {
-  constructor (href) {
-    super(href)
+  constructor (url) {
+    super(url)
     this.resource = axios.create({
       baseURL: 'http://localhost:1234',
       headers: {
         'Content-Type': 'application/json',
-        'Storage-Config': JSON.stringify({ href })
+        'Storage-Config': JSON.stringify({ url })
       }
     })
   }
@@ -21,7 +21,7 @@ export default class FileStorage extends AbstractStorage {
   }
 
   postNote (note) {
-    if (note.config.storage.indexOf(this.href) > -1) {
+    if (note.config.storage.indexOf(this.url) > -1) {
       return this.resource
         .post(`/notes/${note.id}`, this.forgetStorage(note))
         .then(this._parseNote.bind(this))
@@ -29,7 +29,7 @@ export default class FileStorage extends AbstractStorage {
       return Promise.reject(new Error(
         'postNote can\'t store not related note ' +
         note.config.storage +
-        ' to our storage ' + this.href
+        ' to our storage ' + this.url
       ))
     }
   }

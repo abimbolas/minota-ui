@@ -1,19 +1,19 @@
+import { Note, Notepoint, Noteline, Noteplane, Notespace } from '@/models'
+
 export default {
   computed: {
-    config () {
-      return this.prop.config
-    },
-
-    content () {
-      return this.prop.content
-    },
-
-    type () {
-      return ['space', 'plane', 'line', 'point', 'note'].find(key => this[key])
-    },
-
-    prop () {
-      return this[this.type]
+    itemType () {
+      if (this.item instanceof Notespace) {
+        return 'space'
+      } else if (this.item instanceof Noteplane) {
+        return 'plane'
+      } else if (this.item instanceof Noteline) {
+        return 'line'
+      } else if (this.item instanceof Notepoint) {
+        return 'point'
+      } else if (this.item instanceof Note) {
+        return 'note'
+      }
     }
   }
 }

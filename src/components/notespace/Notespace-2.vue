@@ -1,15 +1,15 @@
 <template lang="pug">
-  .minota-note-space
+  .minota-notespace
     div Note Space
 </template>
 
 <script>
 export default {
-  name: 'NoteSpace'
+  name: 'Notespace'
 }
 </script>
 
 <style lang="stylus">
-.minota-note-space
+.minota-notespace
   background-color alpha(steelblue, 0.1)
 </style>

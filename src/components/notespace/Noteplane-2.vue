@@ -1,35 +1,35 @@
 <template lang="pug">
   .minota-note-plane
     div
-      small {{ type }}
+      small plane/{{ itemType }}
       br
-      small {{ config.date }}
+      small {{ item.config.date }}
     note-line-component(
-      v-for="line in plane.lines"
+      v-for="line in item.lines"
       v-bind:key="line.id"
-      v-bind:line="line")
+      v-bind:item="line")
 </template>
 
 <script>
-import { NotePlane } from '@/models'
-import NoteLineComponent from '@/components/notespace/NoteLine'
+import { Noteplane } from '@/models'
+import NotelineComponent from '@/components/notespace/Noteline'
 import mixin from '@/components/notespace/mixin'
 
 export default {
-  name: 'NotePlane',
+  name: 'Noteplane',
 
   components: {
-    NoteLineComponent
+    NotelineComponent
   },
 
   mixins: [mixin],
 
   props: {
-    plane: {
+    item: {
       type: Object,
       required: true,
       default () {
-        return new NotePlane()
+        return new Noteplane()
       }
     }
   }

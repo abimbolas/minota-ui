@@ -1,4 +1,4 @@
-import FileStorage from '@/backend/file'
+import FileStorage from './file-storage'
 
 export class StorageInvalidURLError extends Error {
   constructor (message = 'Storage Invalid URL') {
@@ -34,14 +34,18 @@ export default class StorageManager {
     if (this.nodes[validUrl.href]) {
       throw new StorageDuplicateError(validUrl.href)
     }
-    // Add storage if all good
-    this.nodes[validUrl.href] = new this.types[validUrl.protocol](validUrl.href)
-    // Freshly added storage start
-    // emitting notes. How to pass them to vue?
+    // If all good, create, keep and return new storage instance
+    const storageInstance = new this.types[validUrl.protocol](validUrl.href)
+    this.nodes[validUrl.href] = storageInstance
+    return storageInstance
   }
 
   removeStorage (url) {
-    delete this.nodes[this.validate(url).href]
+    try {
+      delete this.nodes[this.validate(url).href]
+    } catch {
+      delete this.nodes[url]
+    }
   }
 
   getStorage (url) {

@@ -1,4 +1,5 @@
-import { Note, Workspace } from '@/models'
+import Note from './note'
+import Workspace from './workspace'
 
 const Table = new Workspace()
 

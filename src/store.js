@@ -2,22 +2,17 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 
-import modal from '@/store/modal'
-import notespace from '@/store/notespace'
-import storage from '@/store/storage'
-import storagePlugin from '@/store/plugins/storage-plugin'
-import table from '@/store/table'
+import modal from '@/domain/ui/modal'
+import storage from '@/domain/system/storage'
+import storagePlugin from '@/domain/system/storage-plugin'
+import table from '@/domain/user/table'
 
 Vue.use(Vuex)
-
-// const Table = new Workspace()
-console.log(notespace)
 
 export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
 
   state: {
-    // ...notespace.state,
     ...table.state
   },
 
@@ -26,13 +21,11 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    // ...notespace.mutations,
     ...table.mutations
   },
 
   modules: {
     modal,
-    notespace,
     storage
   },
 

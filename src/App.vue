@@ -16,23 +16,21 @@ export default {
   },
 
   created () {
-    // this.addStorageAction({
-    //   url: 'file:///Users/antivitla/Projects/Personal/Minota/.minota-002'
-    // })
-    //
-    // this.addStorageAction({
-    //   url: 'file:///Users/antivitla/Projects/Personal/Minota/.minota'
-    // })
-    //
-    // this.addStorageAction({
-    //   url: 'file:///Users/antivitla/Dropbox/Notesss'
-    // })
+    this.addStorageAction({
+      url: 'file:///Users/antivitla/Projects/Personal/Minota/.minota-002'
+    })
 
-    // this.addStorageAction({
-    //   url: 'file:///Users/antivitla/zok'
-    // }).then(result => {
-    //   console.log('resolve', result)
-    // })
+    this.addStorageAction({
+      url: 'file:///Users/antivitla/Projects/Personal/Minota/.minota'
+    })
+
+    this.addStorageAction({
+      url: 'file:///Users/antivitla/Dropbox/Notes'
+    })
+
+    this.addStorageAction({
+      url: 'file:///Users/antivitla/zok'
+    })
 
     console.log('Minotá UI created')
   },

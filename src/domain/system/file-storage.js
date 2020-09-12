@@ -1,6 +1,6 @@
 import axios from 'axios'
-import Note from '@/models/note'
-import AbstractStorage from '@/backend/abstract'
+import Note from '@/domain/user/note'
+import AbstractStorage from './abstract-storage'
 
 export default class FileStorage extends AbstractStorage {
   constructor (url) {

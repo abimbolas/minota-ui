@@ -7,9 +7,8 @@
 </template>
 
 <script>
-import { Noteline } from '@/models'
-import NotepointComponent from '@/components/notespace/Notepoint'
-import mixin from '@/components/notespace/mixin'
+import Noteline from '@/domain/user/noteline'
+import NotepointComponent from '@/components/Notepoint'
 
 export default {
   name: 'Noteline',
@@ -17,8 +16,6 @@ export default {
   components: {
     NotepointComponent
   },
-
-  mixins: [mixin],
 
   props: {
     item: {

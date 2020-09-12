@@ -1,5 +1,5 @@
 <template lang="pug">
-  .minota-note(v-bind:mode="mode")
+  .minota-note(v-bind:lod="lod")
     //- Header
     .minota-note__header(v-bind:scroll-overflow="hasTopOverflow")
       slot(name="header-actions")
@@ -22,7 +22,7 @@
 <script>
 import { mapActions } from 'vuex'
 import bus from '@/event-bus'
-import Note from '@/models/note'
+import Note from '@/domain/user/note'
 import cursorPosition from '@/directives/cursor-position'
 import scrollOverflow from '@/directives/scroll-overflow'
 
@@ -43,10 +43,10 @@ export default {
       }
     },
 
-    mode: {
-      type: String,
+    lod: {
+      type: Number,
       required: false,
-      default: ''
+      default: 0
     }
   },
 
@@ -78,7 +78,7 @@ export default {
       }
     },
 
-    'mode' (mode) {
+    'lod' (lod) {
       this.updateScrollOverflow()
     }
   },
@@ -161,10 +161,6 @@ export default {
   box-sizing border-box
   box-shadow 0px 0px 0px 2px alpha(black, 0.05)
 
-  // &[mode]
-  //   min-height 0
-  //   height 100%
-
 .minota-note__header
 .minota-note__footer
   font-size 1rem
@@ -199,8 +195,10 @@ export default {
   flex-grow 1
   padding 0 7.25%
   overflow scroll
-  padding-top 0rem
-  padding-bottom 1.5rem
+  box-sizing border-box
+  width 100%
+  margin-left auto
+  margin-right auto
 
 .minota-note__header[scroll-overflow]
   position relative
@@ -238,9 +236,40 @@ export default {
 
 .minota-note__editor
   width 100%
+  max-width 40em
+  margin-left auto
+  margin-right auto
   flex-grow 1
+  flex-shrink 0
   outline none
   &:empty:before
     content '(Заметка девственно чиста)'
     opacity low-emphasis
+
+//
+// LOD
+//
+
+.minota-note[lod="0"]
+  .minota-note__footer
+    @media (min-width 768px)
+      flex-basis 6rem
+      min-height 6rem
+    @media (min-width 1025px)
+      flex-basis 7.5rem
+      min-height 7.5rem
+
+.minota-note[lod="1"]
+  min-height 0
+  height 100%
+  font-size 16px
+  .minota-note__main
+    padding-bottom 3rem
+
+.minota-note[lod="2"]
+  min-height 0
+  height 100%
+  font-size 12px
+  .minota-note__main
+    padding-bottom 3rem
 </style>

@@ -1,7 +1,7 @@
 <template lang="pug">
   .minota-note-plane
     div
-      small plane/{{ itemType }}
+      small plane
       br
       small {{ item.config.date }}
     note-line-component(
@@ -11,9 +11,8 @@
 </template>
 
 <script>
-import { Noteplane } from '@/models'
-import NotelineComponent from '@/components/notespace/Noteline'
-import mixin from '@/components/notespace/mixin'
+import Noteplane from '@/domain/user/noteplane'
+import NotelineComponent from '@/components/Noteline'
 
 export default {
   name: 'Noteplane',
@@ -21,8 +20,6 @@ export default {
   components: {
     NotelineComponent
   },
-
-  mixins: [mixin],
 
   props: {
     item: {

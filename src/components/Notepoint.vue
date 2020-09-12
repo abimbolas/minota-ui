@@ -5,13 +5,10 @@
 </template>
 
 <script>
-import { Notepoint } from '@/models'
-import mixin from '@/components/notespace/mixin'
+import Notepoint from '@/domain/user/notepoint'
 
 export default {
   name: 'Notepoint',
-
-  mixins: [mixin],
 
   props: {
     item: {

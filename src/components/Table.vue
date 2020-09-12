@@ -3,30 +3,51 @@
     v-observe-zoom
     v-on:zoom-in="onZoomIn($event)"
     v-on:zoom-out="onZoomOut($event)"
-    v-on:zoom-stop="onZoomStop($event)")
+    v-on:zoom-stop="onZoomStop($event)"
+    v-bind:lod="lod")
+
+    //- .minota-table-grid__panel(position="bottom")
+      note-line-component(v-bind:item="tableLine")
+
     .minota-table-grid__content(
-      v-bind:style="style"
-      v-bind:animating="zoom")
+      v-bind:style="zoomStyle"
+      v-bind:animating="zoomStep")
+      //- .minota-zoom(
+      //-   v-bind:style="zoomStyle"
+      //-   v-bind:animating="zoomStep")
 
-      //- Content is plane XY with yet undefined rows and columns.
-      //- Though at the same time it primarily can be either one of them.
-
-      //- Note line
       .minota-table-grid__content-item(
         v-for="note in table"
         v-bind:key="note.id"
-        v-bind:content-item-id="note.id")
+        v-bind:content-item-id="note.id"
+        v-observe-view:threshold="0.875"
+        v-on:enter-view="onEnterView(note)"
+        v-on:exit-view="onExitView(note)")
         //- Note
         note-component(
           v-bind:note="note"
           v-on:cursor-near-end="scrollContentItem(note.id, 'bottom')"
           v-on:cursor-near-start="scrollContentItem(note.id, 'top')"
-          v-on:delete-note="onDelete(note)")
+          v-on:delete-note="onDelete(note)"
+          v-bind:lod="lod")
+          //- template(slot="header-actions" v-if="lod > 0")
+            .minota-section-right
+              //- .minota-action.minota-action_icon(
+                v-if="lod > 1"
+                v-on:click="onLod(0, note)")
+                i.material-icons open_in_full
+              .minota-action.minota-action_icon
+                i.material-icons close
+          template(slot="footer-actions" v-if="lod > 0")
+            .minota-section-right
+              .minota-action(danger v-on:click="onDelete(note)") Удалить
 
       //- Control panel
       .minota-table-grid__content-item(
         control
-        content-item-id="control")
+        content-item-id="control"
+        v-on:enter-view="onEnterView('control')"
+        v-on:exit-view="onExitView('control')")
         //- Create note
         .minota-create-note(
           v-on:click="onCreate()"
@@ -37,37 +58,80 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import bus from '@/event-bus'
-import Note from '@/models/note'
-import { observeZoom } from '@/directives'
+import { observeZoom, observeView } from '@/directives'
 import InspireComponent from '@/components/Inspire'
 import NoteComponent from '@/components/Note'
+import NotelineComponent from '@/components/Noteline'
+import Note from '@/domain/user/note'
+import Notepoint from '@/domain/user/notepoint'
+import Noteline from '@/domain/user/noteline'
 
 let zoomSpeed = 0.125
-let zoomLimit = 0.375
+let zoomLimit = 0.25
 
 export default {
   name: 'Table',
 
   directives: {
+    observeView,
     observeZoom
   },
 
   components: {
     InspireComponent,
-    NoteComponent
+    NoteComponent,
+    NotelineComponent
   },
 
   data () {
     return {
-      style: {
+      zoomStyle: {
         transform: 'scale(1)'
       },
-      zoom: 0
+      zoomStep: false,
+      zoom: 1,
+      lod: 0
     }
   },
 
   computed: {
+    tableLine () {
+      return new Noteline({
+        points: this.table.map(note => new Notepoint({ note }))
+      })
+    },
+
     ...mapGetters(['table'])
+  },
+
+  watch: {
+    'lod' (lod) {
+      if (lod < 0) {
+        this.lod = 0
+      } else if (lod > 2) {
+        this.lod = 2
+      }
+    },
+
+    'zoom' (zoom) {
+      if (zoom > 0.25) {
+        if (!this.lodDirty) {
+          this.lod -= 1
+        }
+        this.lodDirty = true
+      } else if (zoom < -0.25) {
+        if (!this.lodDirty) {
+          this.lod += 1
+        }
+        this.lodDirty = true
+      } else {
+        this.lodDirty = false
+      }
+      clearTimeout(this.lodDirtyTimeout)
+      this.lodDirtyTimeout = setTimeout(() => {
+        this.lodDirty = false
+      }, 500)
+    }
   },
 
   methods: {
@@ -107,13 +171,12 @@ export default {
     // UI events
 
     onZoomIn (event) {
-      // Zoom steps should be defined.
-      // Visually how to switch steps.
-      this.zoom = this.zoom || 1
-      this.zoom += zoomSpeed
-      let value = zoomLimit * 2 * (1 - 1 / this.zoom)
-      console.log(1 + value)
-      this.style.transform = `scale(${1 + value})`
+      this.zoomStep = this.zoomStep || 1
+      this.zoomStep += zoomSpeed * 2 * Math.abs(event.detail)
+      let value = zoomLimit * (1 - 1 / this.zoomStep)
+      this.zoom = (1 - 1 / this.zoomStep) // watch
+      this.zoomStyle.transform = `scale(${1 + value})`
+
       clearTimeout(this.zoomTimeout)
       this.zoomTimeout = setTimeout(() => {
         this.onZoomStop()
@@ -121,11 +184,12 @@ export default {
     },
 
     onZoomOut (event) {
-      this.zoom = this.zoom || 1
-      this.zoom += zoomSpeed
-      let value = zoomLimit * (1 - 1 / this.zoom)
-      console.log(1 - value)
-      this.style.transform = `scale(${1 - value})`
+      this.zoomStep = this.zoomStep || 1
+      this.zoomStep += zoomSpeed * Math.abs(event.detail)
+      let value = zoomLimit * (1 - 1 / this.zoomStep)
+      this.zoom = (-1 + 1 / this.zoomStep) // watch
+      this.zoomStyle.transform = `scale(${1 - value})`
+
       clearTimeout(this.zoomTimeout)
       this.zoomTimeout = setTimeout(() => {
         this.onZoomStop()
@@ -133,9 +197,21 @@ export default {
     },
 
     onZoomStop (event) {
-      console.log('zoom stop')
-      this.style.transform = `scale(1)`
-      this.zoom = false
+      this.zoomStyle.transform = `scale(1)`
+      this.zoomStep = false
+    },
+
+    onLod (lod, note) {
+      this.lod = lod
+      this.scrollContentItem(note.id, 'view')
+    },
+
+    onEnterView (note) {
+      // console.log('enter', note)
+    },
+
+    onExitView (note) {
+      // console.log('exit', note)
     },
 
     // UI helper
@@ -195,7 +271,25 @@ export default {
   padding-left 0
 
 //
-// Control panel styles
+// LOD
+//
+
+.minota-table-grid[lod="1"]
+  .minota-table-grid__content
+    grid-auto-columns 100%
+    @media (min-width 49rem)
+      grid-auto-columns 48rem
+
+.minota-table-grid[lod="2"]
+  .minota-table-grid__content
+    grid-auto-columns 100%
+    height 75vh
+    margin-top 10vh
+    @media (min-width 38rem)
+      grid-auto-columns 37rem
+
+//
+// Control
 //
 
 .minota-table-grid__content-item[control]

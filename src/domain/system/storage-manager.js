@@ -26,7 +26,7 @@ export default class StorageManager {
     'file:': FileStorage
   }
 
-  nodes = {}
+  nodes = {} // storage nodes
 
   addStorage (url) {
     const validUrl = this.validate(url)

@@ -1,11 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import createPersistedState from 'vuex-persistedstate'
+// import createPersistedState from 'vuex-persistedstate'
 
-import modal from '@/domain/ui/modal'
-import storage from '@/domain/system/storage'
-import storagePlugin from '@/domain/system/storage-plugin'
+// Sytem
+// import notesPlugin from '@/domain/system/notes-plugin'
+// import storagePlugin from '@/domain/system/storage-plugin'
+// UI
+// import modal from '@/domain/ui/modal'
+// User
+import storage from '@/domain/user/storage'
 import table from '@/domain/user/table'
+// import mind from '@/domain/user/mind'
 
 Vue.use(Vuex)
 
@@ -13,32 +18,39 @@ export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
 
   state: {
+    ...storage.state,
     ...table.state
   },
 
-  getters: {
-    ...table.getters
-  },
+  // getters: {
+  //   // ...table.getters
+  // },
 
   mutations: {
-    ...table.mutations
+    ...storage.mutations
   },
 
-  modules: {
-    modal,
-    storage
-  },
+  actions: {
+    ...table.actions
+  }
 
-  plugins: [
-    storagePlugin,
-    createPersistedState({
-      key: 'minota-store',
-      storage: localStorage,
-      paths: ['table', 'storage.nodes'],
-      rehydrated (store) {
-        store.commit('rehydrateTable')
-        store.commit('rehydrateStorageNodes')
-      }
-    })
-  ]
+  // modules: {
+  //   mind,
+  //   modal,
+  //   storage
+  // }
+
+  // plugins: [
+  //   storagePlugin,
+  //   notesPlugin,
+  //   createPersistedState({
+  //     key: 'minota-store',
+  //     storage: localStorage,
+  //     // paths: ['table', 'storage.nodes'],
+  //     rehydrated (store) {
+  //       // store.commit('rehydrateStorageNodes')
+  //       // store.commit('rehydrateTable')
+  //     }
+  //   })
+  // ]
 })

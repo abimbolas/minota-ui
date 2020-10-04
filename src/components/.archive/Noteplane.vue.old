@@ -1,10 +1,10 @@
 <template lang="pug">
-  .minota-note-plane
+  .minota-noteplane
     div
       small plane
       br
       small {{ item.config.date }}
-    note-line-component(
+    noteline-component(
       v-for="line in item.lines"
       v-bind:key="line.id"
       v-bind:item="line")
@@ -34,6 +34,6 @@ export default {
 </script>
 
 <style lang="stylus">
-.minota-note-plane
+.minota-noteplane
   background-color alpha(lightblue, 0.1)
 </style>

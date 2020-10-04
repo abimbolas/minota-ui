@@ -61,10 +61,7 @@ import bus from '@/event-bus'
 import { observeZoom, observeView } from '@/directives'
 import InspireComponent from '@/components/Inspire'
 import NoteComponent from '@/components/Note'
-import NotelineComponent from '@/components/Noteline'
 import Note from '@/domain/user/note'
-import Notepoint from '@/domain/user/notepoint'
-import Noteline from '@/domain/user/noteline'
 
 let zoomSpeed = 0.125
 let zoomLimit = 0.25
@@ -79,8 +76,7 @@ export default {
 
   components: {
     InspireComponent,
-    NoteComponent,
-    NotelineComponent
+    NoteComponent
   },
 
   data () {
@@ -95,12 +91,6 @@ export default {
   },
 
   computed: {
-    tableLine () {
-      return new Noteline({
-        points: this.table.map(note => new Notepoint({ note }))
-      })
-    },
-
     ...mapGetters(['table'])
   },
 

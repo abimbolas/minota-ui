@@ -1,6 +1,6 @@
 <template lang="pug">
-  .minota-note-line
-    note-point-component(
+  .minota-noteline
+    notepoint-component(
       v-for="point in item.points"
       v-bind:key="point.id"
       v-bind:item="point")
@@ -30,16 +30,16 @@ export default {
 </script>
 
 <style lang="stylus">
-.minota-note-line
+.minota-noteline
   // background-color alpha(limegreen, 0.1)
   display flex
   overflow auto
   height 20vh
-  .minota-note-point
+  .minota-notepoint
     height 100%
     width calc(0.7 * 20vh)
     flex-basis calc(0.7 * 20vh)
     flex-shrink 0
-    & + .minota-note-point
+    & + .minota-notepoint
       margin-left 0.5rem
 </style>

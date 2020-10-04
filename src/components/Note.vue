@@ -9,6 +9,7 @@
       v-on:scroll-overflow="scrollOverflow = $event.detail")
       .minota-note__editor(
         contenteditable
+        ref="editor"
         v-on:input="onInput($event)"
         v-on:keydown="onKeydown($event)"
         v-cursor-position
@@ -72,7 +73,7 @@ export default {
     },
 
     'note.content' (content) {
-      let innerText = this.$el.querySelector('[contenteditable]').innerText
+      let innerText = this.$refs.editor.innerText
       if (content !== innerText) {
         console.warn('note out of sync', content, innerText)
       }
@@ -96,10 +97,7 @@ export default {
       this.updateNoteAction({
         note: this.note,
         update: {
-          content: event.target.innerText,
-          config: {
-            updated: new Date()
-          }
+          content: event.target.innerText
         }
       })
     },
@@ -108,7 +106,7 @@ export default {
       // If content is empty (or just whitespace, temporary until we get
       // more decent editor) and we additionaly do delete input,
       // send delete intent
-      if (!this.note.content.trim() && event.code.match(/Backspace|Delete/)) {
+      if (!this.$refs.editor.innerText && event.code.match(/Backspace|Delete/)) {
         this.$emit('delete-note')
       }
     },

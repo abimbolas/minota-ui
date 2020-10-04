@@ -1,7 +1,4 @@
-import StorageManager from './storage-manager'
-import storageActions from '@/domain/user/storage-actions'
-
-export const storageManager = new StorageManager()
+import { storage as userStorage } from '@/domain/user/storage'
 
 export default {
   state: {
@@ -47,6 +44,6 @@ export default {
   },
 
   actions: {
-    ...storageActions
+    ...userStorage.actions
   }
 }

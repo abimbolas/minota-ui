@@ -4,18 +4,12 @@ export default class Note {
   constructor ({ content = '', config } = {}) {
     this.content = content
     this.config = Object.assign({
-      id: uuid()
+      id: uuid(),
+      date: new Date()
     }, config)
 
     // Setup date
-    if (!this.config.date) {
-      this.config.date = new Date()
-    } else {
-      this.config.date = new Date(this.config.date)
-    }
-    if (this.config.updated) {
-      this.config.updated = new Date(this.config.updated)
-    }
+    this.config.date = new Date(this.config.date)
   }
 
   get id () {
@@ -24,9 +18,5 @@ export default class Note {
 
   set id (id) {
     this.config.id = id
-  }
-
-  syncWith (note) {
-    return note.config.updated < this.config.updated ? this : note
   }
 }

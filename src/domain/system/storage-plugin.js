@@ -1,21 +1,15 @@
-import { storageManager } from './storage'
+import StorageManager from './storage-manager'
 
-function initStorageNode (store, node) {
-  storageManager.addStorage(node.url).getNotes().then(notes => {
-    console.log('setNotes', notes.length)
-  }).catch(error => {
-    console.warn('BE', error)
-  })
-}
+export const storageManager = new StorageManager()
 
 export default function (store) {
   const mutations = {
     rehydrateStorageNodes (state) {
       state.storage.nodes.forEach(node => {
         try {
-          initStorageNode(store, node)
+          storageManager.addStorage(node.url)
         } catch (error) {
-          console.warn('rehydrate storage failed:', node)
+          console.warn(node)
         }
       })
     }
@@ -24,10 +18,10 @@ export default function (store) {
   const actions = {
     addStorageAction (state, payload) {
       try {
-        initStorageNode(store, payload)
+        storageManager.addStorage(payload.url)
         store.commit('addStorage', payload)
       } catch (error) {
-        console.warn('add storage failed:', error)
+        console.warn(error)
       }
     },
     removeStorageAction (state, payload) {

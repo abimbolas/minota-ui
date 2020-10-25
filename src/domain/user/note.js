@@ -1,6 +1,6 @@
 import uuid from 'uuid/v4'
 
-export default class Note {
+export class Note {
   constructor ({ content = '', config } = {}) {
     this.content = content
     this.config = Object.assign({

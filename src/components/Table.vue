@@ -61,7 +61,7 @@ import bus from '@/event-bus'
 import { observeZoom, observeView } from '@/directives'
 import InspireComponent from '@/components/Inspire'
 import NoteComponent from '@/components/Note'
-import Note from '@/domain/user/note'
+import { Note } from '@/domain/user/note'
 
 let zoomSpeed = 0.125
 let zoomLimit = 0.25

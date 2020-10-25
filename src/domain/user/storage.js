@@ -1,3 +1,6 @@
+import FileStorage from '@/domain/system/file-storage'
+import { Note } from '@/domain/user/note'
+
 export class Storage extends Map {
   add (note) {
     let duplicate = this.get(note.id)
@@ -16,35 +19,73 @@ export class Storage extends Map {
       if ('content' in update) {
         target.content = update.content
       }
-      if ('config' in update) {
-        delete update.config.id // just in case
-        Object.assign(target.config, update.config)
-      }
-      target.config.updated = new Date()
+      // if ('config' in update) {
+      //   delete update.config.id // just in case
+      //   Object.assign(target.config, update.config)
+      // }
+      // target.config.updated = new Date()
     }
   }
 }
+
+const defaultFileUrl = 'file:///Users/antivitla/Projects/Personal/Minota/tmp'
+const defaultFileStorage = new FileStorage(defaultFileUrl)
 
 export default {
   state: {
     storage: new Storage()
   },
+  getters: {
+    getNote: state => id => state.storage.get(id)
+  },
   mutations: {
-    addNote ({ storage }, payload) {
-      storage.add(payload.note)
-      console.log('Storage note', storage.get(payload.note.id))
+    addNote ({ storage }, { id, content }) {
+      storage.add(new Note({
+        content,
+        config: { id }
+      }))
+      console.group('addNote')
+      console.log(storage.get(id))
+      console.groupEnd()
     },
-    updateNote ({ storage }, payload) {
-      storage.update(payload.note.id, payload.update)
-      console.log('Storage updated', storage.get(payload.note.id))
+    updateNote ({ storage }, { id, content }) {
+      storage.update(id, { content })
+      console.group('updateNote')
+      console.log(storage.get(id))
+      console.groupEnd()
+    },
+  },
+  actions: {
+    getNoteAction ({ commit, getters }, { id }) {
+      return defaultFileStorage
+        .getNote(id)
+        .then(note => {
+          if (!getters.getNote(note.id)) {
+            commit('addNote', note)
+          }
+          return Promise.resolve(note)
+        })
+        .catch(error => {
+          console.group('getNoteAction')
+          console.error(error)
+          console.groupEnd()
+          return Promise.reject(error.response)
+        })
+    },
+    updateNoteAction ({ getters, commit }, { id, content }) {
+      if (getters.getNote(id)) {
+        commit('updateNote', { id, content })
+      } else {
+        commit('addNote', { id, content })
+      }
+      return defaultFileStorage
+        .postNote(getters.getNote(id))
+        .catch(error => {
+          console.group('updateNoteAction')
+          console.error(error)
+          console.groupEnd()
+          return Promise.reject(error.response)
+        })
     }
   }
-  // actions: {
-  //   addStorageAction () {
-  //     // user wants to add storage
-  //   },
-  //   removeStorageAction () {
-  //     // user wants to remove storage
-  //   }
-  // }
 }

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import Note from '@/domain/user/note'
+import { Note } from '@/domain/user/note'
 import AbstractStorage from './abstract-storage'
 
 export default class FileStorage extends AbstractStorage {
@@ -20,18 +20,16 @@ export default class FileStorage extends AbstractStorage {
       .then(this._parseNotes.bind(this))
   }
 
+  getNote (id) {
+    return this.resource
+      .get(`/notes/${id}`)
+      .then(this._parseNote.bind(this))
+  }
+
   postNote (note) {
-    if (note.config.storage.indexOf(this.url) > -1) {
-      return this.resource
-        .post(`/notes/${note.id}`, this.forgetStorage(note))
-        .then(this._parseNote.bind(this))
-    } else {
-      return Promise.reject(new Error(
-        'postNote can\'t store not related note ' +
-        note.config.storage +
-        ' to our storage ' + this.url
-      ))
-    }
+    return this.resource
+      .post(`/notes/${note.id}`, note)
+      .then(this._parseNote.bind(this))
   }
 
   deleteNote (note) {
@@ -52,13 +50,13 @@ export default class FileStorage extends AbstractStorage {
 
   _parseNotes (response) {
     return Promise.resolve(
-      response.data.map(note => new Note(this.rememberStorage(note)))
+      response.data.map(note => new Note(note))
     )
   }
 
   _parseNote (response) {
     return Promise.resolve(
-      new Note(this.rememberStorage(Array.isArray(response.data) ? response.data[0] : response.data))
+      new Note(Array.isArray(response.data) ? response.data[0] : response.data)
     )
   }
 

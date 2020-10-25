@@ -6,8 +6,8 @@
 
 <script>
 import { mapActions } from 'vuex'
-// import ModalComponent from '@/components/Modal'
 import bus from '@/event-bus'
+// import ModalComponent from '@/components/Modal'
 
 export default {
   name: 'App',
@@ -110,9 +110,26 @@ export default {
 </script>
 
 <style lang="stylus">
-@import '~@/assets/styles/common'
+@import '~@/assets/styles/variables'
 
+html
+body
+  font-size 16px
+  line-height 1.5
+  font-family sans-family
+  margin 0
+  padding 0
+  overflow auto
+  min-height 100vh
+  scroll-snap-type both proximity
+
+html
+  background-color background-main
+</style>
+
+<style scoped lang="stylus">
 .minota-app
   box-sizing border-box
   min-height 100vh
+  min-width 100vw
 </style>

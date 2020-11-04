@@ -3,6 +3,7 @@ import Router from 'vue-router'
 
 // import TableComponent from '@/components/Table'
 import LevelNoteComponent from '@/components/LevelNote'
+import LevelNotesComponent from '@/components/LevelNotes'
 
 Vue.use(Router)
 
@@ -13,6 +14,11 @@ const router = new Router({
       name: 'home',
       path: '/',
       component: LevelNoteComponent
+    },
+    {
+      name: 'notes',
+      path: '/notes',
+      component: LevelNotesComponent
     }
     // {
     //   name: 'table',

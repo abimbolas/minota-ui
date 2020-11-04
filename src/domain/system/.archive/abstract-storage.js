@@ -1,4 +1,4 @@
-import Note from '@/domain/user/note'
+import { Note } from '@/domain/user/note'
 
 export default class AbstractStorage extends URL {
   getNotes () { return Promise.reject(new Error('Abstract getNotes')) }

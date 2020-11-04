@@ -5,24 +5,40 @@
       ref="editor"
       contenteditable
       placeholder="(Заметка девственно чиста)"
-      @input="$emit('update', $event.target.innerText)")
+      @input="onUpdate($event)")
 </template>
 
 <script>
+import { Note } from '@/domain/user/note'
+
 export default {
   name: 'Note',
   props: {
-    content: String,
-    required: false,
-    default: ''
-  },
-  watch: {
-    'content' (content) {
-      this.$refs.editor.innerText = content
+    note: {
+      type: Note,
+      required: false,
+      default () {
+        return new Note()
+      }
     }
   },
-  mounted () {
-    this.$refs.editor.innerText = this.content
+  watch: {
+    'note.content' (content) {
+      console.log('note.content changed', content, this.note.id, this.note.content)
+      // 1. save cursor position
+      // 2. insert text
+      if (this.$refs.editor.innerText !== content) {
+        this.syncToEditor(content || '')
+      }
+    }
+  },
+  methods: {
+    syncToEditor (content) {
+      this.$refs.editor.innerText = content
+    },
+    onUpdate (event) {
+      this.$emit('update', event.target.innerText)
+    }
   }
 }
 </script>

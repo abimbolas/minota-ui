@@ -1,14 +1,13 @@
 <template lang="pug">
   .minota-level-note
     note-component(
-      v-if="content !== null"
       @update="onUpdate($event)"
-      :content="content")
+      :note="note")
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-import { Note } from '@/domain/user/note'
+// import { Note } from '@/domain/user/note'
 import NoteComponent from '@/components/Note'
 
 export default {
@@ -18,12 +17,12 @@ export default {
   },
   data () {
     return {
-      content: null
+      note: null
     }
   },
   created () {
     this.getNoteAction({ id: 'single-note' }).then(note => {
-      this.content = note.content
+      this.note = note
     })
   },
   methods: {
@@ -63,7 +62,7 @@ export default {
     --editor-min-height calc(100vh - 2rem)
     @media (min-width screen-sm)
       padding 2rem
-      --editor-font-size 17px
+      --editor-font-size 18px
       --editor-min-height calc(100vh - 4rem)
     @media (min-width screen-md)
       padding 3rem 1rem

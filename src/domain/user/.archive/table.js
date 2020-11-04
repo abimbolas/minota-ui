@@ -1,4 +1,4 @@
-import Note from './note'
+import { Note } from './note'
 import Workspace from './workspace'
 
 const Table = new Workspace()

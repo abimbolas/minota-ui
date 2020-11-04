@@ -44,16 +44,16 @@ export default {
         content,
         config: { id }
       }))
-      console.group('addNote')
-      console.log(storage.get(id))
-      console.groupEnd()
+      // console.group('addNote')
+      // console.log(storage.get(id))
+      // console.groupEnd()
     },
     updateNote ({ storage }, { id, content }) {
       storage.update(id, { content })
-      console.group('updateNote')
-      console.log(storage.get(id))
-      console.groupEnd()
-    },
+      // console.group('updateNote')
+      // console.log(storage.get(id))
+      // console.groupEnd()
+    }
   },
   actions: {
     getNoteAction ({ commit, getters }, { id }) {
@@ -66,9 +66,24 @@ export default {
           return Promise.resolve(note)
         })
         .catch(error => {
-          console.group('getNoteAction')
-          console.error(error)
-          console.groupEnd()
+          // console.group('getNoteAction')
+          // console.error(error)
+          // console.groupEnd()
+          return Promise.reject(error.response)
+        })
+    },
+    getNotesAction ({ getters, commit }) {
+      return defaultFileStorage
+        .getNotes()
+        .then(notes => {
+          notes.forEach(note => {
+            if (!getters.getNote(note.id)) {
+              commit('addNote', note)
+            }
+          })
+          return Promise.resolve(notes)
+        })
+        .catch(error => {
           return Promise.reject(error.response)
         })
     },
@@ -81,11 +96,16 @@ export default {
       return defaultFileStorage
         .postNote(getters.getNote(id))
         .catch(error => {
-          console.group('updateNoteAction')
-          console.error(error)
-          console.groupEnd()
+          // console.group('updateNoteAction')
+          // console.error(error)
+          // console.groupEnd()
           return Promise.reject(error.response)
         })
+    },
+    createNoteAction ({ getters, commit }) {
+      let note = new Note()
+      commit('addNote', note)
+      return Promise.resolve(note)
     }
   }
 }

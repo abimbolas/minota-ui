@@ -1,110 +1,13 @@
 <template lang="pug">
   .minota-app
     router-view
-    //- modal-component
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import bus from '@/event-bus'
-// import ModalComponent from '@/components/Modal'
-
 export default {
-  name: 'App',
-
-  components: {
-    // ModalComponent
-  },
-
-  created () {
-    // this.addStorageAction({
-    //   url: 'file:///Users/antivitla/Projects/Personal/Minota/.minota-002'
-    // })
-    //
-    // this.addStorageAction({
-    //   url: 'file:///Users/antivitla/Projects/Personal/Minota/.minota'
-    // })
-    //
-    // this.addStorageAction({
-    //   url: 'file:///Users/antivitla/Dropbox/Notes'
-    // })
-    //
-    // this.addStorageAction({
-    //   url: 'file:///Users/antivitla/zok'
-    // })
-    console.log('Minotá UI created')
-  },
-
+  name: 'Minota',
   mounted () {
-    // Check url query for known commands
-    this.parseQueryForCommands([
-      'createNote'
-    ])
-    // Listen keyboard for commands
-    this.startListenShortcutsForCommands({
-      'ctrlKey+shiftKey+KeyN': 'createNote'
-    })
-  },
-
-  beforeDestroy () {
-    // Cleanup shortcut listener
-    this.stopListenShortcutsForCommands()
-    console.log('Minotá UI destroyed')
-  },
-
-  methods: {
-    createNote () {
-      // Но как запускать эту команду?
-      // + с пути урл
-      // + с клавиатуры
-      // - кнопкой с экрана
-      this.createNoteAction().then(note => {
-        this.note = note
-      })
-    },
-    parseQueryForCommands (commands) {
-      return commands.filter(command => {
-        if (command in this.$route.query) {
-          let query = { ...this.$route.query }
-          delete query[command]
-          this.$router.replace({ query })
-          return true
-        }
-      }).forEach(command => {
-        this[command]()
-      })
-    },
-    parseShortcutForCommands (commands, emitEvent, shortcut) {
-      const triggered = Object.keys(commands).find(command => {
-        return command.split('+').every(key => {
-          if (key.match(/^Key/)) {
-            return shortcut.code === key
-          } else {
-            return shortcut[key]
-          }
-        })
-      })
-      if (triggered) {
-        bus.$emit(emitEvent, commands[triggered])
-      }
-    },
-    startListenShortcutsForCommands (commands) {
-      const SHORTCUT_EVENT = 'SHORTCUT_EVENT'
-      let parseShortcut = this.parseShortcutForCommands.bind(
-        this, commands, SHORTCUT_EVENT
-      )
-      document.addEventListener('keyup', parseShortcut)
-      bus.$on(SHORTCUT_EVENT, command => this[command]())
-      this.stopListenShortcutsForCommands = function () {
-        document.removeEventListener('keyup', parseShortcut)
-        bus.$off(SHORTCUT_EVENT)
-      }
-    },
-    ...mapActions([
-      // 'addStorageAction',
-      // 'removeStorageAction',
-      'createNoteAction'
-    ])
+    console.log('Minotá created')
   }
 }
 </script>
@@ -121,6 +24,7 @@ body
   padding 0
   overflow auto
   min-height 100vh
+  min-width 100vw
   scroll-snap-type both proximity
 
 html
@@ -132,4 +36,6 @@ html
   box-sizing border-box
   min-height 100vh
   min-width 100vw
+  padding 1rem
+  --editor-min-height calc(100vh - 2rem)
 </style>

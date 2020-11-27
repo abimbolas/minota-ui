@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-// import TableComponent from '@/components/Table'
-import LevelNoteComponent from '@/components/LevelNote'
-import LevelNotesComponent from '@/components/LevelNotes'
+import Note from '@/components/Note'
+import Notepad from '@/components/Notepad'
 
 Vue.use(Router)
 
@@ -13,18 +12,18 @@ const router = new Router({
     {
       name: 'home',
       path: '/',
-      component: LevelNoteComponent
+      redirect: '/note'
     },
     {
-      name: 'notes',
-      path: '/notes',
-      component: LevelNotesComponent
+      name: 'note',
+      path: '/note',
+      component: Note
+    },
+    {
+      name: 'notepad',
+      path: '/notepad',
+      component: Notepad
     }
-    // {
-    //   name: 'table',
-    //   path: '/table',
-    //   component: TableComponent
-    // },
   ]
 })
 

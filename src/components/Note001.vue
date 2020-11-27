@@ -9,31 +9,34 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { Note } from '@/domain/user/note'
 
 export default {
   name: 'Note',
-  computed: {
-    ...mapState('note', ['note'])
-  },
-  watch: {
+  props: {
     note: {
-      handler (note) {
-        if (this.$refs.editor.innerText !== note.content) {
-          this.$refs.editor.innerText = note.content || ''
-        }
-      },
-      deep: true
+      type: Note,
+      required: false,
+      default () {
+        return new Note()
+      }
     }
   },
-  mounted () {
-    this.$refs.editor.innerText = this.note.content || ''
+  watch: {
+    'note.content' (content) {
+      // 1. save cursor position
+      // 2. insert text
+      if (this.$refs.editor.innerText !== content) {
+        this.syncToEditor(content || '')
+      }
+    }
   },
   methods: {
+    syncToEditor (content) {
+      this.$refs.editor.innerText = content
+    },
     onUpdate (event) {
-      this.$store.commit('note/update', {
-        content: event.target.innerText
-      })
+      this.$emit('update', event.target.innerText)
     }
   }
 }
@@ -45,9 +48,6 @@ export default {
 .minota-note
   background-color white
   box-sizing border-box
-  padding var(--note-padding, 3rem 3rem)
-  border-radius var(--note-border-radius, 0.25rem)
-  box-shadow var(--note-box-shadow, 0px 1px 5px 0px alpha(black, 0.1))
 
 //
 // Editor

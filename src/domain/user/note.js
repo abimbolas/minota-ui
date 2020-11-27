@@ -1,14 +1,14 @@
-import uuid from 'uuid/v4'
+import uuid from 'uuid/v1' // time-based
 
 export class Note {
-  constructor ({ content = '', config } = {}) {
+  constructor ({ content = '', config = {} } = {}) {
     this.content = content
+
     this.config = Object.assign({
       id: uuid(),
       date: new Date()
     }, config)
 
-    // Setup date
     this.config.date = new Date(this.config.date)
   }
 
@@ -18,5 +18,32 @@ export class Note {
 
   set id (id) {
     this.config.id = id
+  }
+
+  get date () {
+    return this.config.date
+  }
+
+  set date (date) {
+    this.config.date = new Date(date)
+  }
+}
+
+//
+// Store
+//
+
+export default {
+  namespaced: true,
+  state: {
+    note: new Note({ config: { id: 'unique-note' } })
+  },
+  mutations: {
+    update (state, { content }) {
+      state.note.content = content
+    },
+    sync (state, note) {
+      state.note = note
+    }
   }
 }

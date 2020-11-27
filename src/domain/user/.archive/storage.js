@@ -1,4 +1,5 @@
-import FileStorage from '@/domain/system/file-storage'
+// import FileStorage from '@/domain/system/storage/file'
+import BrowserStorage from '@/domain/system/storage/browser'
 import { Note } from '@/domain/user/note'
 
 export class Storage extends Map {
@@ -28,8 +29,8 @@ export class Storage extends Map {
   }
 }
 
-const defaultFileUrl = 'file:///Users/antivitla/Projects/Personal/Minota/tmp'
-const defaultFileStorage = new FileStorage(defaultFileUrl)
+// const defaultStorage = new FileStorage('file://minota/antivitla')
+const defaultStorage = new BrowserStorage('browser://minota/antivitla')
 
 export default {
   state: {
@@ -57,7 +58,7 @@ export default {
   },
   actions: {
     getNoteAction ({ commit, getters }, { id }) {
-      return defaultFileStorage
+      return defaultStorage
         .getNote(id)
         .then(note => {
           if (!getters.getNote(note.id)) {
@@ -73,7 +74,7 @@ export default {
         })
     },
     getNotesAction ({ getters, commit }) {
-      return defaultFileStorage
+      return defaultStorage
         .getNotes()
         .then(notes => {
           notes.forEach(note => {
@@ -93,7 +94,7 @@ export default {
       } else {
         commit('addNote', { id, content })
       }
-      return defaultFileStorage
+      return defaultStorage
         .postNote(getters.getNote(id))
         .catch(error => {
           // console.group('updateNoteAction')

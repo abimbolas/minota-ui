@@ -1,9 +1,9 @@
 import axios from 'axios'
-import StorageInterface from '@/domain/system/storage-interface'
+import PersistentStorage from '@/domain/system/storage/persistent'
 import { Note } from '@/domain/user/note'
 
-export default class FileStorage extends StorageInterface {
-  constructor(url) {
+export default class FileStorage extends PersistentStorage {
+  constructor (url) {
     super(url)
     this.resource = axios.create({
       baseURL: 'http://localhost:54321',
@@ -14,28 +14,47 @@ export default class FileStorage extends StorageInterface {
     })
   }
 
-  getNote (id) {
-    return this.resource
-      .get(`/notes/${id}`)
-      .then(this._parseNote.bind(this))
-  }
+  // Module: Note
 
-  getNotes () {
+  getNote () {
     return this.resource
-      .get('/notes')
-      .then(this._parseNotes.bind(this))
+      .get('/note')
+      .then(this._parseNote)
+      .catch(this._parseError)
   }
 
   postNote (note) {
     return this.resource
-      .post(`/notes/${note.id}`, note)
-      .then(this._parseNote.bind(this))
+      .post('/note', note)
+      .then(this._parseNote)
+      .catch(this._parseError)
   }
+
+  // Module: Iterable Notes
+
+  // getNotes () {
+  //   return this.resource
+  //     .get('/notes')
+  //     .then(this._parseNotes.bind(this))
+  // }
+  //
+  // getNoteById (id) {
+  //   return this.resource
+  //     .get(`/notes/${id}`)
+  //     .then(this._parseNote.bind(this))
+  // }
+
+  // postNotes (note) {
+  //   return this.resource
+  //     .post(`/notes/${note.id}`, note)
+  //     .then(this._parseNote.bind(this))
+  // }
 
   deleteNote (note) {
     return this.resource
       .delete(`/notes/${note.id}`)
       .then(this._parseSuccess)
+      .catch(this._parseError)
   }
 
   deleteNotes (notes) {
@@ -62,5 +81,9 @@ export default class FileStorage extends StorageInterface {
 
   _parseSuccess (response) {
     return Promise.resolve(response.data)
+  }
+
+  _parseError (error) {
+    return Promise.reject(error.response)
   }
 }

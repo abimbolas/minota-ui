@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 // import createPersistedState from 'vuex-persistedstate'
 
 import note from '@/domain/user/note'
+import notes from '@/domain/user/notes'
 import storage from '@/domain/system/storage'
 
 Vue.use(Vuex)
@@ -10,7 +11,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
   modules: {
-    note
+    note,
+    notes
   },
   plugins: [storage]
   // plugins: [

@@ -8,12 +8,26 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
+import { Note } from '@/domain/user/note'
 
 export default {
   name: 'Note',
+  props: {
+    noteId: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
   computed: {
-    ...mapState('note', ['note'])
+    focusedNote () {
+      return this.$store.state['note'].note
+    },
+    note () {
+      return this.noteId ? this.byNoteId(this.noteId) : this.focusedNote
+    },
+    ...mapGetters('notes', ['byNoteId'])
   },
   watch: {
     note: {
@@ -30,9 +44,16 @@ export default {
   },
   methods: {
     onUpdate (event) {
-      this.$store.commit('note/update', {
-        content: event.target.innerText
-      })
+      if (this.noteId) {
+        this.$store.commit('notes/update', {
+          id: this.noteId,
+          content: event.target.innerText
+        })
+      } else {
+        this.$store.commit('note/update', {
+          content: event.target.innerText
+        })
+      }
     }
   }
 }
@@ -62,8 +83,10 @@ export default {
   margin-left auto
   margin-right auto
   min-height var(--editor-min-height, 0)
+  cursor text
 
   &:empty:before
     content attr(placeholder)
     color alpha(black, low-emphasis)
+    user-select none
 </style>

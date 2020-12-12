@@ -10,8 +10,6 @@ export class Note {
       ...config
     }
 
-    console.log('note', this.config, config)
-
     this.config.date = new Date(this.config.date)
   }
 
@@ -42,8 +40,16 @@ export default {
     note: new Note()
   },
   mutations: {
-    update (state, { content }) {
-      state.note.content = content
+    update (state, note) {
+      if (note.content !== undefined) {
+        state.note.content = note.content
+      }
+      if (note.config !== undefined) {
+        Object.assign(state.note.config, note.config)
+      }
+    },
+    replace (state, note) {
+      state.note = note
     },
     sync (state, note) {
       state.note = note

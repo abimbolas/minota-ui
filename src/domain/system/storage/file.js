@@ -39,6 +39,13 @@ export default class FileStorage extends PersistentStorage {
       .catch(this._parseError)
   }
 
+  postNotes (notes) {
+    return this.resource
+      .post('/notes', notes)
+      .then(this._parseNotes)
+      .catch(this._parseError)
+  }
+
   // getNoteById (id) {
   //   return this.resource
   //     .get(`/notes/${id}`)

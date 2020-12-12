@@ -22,10 +22,6 @@ body
   font-family sans-family
   margin 0
   padding 0
-  overflow auto
-  min-height 100vh
-  min-width 100vw
-  scroll-snap-type both proximity
 
 html
   background-color background-main
@@ -33,9 +29,10 @@ html
 
 <style scoped lang="stylus">
 .minota-app
-  box-sizing border-box
-  min-height 100vh
-  min-width 100vw
-  padding 1rem
-  --editor-min-height calc(100vh - 2rem)
+  height 100vh
+  width 100vw
+  // margin-top 5vh
+  // margin-left 5vw
+  // box-shadow 0px 0px 0px 1px alpha(black, 0.1)
+  // overflow auto
 </style>

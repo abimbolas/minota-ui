@@ -30,14 +30,15 @@ export default class FileStorage extends PersistentStorage {
       .catch(this._parseError)
   }
 
-  // Module: Iterable Notes
+  // Module: Notes
 
-  // getNotes () {
-  //   return this.resource
-  //     .get('/notes')
-  //     .then(this._parseNotes.bind(this))
-  // }
-  //
+  getNotes () {
+    return this.resource
+      .get('/notes')
+      .then(this._parseNotes)
+      .catch(this._parseError)
+  }
+
   // getNoteById (id) {
   //   return this.resource
   //     .get(`/notes/${id}`)

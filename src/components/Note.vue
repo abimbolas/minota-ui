@@ -1,6 +1,5 @@
 <template lang="pug">
   .minota-note
-    //- Editor
     .minota-note-editor(
       ref="editor"
       contenteditable
@@ -43,6 +42,7 @@ export default {
 @import '~@/assets/styles/variables'
 
 .minota-note
+  min-height 100%
   background-color white
   box-sizing border-box
   padding var(--note-padding, 3rem 3rem)

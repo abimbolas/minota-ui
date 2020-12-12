@@ -1,0 +1,44 @@
+@import '~@/assets/styles/variables'
+
+.minota-actions
+  display flex
+  .minota-action
+    display block
+    flex-shrink 0
+
+.minota-action
+  display inline-block
+  padding 0.5rem 1rem
+  cursor pointer
+  border-radius 0.25rem
+  user-select none
+  font-weight bold
+  color alpha(black, medium-emphasis)
+  transition all 0.125s ease-out
+  font-family inherit
+  font-size inherit
+  line-height inherit
+
+  a&
+    text-decoration none
+    display: inline-block
+
+  button&
+    border none
+    background-color transparent
+
+  &:hover
+    background-color button-hover
+    color alpha(black, 1)
+
+  &[primary]
+    background-color alpha(black, high-emphasis)
+    color alpha(white, high-emphasis)
+    &:hover
+      background-color alpha(black, 1)
+      color alpha(white, 1)
+
+  &[outline]
+    box-shadow 0px 0px 0px 2px alpha(black, 0.05)
+    &:hover
+      color alpha(black, 1)

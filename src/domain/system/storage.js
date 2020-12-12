@@ -19,10 +19,10 @@ export default function (store) {
     store.commit('note/sync', note)
   })
 
-  // storage.getNotePad().then(notepad => {
-  //   console.log('notepad', notepad)
+  // storage.getNotes().then(notes => {
+  //   console.log('getNotes', notes)
   // }).catch(error => {
-  //   console.warn(error)
+  //   console.warn('getNotes error', error)
   // })
 
   store.subscribe((mutation, state) => {

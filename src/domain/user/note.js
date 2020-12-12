@@ -4,10 +4,13 @@ export class Note {
   constructor ({ content = '', config = {} } = {}) {
     this.content = content
 
-    this.config = Object.assign({
+    this.config = {
       id: uuid(),
-      date: new Date()
-    }, config)
+      date: new Date(),
+      ...config
+    }
+
+    console.log('note', this.config, config)
 
     this.config.date = new Date(this.config.date)
   }
@@ -36,7 +39,7 @@ export class Note {
 export default {
   namespaced: true,
   state: {
-    note: new Note({ config: { id: 'unique-note' } })
+    note: new Note()
   },
   mutations: {
     update (state, { content }) {

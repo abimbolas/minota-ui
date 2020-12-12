@@ -9,7 +9,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { Note } from '@/domain/user/note'
 
 export default {
   name: 'Note',

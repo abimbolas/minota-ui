@@ -20,7 +20,7 @@ import { observeView } from '@/directives'
 export default {
   name: 'Notes',
   directives: {
-    observeView,
+    observeView
   },
   components: {
     NoteComponent

@@ -1,3 +1,4 @@
+/* eslint-disable brace-style, padded-blocks */
 import FileStorage from '@/domain/system/storage/file'
 import { Note } from '@/domain/user/note'
 
@@ -46,7 +47,7 @@ export default function (store) {
     //
     // Module:Note
     //
-    
+
     if (mutation.type === 'note/update') {
       debounce(mutation.type, () => {
         const note = state['note'].note

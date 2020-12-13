@@ -2,12 +2,18 @@
 
 .minota-actions
   display flex
+  box-sizing border-box
+
   .minota-action
-    display block
+    display flex
     flex-shrink 0
+    & + .minota-action
+      margin-left 0.5rem
 
 .minota-action
-  display inline-block
+  display flex
+  justify-content center
+  align-items center
   padding 0.5rem 1rem
   cursor pointer
   border-radius 0.25rem
@@ -27,18 +33,51 @@
     border none
     background-color transparent
 
+  .material-icons + *
+    margin-left 0.25rem
+
+  &.text
+    color inherit
+  &.icon
+    padding 0.5rem
+  &.block
+    width 100%
+    box-sizing border-box
+  &.outline
+    box-shadow 0px 0px 0px 2px alpha(black, 0.05)
+
   &:hover
+  &.hover
     background-color button-hover
     color alpha(black, 1)
+
+  &[disabled]
+    pointer-events none
+    opacity low-emphasis
 
   &[primary]
     background-color alpha(black, high-emphasis)
     color alpha(white, high-emphasis)
     &:hover
+    &.hover
       background-color alpha(black, 1)
       color alpha(white, 1)
 
   &[outline]
     box-shadow 0px 0px 0px 2px alpha(black, 0.05)
     &:hover
+    &.hover
       color alpha(black, 1)
+
+  &[danger]
+    color brown
+    &:hover
+      background-color alpha(brown, 0.125)
+      color white
+
+  &[danger][primary]
+    background-color brown
+    color alpha(white, high-emphasis)
+    &:hover
+      background-color brown
+      color white

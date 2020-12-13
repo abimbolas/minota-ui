@@ -30,7 +30,7 @@ export default function (store) {
     // 2. Get Module:Notes
     storage.getNotes().then(notes => {
       // console.log('getNotes', notes)
-      store.commit('notes/sync', notes)
+      store.commit('notes/sync', notes.sort((a, b) => a.date - b.date))
     })
   ]).then(() => {
 
@@ -79,6 +79,10 @@ export default function (store) {
           storage.postNotes([note])
         })
       }
+    }
+
+    else if (mutation.type === 'notes/delete') {
+      storage.deleteNotes([mutation.payload])
     }
   })
 }

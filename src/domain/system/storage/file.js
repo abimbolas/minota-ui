@@ -46,6 +46,14 @@ export default class FileStorage extends PersistentStorage {
       .catch(this._parseError)
   }
 
+  deleteNotes (notes) {
+    return this.resource
+      .delete('/notes', {
+        data: notes.map(note => note.id)
+      })
+      .then(this._parseSuccess)
+  }
+
   // getNoteById (id) {
   //   return this.resource
   //     .get(`/notes/${id}`)
@@ -58,22 +66,22 @@ export default class FileStorage extends PersistentStorage {
   //     .then(this._parseNote.bind(this))
   // }
 
-  deleteNote (note) {
-    return this.resource
-      .delete(`/notes/${note.id}`)
-      .then(this._parseSuccess)
-      .catch(this._parseError)
-  }
-
-  deleteNotes (notes) {
-    return this.resource
-      .delete('/notes', {
-        params: {
-          notes: notes.map(note => note.id)
-        }
-      })
-      .then(this._parseSuccess)
-  }
+  // deleteNote (note) {
+  //   return this.resource
+  //     .delete(`/notes/${note.id}`)
+  //     .then(this._parseSuccess)
+  //     .catch(this._parseError)
+  // }
+  //
+  // deleteNotes (notes) {
+  //   return this.resource
+  //     .delete('/notes', {
+  //       params: {
+  //         notes: notes.map(note => note.id)
+  //       }
+  //     })
+  //     .then(this._parseSuccess)
+  // }
 
   _parseNotes (response) {
     return Promise.resolve(

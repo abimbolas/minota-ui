@@ -9,12 +9,18 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { Note } from '@/domain/user/note'
 
 export default {
   name: 'Note',
   props: {
     noteId: {
       type: String,
+      required: false,
+      default: null
+    },
+    noteModel: {
+      type: Note,
       required: false,
       default: null
     }
@@ -24,7 +30,13 @@ export default {
       return this.$store.state['note'].note
     },
     note () {
-      return this.noteId ? this.byNoteId(this.noteId) : this.focusedNote
+      if (this.noteModel) {
+        return this.noteModel
+      } else if (this.noteId) {
+        return this.byNoteId(this.noteId)
+      } else {
+        return this.focusedNote
+      }
     },
     ...mapGetters('notes', ['byNoteId'])
   },
@@ -43,9 +55,9 @@ export default {
   },
   methods: {
     onUpdate (event) {
-      if (this.noteId) {
+      if (this.noteId || this.noteModel) {
         this.$store.commit('notes/update', {
-          id: this.noteId,
+          id: this.note.id,
           content: event.target.innerText
         })
       } else {

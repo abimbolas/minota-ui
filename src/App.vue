@@ -1,11 +1,17 @@
 <template lang="pug">
   .minota-app
     router-view
+    modals-component
 </template>
 
 <script>
+import ModalsComponent from '@/components/Modal'
+
 export default {
   name: 'Minota',
+  components: {
+    ModalsComponent
+  },
   mounted () {
     console.log('Minotá created')
   }

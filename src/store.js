@@ -5,6 +5,7 @@ import Vuex from 'vuex'
 import note from '@/domain/user/note'
 import notes from '@/domain/user/notes'
 import storage from '@/domain/system/storage'
+import modal from '@/domain/ui/modal'
 
 Vue.use(Vuex)
 
@@ -12,7 +13,8 @@ export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
   modules: {
     note,
-    notes
+    notes,
+    modal
   },
   plugins: [storage]
   // plugins: [

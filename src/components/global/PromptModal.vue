@@ -1,9 +1,9 @@
 <template lang="pug">
   .minota-modal
     .minota-modal__header {{ modal.header }}
-    .minota-modal__main {{ modal.description }}
+    .minota-modal__main(v-html="modal.description")
     .minota-modal__footer
-      .minota-section-right
+      .minota-actions
         .minota-action.minota-action_cancel(
           v-on:click="rejectModalAction({ modal })")
           | {{ modal.cancel }}
@@ -47,6 +47,7 @@ export default {
 
 <style lang="stylus">
 @import '~@/assets/styles/variables'
+@import '~@/assets/styles/actions'
 
 .minota-modal
   width 100%
@@ -64,8 +65,13 @@ export default {
   border-top solid 1px alpha(black, 0.125)
   padding 0.5rem
 
+  .minota-actions
+    justify-content flex-end
+
 .minota-modal__main
   padding 0 1.5rem 1.5rem 1.5rem
   &:empty
     display none
+  p:first-child
+    margin-top 0
 </style>

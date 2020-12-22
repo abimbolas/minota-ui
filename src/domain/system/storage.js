@@ -14,7 +14,7 @@ function debounce (type, callback, delay = 300) {
 
 export default function (store) {
   const storage = new FileStorage(
-    'file:///Users/antivitla/Projects/Personal/Minota/.minota-003'
+    'file:///Users/antivitla/Projects/Personal/Minota/.minota-1'
   )
 
   Promise.all([
@@ -82,7 +82,11 @@ export default function (store) {
     }
 
     else if (mutation.type === 'notes/delete') {
-      storage.deleteNotes([mutation.payload])
+      storage.deleteNotes(
+        Array.isArray(mutation.payload)
+          ? mutation.payload
+          : [mutation.payload]
+      )
     }
   })
 }

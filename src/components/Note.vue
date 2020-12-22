@@ -79,7 +79,7 @@ export default {
   box-sizing border-box
   padding var(--note-padding, 3rem 3rem)
   border-radius var(--note-border-radius, 0.25rem)
-  box-shadow var(--note-box-shadow, 0px 1px 5px 0px alpha(black, 0.1))
+  box-shadow var(--note-box-shadow, note-shadow)
 
 //
 // Editor

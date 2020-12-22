@@ -9,7 +9,7 @@
           | {{ modal.cancel }}
         .minota-action.minota-action_ok(
           v-bind:danger="modal.danger"
-          v-bind:primary="modal.danger"
+          v-bind:primary="modal.primary"
           v-on:click="resolveModalAction({ modal })")
           | {{ modal.ok }}
 </template>
@@ -30,7 +30,8 @@ export default {
           description: '?',
           ok: 'Ok',
           cancel: 'Отмена',
-          danger: false
+          danger: false,
+          primary: false
         }
       }
     }

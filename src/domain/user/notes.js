@@ -30,10 +30,13 @@ export default {
       }
     },
     delete (state, note) {
-      const deleteIndex = state.notes.findIndex(item => item.id === note.id)
-      if (deleteIndex > -1) {
-        state.notes.splice(deleteIndex, 1)
-      }
+      const notes = Array.isArray(note) ? note : [note]
+      notes.forEach(note => {
+        const deleteIndex = state.notes.findIndex(item => item.id === note.id)
+        if (deleteIndex > -1) {
+          state.notes.splice(deleteIndex, 1)
+        }
+      })
     },
     sync (state, notes) {
       state.notes = notes

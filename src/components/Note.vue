@@ -1,5 +1,5 @@
 <template lang="pug">
-  .minota-note
+  .minota-note(@focus-note-editor="onFocusNoteEditor")
     .minota-note-editor(
       ref="editor"
       contenteditable
@@ -33,12 +33,12 @@ export default {
       if (this.noteModel) {
         return this.noteModel
       } else if (this.noteId) {
-        return this.byNoteId(this.noteId)
+        return this.noteById(this.noteId)
       } else {
         return this.focusedNote
       }
     },
-    ...mapGetters('notes', ['byNoteId'])
+    ...mapGetters('notepad', ['noteById'])
   },
   watch: {
     note: {
@@ -56,7 +56,7 @@ export default {
   methods: {
     onUpdate (event) {
       if (this.noteId || this.noteModel) {
-        this.$store.commit('notes/update', {
+        this.$store.commit('notepad/update', {
           id: this.note.id,
           content: event.target.innerText
         })
@@ -65,6 +65,9 @@ export default {
           content: event.target.innerText
         })
       }
+    },
+    onFocusNoteEditor () {
+      this.$refs.editor.focus()
     }
   }
 }
@@ -79,7 +82,7 @@ export default {
   box-sizing border-box
   padding var(--note-padding, 3rem 3rem)
   border-radius var(--note-border-radius, 0.25rem)
-  box-shadow var(--note-box-shadow, note-shadow)
+  box-shadow var(--note-box-shadow, shadow-note)
 
 //
 // Editor

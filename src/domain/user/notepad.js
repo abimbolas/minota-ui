@@ -4,7 +4,7 @@ export default {
     notes: []
   },
   getters: {
-    byNoteId: state => id => state.notes.find(note => note.id === id)
+    noteById: state => id => state.notes.find(note => note.id === id)
   },
   mutations: {
     add (state, note) {
@@ -19,7 +19,7 @@ export default {
     update (state, payload) {
       const note = state.notes.find(note => note.id === payload.id)
       if (!note) {
-        console.warn('notes/update not found', payload)
+        console.warn('notepad/update not found', payload)
       } else {
         if (payload.content !== undefined) {
           note.content = payload.content

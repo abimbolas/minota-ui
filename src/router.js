@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Note from '@/components/Note'
-import Notes from '@/components/Notes'
+import Notepad from '@/components/Notepad'
 
 Vue.use(Router)
 
@@ -20,9 +20,9 @@ const router = new Router({
       component: Note
     },
     {
-      name: 'notes',
-      path: '/notes',
-      component: Notes
+      name: 'notepad',
+      path: '/notepad',
+      component: Notepad
     }
   ]
 })

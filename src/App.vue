@@ -30,7 +30,7 @@ body
   padding 0
 
 html
-  background-color background-main
+  background-color color-background-main
 </style>
 
 <style scoped lang="stylus">

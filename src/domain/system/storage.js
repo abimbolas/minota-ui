@@ -14,7 +14,7 @@ function debounce (type, callback, delay = 300) {
 
 export default function (store) {
   const storage = new FileStorage(
-    'file:///Users/antivitla/Projects/Personal/Minota/.minota-1'
+    'file:///Users/antivitla/Projects/Personal/Minota/.minota'
   )
 
   Promise.all([
@@ -27,17 +27,17 @@ export default function (store) {
       }
     }),
 
-    // 2. Get Module:Notes
+    // 2. Get Module:Notepad
     storage.getNotes().then(notes => {
       // console.log('getNotes', notes)
-      store.commit('notes/sync', notes.sort((a, b) => a.date - b.date))
+      store.commit('notepad/sync', notes.sort((a, b) => a.date - b.date))
     })
   ]).then(() => {
 
-    // Upgrade Module:Note to Module:Notes
+    // Upgrade Module:Note to Module:Notepad
     const focusedNote = store.state['note'].note
-    if (!store.getters['notes/byNoteId'](focusedNote.id)) {
-      store.commit('notes/add', focusedNote)
+    if (!store.getters['notepad/noteById'](focusedNote.id)) {
+      store.commit('notepad/add', focusedNote)
       storage.postNotes([focusedNote])
     }
   })
@@ -53,7 +53,7 @@ export default function (store) {
         const note = state['note'].note
         // Update single Module:Note
         storage.postNote(note)
-        // Update relevant Modules:Notes note
+        // Update relevant Modules:Notepad note
         storage.postNotes([note])
       })
     }
@@ -63,25 +63,25 @@ export default function (store) {
     }
 
     //
-    // Module:Notes
+    // Module:Notepad
     //
 
-    else if (mutation.type === 'notes/update') {
-      const note = store.getters['notes/byNoteId'](mutation.payload.id)
+    else if (mutation.type === 'notepad/update') {
+      const note = store.getters['notepad/noteById'](mutation.payload.id)
       const focusedNote = store.state['note'].note
       // If updating focused note, redirect to 'note/update'
       if (note.id === focusedNote.id) {
-        // Update both Module:Note and Module:Notes in redirect
+        // Update both Module:Note and Module:Notepad in redirect
         store.commit('note/update', note)
       } else {
-        // Update Module:Notes only
+        // Update Module:Notepad only
         debounce(`${mutation.type}${mutation.payload.id}`, () => {
           storage.postNotes([note])
         })
       }
     }
 
-    else if (mutation.type === 'notes/delete') {
+    else if (mutation.type === 'notepad/delete') {
       storage.deleteNotes(
         Array.isArray(mutation.payload)
           ? mutation.payload

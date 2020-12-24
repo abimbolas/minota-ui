@@ -55,6 +55,7 @@ export default {
   max-width 30rem
   background-color white
   border-radius 0.25rem
+  box-shadow 0px 5px 10px 0px rgba(0, 0, 0, 0.125)
 
 .minota-modal__header
   padding 1.5rem

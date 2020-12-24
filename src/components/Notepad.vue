@@ -1,5 +1,5 @@
 <template lang="pug">
-  .minota-notes(:class="styleClass")
+  .minota-notepad
     .minota-row
       .minota-cell(
         v-for="note in notes"
@@ -7,25 +7,24 @@
         :ref="note.id"
         v-observe-view
         @enter-view="onFocusNote(note)")
-        note-component(:note-id="note.id")
+        note-component.minota-notepad-note(:note-id="note.id")
 
       //- Right actions
       .minota-cell.minota-actions.right(
         v-observe-view:threshold="0.75"
-        @enter-view="action.createNote = true"
-        @exit-view="action.createNote = false")
-        .minota-action(@click="onCreateNote")
-          .minota-action-image &nbsp;
+        @enter-view="observe.rightActions = true"
+        @exit-view="observe.rightActions = false")
+        .minota-action.create(@click="onCreateNote")
+          .minota-action-image
 
     //- Bottom actions
     .minota-actions.bottom
-      .minota-action(
-        v-observe-view:threshold="[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]"
-        @change-view="onDeleteChangeView") &nbsp;
-      //- .minota-action(
-        v-else
-        v-observe-view:threshold="[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]"
-        @change-view="onCreateChangeView") &nbsp;
+      .minota-action.delete.hover(
+        danger
+        primary
+        v-observe-view:threshold="[0, 0.2, 1]"
+        @change-view="observe.bottomActions = $event.detail.ratio")
+        | Delete {{ observe.rightActions ? 'all notes in notepad' : 'note'}}
       </template>
 </template>
 
@@ -36,7 +35,7 @@ import NoteComponent from '@/components/Note'
 import { observeView } from '@/directives'
 
 export default {
-  name: 'Notes',
+  name: 'Notpad',
   directives: {
     observeView
   },
@@ -48,61 +47,87 @@ export default {
       task: {
         initialFocusNote: true
       },
-      timeout: {
-        focus: null
-      },
-      action: {
-        createNote: false,
-        deleteNote: false
-      },
-      change: {
-        delete: false,
-        create: false
-      },
-      styleNotes: {
-        backgroundColor: 'transparent'
-      },
-      styleClass: {
-        warning: false,
+      background: {
         danger: false
+      },
+      observe: {
+        rightActions: false,
+        bottomActions: 0
+      },
+      charge: {
+        delete: false,
+        background: false
       }
     }
   },
   computed: {
     ...mapState({
       focusedNote: state => state['note'].note,
-      notes: state => state['notes'].notes
+      notes: state => state['notepad'].notes
     }),
-    ...mapGetters('notes', ['byNoteId'])
+    ...mapGetters('notepad', ['noteById'])
+  },
+  watch: {
+    'observe.bottomActions' (ratio) {
+      // Bottom Actions === Delete note(s)
+      if (ratio === 1) {
+        this.charge.delete = true
+        this.charge.background = true
+      } else if (this.charge.delete) {
+        setTimeout(() => {
+          Promise.all([
+            this.observe.rightActions
+              ? this.onDeleteNotes()
+              : this.onDeleteNote()
+          ]).finally(() => {
+            this.background.danger = false
+            this.charge.background = false
+          })
+        }, 150)
+        this.charge.delete = false
+      }
+
+      // Setup ui
+      if (ratio === 1) {
+        this.background.danger = true
+      } else if (!this.charge.background) {
+        this.background.danger = false
+      }
+    }
   },
   updated () {
     // Initially show focused note
     if (this.task.initialFocusNote && this.$refs[this.focusedNote.id]) {
-      this.focusNote(this.focusedNote, true) // instant focus
+      this.scrollToNote(this.focusedNote, true) // instant focus
       this.task.initialFocusNote = false
     }
     // Defer focus note
     if (this.task.focusNote && this.$refs[this.task.focusNote.id]) {
-      this.focusNote(this.task.focusNote)
+      this.scrollToNote(this.task.focusNote)
       this.task.focusNote = null
     }
   },
   methods: {
     onCreateNote () {
       const note = new Note()
-      this.$store.commit('notes/add', note)
-      this.$store.commit('note/replace', this.byNoteId(note.id))
+      this.$store.commit('notepad/add', note)
+      this.$store.commit('note/replace', this.noteById(note.id))
+      // Scroll to created note
       setTimeout(() => {
-        this.focusNote(note)
+        this.scrollToNote(note)
       }, 100)
+      // Focus note editor after animation
+      setTimeout(() => {
+        this.focusNoteEditor(note)
+      }, 1000)
     },
     onDeleteNotes () {
-      this.openModalAction({
+      return this.openModalAction({
         modal: {
           component: 'PromptModal',
-          header: 'Delete All Notes',
+          header: 'Delete Notepad Notes',
           description: [
-            `<p>Delete all ${this.notes.length} notes?</p>`
+            `<p>Delete ${this.notes.length} notes in notepad?</p>`
           ].join('\n'),
           ok: `Yes, delete ${this.notes.length} notes`,
           cancel: 'Oh no, cancel',
@@ -110,13 +135,13 @@ export default {
           primary: true
         }
       }).then(() => {
-        this.$store.commit('notes/delete', this.notes.slice(0))
+        this.$store.commit('notepad/delete', this.notes.slice(0))
       }).catch(() => {
         console.warn('Cancel delete all')
       })
     },
     onDeleteNote () {
-      this.openModalAction({
+      return this.openModalAction({
         modal: {
           component: 'PromptModal',
           header: 'Delete Note',
@@ -132,56 +157,39 @@ export default {
         let noteIndex = this.notes.findIndex(note => note.id === this.focusedNote.id)
         noteIndex = Math.max(0, noteIndex - 1)
         noteIndex = Math.max(0, Math.min(noteIndex, this.notes.length - 2))
-        this.$store.commit('notes/delete', this.focusedNote)
+        this.$store.commit('notepad/delete', this.focusedNote)
         if (this.notes.length) {
-          this.focusNote(this.notes[noteIndex])
+          this.scrollToNote(this.notes[noteIndex])
         }
       }).catch(error => {
         console.warn('Cancel delete', error)
       })
     },
     onFocusNote (note) {
-      clearTimeout(this.timeout.focus)
-      this.timeout.focus = setTimeout(() => {
-        this.$store.commit('note/replace', this.byNoteId(note.id))
+      clearTimeout(this.timeoutFocus)
+      this.timeoutFocus = setTimeout(() => {
+        this.$store.commit('note/replace', this.noteById(note.id))
       }, 150)
     },
-    focusNote (note, instant) {
+    scrollToNote (note, instant) {
       requestAnimationFrame(() => {
         if (this.$refs[note.id] && this.$refs[note.id][0]) {
           this.$refs[note.id][0].scrollIntoView({
             behavior: (instant ? 'auto' : 'smooth')
           })
         } else {
+          // Delay focus until note is added to DOM
           this.task.focusNote = note
         }
       })
     },
-    onDeleteChangeView (event) {
-      const ratio = event.detail.ratio < 0.1 ? 0 : event.detail.ratio
-      if (ratio > 0 && ratio <= 0.5) {
-        this.styleClass.warning = true
-        this.styleClass.danger = false
-        // this.styleNotes.backgroundColor = 'sandybrown'
-      } else if (ratio > 0.5 && ratio <= 1) {
-        this.styleClass.warning = false
-        this.styleClass.danger = true
+    focusNoteEditor (note) {
+      if (this.$refs[note.id] && this.$refs[note.id][0]) {
+        this.$refs[note.id][0]
+          .querySelector('.minota-notepad-note')
+          .dispatchEvent(new CustomEvent('focus-note-editor'))
       } else {
-        this.styleClass.warning = false
-        this.styleClass.danger = false
-      }
-      // 'Charge' deletion at 1, release at any lower
-      if (ratio === 1) {
-        this.change.delete = true
-      } else if (this.change.delete) {
-        setTimeout(() => {
-          if (this.action.createNote) {
-            this.onDeleteNotes()
-          } else {
-            this.onDeleteNote() // go-go-go
-          }
-        }, 150)
-        this.change.delete = false
+        console.warn(`focusNoteEditor: note ${note.id} not found`)
       }
     },
     ...mapActions(['openModalAction'])
@@ -194,14 +202,12 @@ export default {
 @import '~@/assets/styles/actions'
 @import '~@/assets/styles/grid'
 
-.minota-notes
+.minota-notepad
   height 100%
   width 100%
   overflow auto
   scroll-snap-type block mandatory
 
-  &.warning
-    background-color color-danger
   &.danger
     background-color color-danger
 
@@ -210,6 +216,10 @@ export default {
 
 .minota-cell
   padding 0.5rem
+
+//
+// Last cell click action
+//
 
 .minota-actions.right
   justify-content center
@@ -225,20 +235,30 @@ export default {
       background-color transparent
     &:active
       background-color white
-      box-shadow note-shadow
+      box-shadow shadow-note
 
     .minota-action-image
       width 100%
       height 100%
-      margin 5%
+      margin 25%
       max-width 480px
       background url('~@/assets/images/book-hegel.png') no-repeat center
       background-size contain
 
+//
+// Bottom scroll action
+//
+
 .minota-actions.bottom
-  padding 0.5rem
+  padding 0.5rem 0.5rem 0 0.5rem
   box-sizing border-box
-  height: 7rem
+  height 7.5rem
+
   .minota-action
     flex-grow 1
+    background-color brown
+    border-bottom-left-radius 0
+    border-bottom-right-radius 0
+    box-shadow shadow-button
+    border-bottom solid darken(brown, 12.5%) 4px
 </style>

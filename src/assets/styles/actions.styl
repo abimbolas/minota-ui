@@ -48,7 +48,7 @@
 
   &:hover
   &.hover
-    background-color button-hover
+    background-color color-hover
     color alpha(black, 1)
 
   &[disabled]
@@ -72,11 +72,12 @@
   &[danger]
     color color-danger
     &:hover
-      background-color button-hover
+      background-color color-hover
 
   &[danger][primary]
     background-color color-danger
     color alpha(white, high-emphasis)
     &:hover
+    &.hover
       background-color color-danger
       color white

@@ -29,7 +29,6 @@ export default function (store) {
 
     // 2. Get Module:Notepad
     storage.getNotes().then(notes => {
-      // console.log('getNotes', notes)
       store.commit('notepad/sync', notes.sort((a, b) => a.date - b.date))
     })
   ]).then(() => {

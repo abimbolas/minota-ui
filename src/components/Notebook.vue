@@ -1,5 +1,11 @@
 <template lang="pug">
   .minota-notepad
+
+    //- Top actions
+    .minota-actions.top
+      .minota-action Switch to notebook
+
+    //- Notes
     .minota-row
       .minota-cell(
         v-for="note in notes"
@@ -260,4 +266,21 @@ export default {
     border-bottom-right-radius 0
     box-shadow shadow-button
     border-bottom solid darken(brown, 12.5%) 4px
+
+//
+// Top scroll action
+//
+
+.minota-actions.top
+  padding 0 0.5rem 0.5rem 0.5rem
+  box-sizing border-box
+  height 7.5rem
+
+  .minota-action
+    flex-grow 1
+    // background-color white
+    // border-top-left-radius 0
+    // border-top-right-radius 0
+    // box-shadow shadow-button
+    // border-top solid darken(brown, 12.5%) 4px
 </style>

@@ -3,6 +3,7 @@ import Router from 'vue-router'
 
 import Note from '@/components/Note'
 import Notepad from '@/components/Notepad'
+import Notebook from '@/components/Notebook'
 
 Vue.use(Router)
 
@@ -23,6 +24,11 @@ const router = new Router({
       name: 'notepad',
       path: '/notepad',
       component: Notepad
+    },
+    {
+      name: 'notebook',
+      path: '/notebook',
+      component: Notebook
     }
   ]
 })

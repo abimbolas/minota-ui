@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { Note } from '@/domain/user/note'
+import { mapGetters } from 'vuex';
+import { Note } from '@/domain/user/note';
 
 export default {
   name: 'Note',
@@ -27,15 +27,15 @@ export default {
   },
   computed: {
     focusedNote () {
-      return this.$store.state['note'].note
+      return this.$store.state['note'].note;
     },
     note () {
       if (this.noteModel) {
-        return this.noteModel
+        return this.noteModel;
       } else if (this.noteId) {
-        return this.noteById(this.noteId)
+        return this.noteById(this.noteId);
       } else {
-        return this.focusedNote
+        return this.focusedNote;
       }
     },
     ...mapGetters('notepad', ['noteById'])
@@ -44,14 +44,14 @@ export default {
     note: {
       handler (note) {
         if (this.$refs.editor.innerText !== note.content) {
-          this.$refs.editor.innerText = note.content || ''
+          this.$refs.editor.innerText = note.content || '';
         }
       },
       deep: true
     }
   },
   mounted () {
-    this.$refs.editor.innerText = this.note.content || ''
+    this.$refs.editor.innerText = this.note.content || '';
   },
   methods: {
     onUpdate (event) {
@@ -59,18 +59,18 @@ export default {
         this.$store.commit('notepad/update', {
           id: this.note.id,
           content: event.target.innerText
-        })
+        });
       } else {
         this.$store.commit('note/update', {
           content: event.target.innerText
-        })
+        });
       }
     },
     onFocusNoteEditor () {
-      this.$refs.editor.focus()
+      this.$refs.editor.focus();
     }
   }
-}
+};
 </script>
 
 <style scoped lang="stylus">

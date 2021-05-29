@@ -1,19 +1,21 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
 // import createPersistedState from 'vuex-persistedstate'
 
-import note from '@/domain/user/note'
-import notepad from '@/domain/user/notepad'
-import storage from '@/domain/system/storage'
-import modal from '@/domain/ui/modal'
+import note from '@/domain/user/note';
+import notepad from '@/domain/user/notepad';
+import notebook from '@/domain/user/notebook';
+import storage from '@/domain/system/storage';
+import modal from '@/domain/ui/modal';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
   modules: {
     note,
     notepad,
+    notebook,
     modal
   },
   plugins: [storage]
@@ -30,4 +32,4 @@ export default new Vuex.Store({
   //     }
   //   })
   // ]
-})
+});

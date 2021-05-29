@@ -6,12 +6,12 @@ export default {
       scrollWidth: element.scrollWidth,
       scrollHeight: element.scrollHeight,
       element: element
-    })
+    });
   },
 
   analyzeScrollFast (data = {}, element) {
-    let scrollTop = element.scrollTop
-    let scrollLeft = element.scrollLeft
+    let scrollTop = element.scrollTop;
+    let scrollLeft = element.scrollLeft;
     return Object.assign(data, {
       velocityY: scrollTop - (data.scrollTop || 0),
       velocityX: scrollLeft - (data.scrollLeft || 0),
@@ -19,19 +19,19 @@ export default {
       scrollLeft: scrollLeft,
       scrollBottom: data.scrollHeight - data.offsetHeight - scrollTop,
       scrollRight: data.scrollWidth - data.offsetWidth - scrollLeft
-    })
+    });
   },
 
   analyzeScrollInit (element) {
-    return this.analyzeScrollFast(this.analyzeScrollSlow({}, element), element)
+    return this.analyzeScrollFast(this.analyzeScrollSlow({}, element), element);
   },
 
   analyzeScrollTick (data, element, callback) {
-    let dataCopy = Object.assign({}, data)
-    clearTimeout(this.analyzeScrollSlowTimeout)
+    let dataCopy = Object.assign({}, data);
+    clearTimeout(this.analyzeScrollSlowTimeout);
     this.analyzeScrollSlowTimeout = setTimeout(() => {
-      this.analyzeScrollSlow(dataCopy, element)
-    }, 1500)
-    callback(this.analyzeScrollFast(dataCopy, element))
+      this.analyzeScrollSlow(dataCopy, element);
+    }, 1500);
+    callback(this.analyzeScrollFast(dataCopy, element));
   }
 }

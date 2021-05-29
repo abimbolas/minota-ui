@@ -1,11 +1,11 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from 'vue';
+import Router from 'vue-router';
 
-import Note from '@/components/Note'
-import Notepad from '@/components/Notepad'
-import Notebook from '@/components/Notebook'
+import Note from '@/components/Note';
+import Notepad from '@/components/Notepad';
+import Notebook from '@/components/Notebook';
 
-Vue.use(Router)
+Vue.use(Router);
 
 const router = new Router({
   mode: 'history',
@@ -17,8 +17,9 @@ const router = new Router({
     },
     {
       name: 'note',
-      path: '/note',
-      component: Note
+      path: '/note/:noteId?',
+      component: Note,
+      props: true
     },
     {
       name: 'notepad',
@@ -31,13 +32,13 @@ const router = new Router({
       component: Notebook
     }
   ]
-})
+});
 
 router.beforeEach(function (to, from, next) {
   if (document && document.body) {
-    document.documentElement.setAttribute('name', to.name)
+    document.documentElement.setAttribute('name', to.name);
   }
-  next()
-})
+  next();
+});
 
-export default router
+export default router;

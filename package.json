@@ -65,8 +65,15 @@
     ],
     "parserOptions": {
       "parser": "babel-eslint"
+    },
+    "rules": {
+      "semi": ["error", "always"]
     }
   },
+  "eslintIgnore": [
+    ".archive/*",
+    ".session*"
+  ],
   "postcss": {
     "plugins": {
       "autoprefixer": {}

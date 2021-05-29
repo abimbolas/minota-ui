@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions } from 'vuex';
 
 export default {
   name: 'PromptModal',
@@ -32,7 +32,7 @@ export default {
           cancel: 'Отмена',
           danger: false,
           primary: false
-        }
+        };
       }
     }
   },
@@ -43,7 +43,7 @@ export default {
       'rejectModalAction'
     ])
   }
-}
+};
 </script>
 
 <style lang="stylus">
@@ -69,6 +69,10 @@ export default {
 
   .minota-actions
     justify-content flex-end
+
+  .minota-action_cancel
+    margin-right auto
+    margin-left 0
 
 .minota-modal__main
   padding 0 1.5rem 1.5rem 1.5rem

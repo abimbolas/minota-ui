@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import ModalsComponent from '@/components/Modal'
+import ModalsComponent from '@/components/Modal';
 
 export default {
   name: 'Minota',
@@ -13,9 +13,9 @@ export default {
     ModalsComponent
   },
   mounted () {
-    console.log('Minotá created')
+    console.log('Minotá created');
   }
-}
+};
 </script>
 
 <style lang="stylus">

@@ -28,3 +28,42 @@ color-warning = wheat // sandybrown
 // Shadow
 shadow-note = 0px 1px 5px 0px alpha(black, 0.125)
 shadow-button = 0px 1px 5px 0px alpha(black, 0.375)
+
+@css {
+  html {
+    --font-family-sans: 'IBM Plex Sans', sans-serif;
+    --font-family-serif: 'IBM Plex Serif', serif;
+    --font-family-mono: 'IBM Plex Mono', monospace;
+
+    --screen-sm: 576px;
+    --screen-md: 768px;
+    --screen-lg: 992px;
+    --screen-xl: 1200px;
+
+    --high-emphasis: 0.87;
+    --medium-emphasis: 0.6;
+    --low-emphasis: 0.38;
+    --hover-emphasis: 0.05;
+
+    --color-red: brown;
+    --color-blue: #297da5;
+    --color-green: #75a529;
+
+    --color-background: #efefef;
+
+    --color-text: rgba(0, 0, 0, var(--high-emphasis));
+    --color-text-invert: rgba(255, 255, 255, var(--high-emphasis));
+    --color-text-muted: rgba(0, 0, 0, var(--low-emphasis));
+    --color-text-muted-invert: rgba(255, 255, 255, var(--low-emphasis));
+
+    --color-fill: white;
+    --color-fill-invert: rgba(0, 0, 0, var(--high-emphasis));
+    --color-fill-blue: var(--color-blue);
+    --color-fill-red: var(--color-red);
+    --color-fill-green: var(--color-green);
+
+
+    --shadow-note: 0px 1px 5px 0px rgba(0, 0, 0, 0.125);
+    --shadow-button: 0px 1px 5px 0px rgba(0, 0, 0, 0.375);
+  }
+}

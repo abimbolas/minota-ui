@@ -6,12 +6,12 @@
       .minota-actions
         .minota-action.minota-action_cancel(
           v-on:click="rejectModalAction({ modal })")
-          | {{ modal.cancel }}
+          | {{ modal.cancel || cancel }}
         .minota-action.minota-action_ok(
           v-bind:danger="modal.danger"
           v-bind:primary="modal.primary"
           v-on:click="resolveModalAction({ modal })")
-          | {{ modal.ok }}
+          | {{ modal.ok || ok }}
 </template>
 
 <script>
@@ -19,7 +19,6 @@ import { mapActions } from 'vuex';
 
 export default {
   name: 'PromptModal',
-
   props: {
     modal: {
       type: Object,
@@ -31,12 +30,17 @@ export default {
           ok: 'Ok',
           cancel: 'Отмена',
           danger: false,
-          primary: false
+          primary: true
         };
       }
     }
   },
-
+  data () {
+    return {
+      cancel: 'Cancel',
+      ok: 'Ok'
+    };
+  },
   methods: {
     ...mapActions([
       'resolveModalAction',

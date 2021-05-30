@@ -101,6 +101,6 @@ export default {
 
   &:empty:before
     content attr(placeholder)
-    color alpha(black, low-emphasis)
+    color var(--color-text-muted)
     user-select none
 </style>

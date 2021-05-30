@@ -1,42 +1,48 @@
 <template lang="pug">
-  .minota-notebook
+  .minota-grid.notebook
 
-    //- Top actions
-    .minota-actions.top
-      .minota-action.organize(
-        primary
-        v-observe-view:threshold="[0, 0.2, 1]"
-        @change-view="observe.topActions = $event.detail.ratio")
-        | Organize {{ observe.rightActions ? 'all notes in notepad' : 'note'}}
-
-    //- Notes
-    .minota-row
+    //- Main
+    .minota-grid-main.minota-row
       .minota-cell(
         v-for="id in table"
         :key="id"
         :ref="id"
         v-observe-view
-        :class="{focused: focusedNote.id === id, 'pending-delete': charge.pendingDelete && focusedNote.id === id, 'pending-organize': charge.pendingOrganize && focusedNote.id === id}"
+        :class="getActionClass(id)"
         @enter-view="onFocusNote(id)")
-        note-component.minota-notepad-note(:note-id="id")
+        note-component.minota-notebook-note(:note-id="id")
 
-      //- Right actions
-      .minota-cell.minota-actions.right(
-        :class="{'pending-delete': observe.rightActions && charge.pendingDelete, 'pending-organize': observe.rightActions && charge.pendingOrganize}"
-        v-observe-view:threshold="0.75"
-        @enter-view="observe.rightActions = true"
-        @exit-view="observe.rightActions = false")
-        .minota-action.create(@click="onCreateNote")
+      .minota-cell
+        .minota-action.create(@click="onCreate")
           .minota-action-image
 
-    //- Bottom actions
-    .minota-actions.bottom(:class="{unfreeze: !freeze}")
-      .minota-action.delete.hover(
-        primary
-        danger
+    //- Top
+    .minota-grid-top.panel
+      .minota-action(
         v-observe-view:threshold="[0, 0.2, 1]"
-        @change-view="observe.bottomActions = $event.detail.ratio")
-        | Delete {{ observe.rightActions ? 'all notes in notepad' : 'note'}}
+        @change-view="observeAction('top', $event.detail.ratio)")
+        span Organize
+
+    //- Left
+    //- .minota-grid-left.panel
+      .minota-action(
+        v-observe-view:threshold="[0, 0.2, 1]"
+        @change-view="observeAction('left', $event.detail.ratio)")
+        span Get
+
+    //- Right
+    //- .minota-grid-right.panel
+      .minota-action(
+        v-observe-view:threshold="[0, 0.2, 0.9999, 1]"
+        @change-view="observeAction('right', $event.detail.ratio)")
+        span New
+
+    //- Bottom
+    .minota-grid-bottom.panel
+      .minota-action(
+        v-observe-view:threshold="[0, 0.2, 0.75, 1]"
+        @change-view="observeAction('bottom', $event.detail.ratio)")
+        span Delete
 </template>
 
 <script>
@@ -58,23 +64,17 @@ export default {
       task: {
         initialFocusNote: true
       },
-      background: {
-        danger: false
+      action: {
+        type: '',
+        charged: false,
+        pending: false
       },
-      observe: {
-        rightActions: false,
-        bottomActions: 0,
-        topActions: 0
-      },
-      charge: {
-        delete: false,
-        prepare: false,
-        pendingDelete: false,
-        decidedDelete: false,
-        pendingOrganize: false,
-        decidedOrganize: false
-      },
-      freeze: false
+      actionMap: {
+        'top': 'Organize',
+        'right': 'Create',
+        'bottom': 'Delete',
+        'left': 'Get'
+      }
     };
   },
   computed: {
@@ -87,45 +87,6 @@ export default {
     }),
     ...mapGetters('notepad', ['noteById']),
     ...mapGetters(['notebook/table'])
-  },
-  watch: {
-    'observe.topActions' (ratio) {
-      if (ratio === 1) {
-        this.charge.decidedOrganize = true;
-        this.charge.pendingOrganize = true;
-      } else if (this.charge.decidedOrganize) {
-        setTimeout(() => {
-          Promise.all([
-            this.observe.rightActions
-              ? this.onOrganizeNotes()
-              : this.onOrganizeNote()
-          ]).finally(() => {
-            this.charge.pendingOrganize = false;
-          });
-        }, 150);
-        this.charge.decidedOrganize = false;
-      }
-    },
-    'observe.bottomActions' (ratio) {
-      if (ratio === 1) {
-        this.charge.decidedDelete = true;
-        this.charge.pendingDelete = true;
-      } else if (this.charge.decidedDelete) {
-        setTimeout(() => {
-          Promise.all([
-            this.observe.rightActions
-              ? this.onDeleteNotes()
-              : this.onDeleteNote()
-          ]).finally(() => {
-            this.charge.pendingDelete = false;
-          });
-        }, 150);
-        this.charge.decidedDelete = false;
-      }
-    },
-    'table' (table) {
-      console.log('watch table', table);
-    }
   },
   updated () {
     // Initially show focused note
@@ -140,50 +101,66 @@ export default {
     }
   },
   methods: {
-    onCreateNote () {
-      const note = new Note();
-      this.$store.commit('notepad/add', note);
-      this.$store.commit('note/replace', this.noteById(note.id));
-      this.$store.commit('notebook/addToTable', note);
-      // Scroll to created note
-      setTimeout(() => {
-        this.scrollToNote(note);
-      }, 100);
-      // Focus note editor after animation
-      setTimeout(() => {
-        this.focusNoteEditor(note);
-      }, 1000);
+    observeAction (type, ratio) {
+      if (ratio === 1) {
+        this.action.pending = true;
+        this.action.charged = true;
+        this.action.type = type;
+      } else if (this.action.charged) {
+        setTimeout(() => {
+          this[`on${this.actionMap[this.action.type]}`]().finally(() => {
+            this.action.pending = false;
+          });
+        }, 150);
+        this.action.charged = false;
+      }
     },
-    onDeleteNotes () {
+    onGet () {
+      console.log('Get');
+      return Promise.resolve();
+    },
+    onOrganize () {
       return this.openModalAction({
         modal: {
           component: 'PromptModal',
-          header: 'Delete Notepad Notes',
-          description: [
-            `<p>Delete ${this.table.length} notes in notepad?</p>`
-          ].join('\n'),
-          ok: `Yes, delete ${this.table.length} notes`,
-          cancel: 'Oh no, cancel',
-          danger: true,
+          header: 'Organize the note?',
+          ok: 'Organize',
           primary: true
         }
       }).then(() => {
-        this.$store.commit('notepad/delete', this.notes.slice(0));
+        let noteIndex = this.table.findIndex(id => id === this.focusedNote.id);
+        noteIndex = Math.max(0, noteIndex - 1);
+        noteIndex = Math.max(0, Math.min(noteIndex, this.table.length - 2));
+        this.$store.commit('notebook/removeFromTable', this.focusedNote);
+        if (this.table.length) {
+          this.scrollToNote(this.noteById(this.table[noteIndex]));
+        }
       }).catch(() => {
-        console.warn('Cancel delete all');
+        console.warn('Organize canceled');
       });
     },
-    onDeleteNote () {
+    onCreate () {
+      return new Promise(resolve => {
+        const note = new Note();
+        this.$store.commit('notepad/add', note);
+        this.$store.commit('note/replace', this.noteById(note.id));
+        this.$store.commit('notebook/addToTable', note);
+        // Scroll to created note
+        setTimeout(() => {
+          this.scrollToNote(note);
+        }, 100);
+        // Focus note editor after animation
+        setTimeout(() => {
+          this.focusNoteEditor(note);
+        }, 1000);
+      });
+    },
+    onDelete () {
       return this.openModalAction({
         modal: {
           component: 'PromptModal',
           header: 'Delete the note?',
-          // description: [
-          //   `<p style="font-size: smaller;">${this.focusedNote.config.date.toDateString()}</p>`,
-          //   `<p><em><q>${this.focusedNote.content.slice(0, 100)}...</q></em></p>`
-          // ].join('\n'),
           ok: 'Delete',
-          cancel: 'Cancel',
           danger: true,
           primary: true
         }
@@ -197,43 +174,7 @@ export default {
           this.scrollToNote(this.noteById(this.table[noteIndex]));
         }
       }).catch(() => {
-        console.warn('Cancel delete');
-      });
-    },
-    onOrganizeNotes () {
-      return this.openModalAction({
-        modal: {
-          component: 'PromptModal',
-          header: `Archive everything (${this.table.length} notes) on the table?`,
-          ok: `Yes, archive ${this.table.length} notes`,
-          cancel: 'Oh no, cancel',
-          primary: true
-        }
-      }).then(() => {
-        console.log('Do organize action');
-      }).catch(() => {
-        console.warn('Cancel organize');
-      });
-    },
-    onOrganizeNote () {
-      return this.openModalAction({
-        modal: {
-          component: 'PromptModal',
-          header: 'Archive note?',
-          ok: 'Archive',
-          cancel: 'Cancel',
-          primary: true
-        }
-      }).then(() => {
-        let noteIndex = this.table.findIndex(id => id === this.focusedNote.id);
-        noteIndex = Math.max(0, noteIndex - 1);
-        noteIndex = Math.max(0, Math.min(noteIndex, this.table.length - 2));
-        this.$store.commit('notebook/removeFromTable', this.focusedNote);
-        if (this.table.length) {
-          this.scrollToNote(this.noteById(this.table[noteIndex]));
-        }
-      }).catch(() => {
-        console.warn('Cancel organize');
+        console.warn('Delete canceled');
       });
     },
     onFocusNote (id) {
@@ -243,6 +184,7 @@ export default {
       }, 150);
     },
     scrollToNote (note, instant) {
+      console.log(this.$refs[note.id]);
       requestAnimationFrame(() => {
         if (this.$refs[note.id] && this.$refs[note.id][0]) {
           this.$refs[note.id][0].scrollIntoView({
@@ -257,11 +199,18 @@ export default {
     focusNoteEditor (note) {
       if (this.$refs[note.id] && this.$refs[note.id][0]) {
         this.$refs[note.id][0]
-          .querySelector('.minota-notepad-note')
+          .querySelector('.minota-note')
           .dispatchEvent(new CustomEvent('focus-note-editor'));
       } else {
         console.warn(`focusNoteEditor: note ${note.id} not found`);
       }
+    },
+    getActionClass (noteId) {
+      if (this.action.pending && this.focusedNote.id === noteId) {
+        return {
+          [`pending-${this.actionMap[this.action.type].toLowerCase()}`]: true
+        };
+      } else return {};
     },
     ...mapActions(['openModalAction'])
   }
@@ -273,52 +222,98 @@ export default {
 @import '~@/assets/styles/actions'
 @import '~@/assets/styles/grid'
 
-.minota-notebook
-  height 100%
-  width 100%
+.notebook
   overflow auto
-  scroll-snap-type block mandatory
 
-  --note-border-radius: 1rem;
-
-  &.danger
-    background-color color-danger
-
-.minota-row
-  scroll-snap-align center
-
-.minota-cell
-  padding 1rem
-
-  &.pending-delete .minota-notepad-note
-    background-color brown
-    color alpha(white, high-emphasis)
-    transition all 0.1s ease-out
-
-  &.pending-organize .minota-notepad-note
-    background-color alpha(black, high-emphasis)
-    color alpha(white, high-emphasis)
-    transition all 0.1s ease-out
-
-//
-// Last cell click action
-//
-
-.minota-actions.right
-  justify-content center
-  align-items stretch
+  .panel
+    padding 1rem
+    &.minota-grid-top
+      padding-top 0
+    &.minota-grid-right
+      padding-right 0
+    &.minota-grid-left
+      padding-left 0
+    &.minota-grid-bottom
+      padding-bottom 0.5px /* strange bug */
 
   .minota-action
-    flex-direction column
-    flex-grow 1
-    display flex
     border-radius 1rem
+    box-sizing border-box
+    box-shadow var(--shadow-note)
+    font-size 120%
 
+  // Get (left) action
+  .minota-grid-left .minota-action
+    background-color var(--color-fill-green)
+    color var(--color-text-invert)
+    border-top-left-radius 0
+    border-bottom-left-radius 0
+    width 10vw
+    height 100%
+    justify-content flex-end
+    padding-right 3rem
+
+  // Organize (top) action
+  .minota-grid-top .minota-action
+    background-color var(--color-fill-invert)
+    color var(--color-text-invert)
+    border-top-left-radius 0
+    border-top-right-radius 0
+    height 7.5rem
+    width 100%
+    align-items flex-end
+    padding-bottom 3rem
+
+  // Create (right) action
+  .minota-grid-right .minota-action
+    background-color var(--color-fill-blue)
+    color var(--color-text-invert)
+    border-top-right-radius 0
+    border-bottom-right-radius 0
+    width 10vw
+    height 100%
+    justify-content flex-start
+    padding-left 3rem
+
+  // Delete (bottom) action
+  .minota-grid-bottom .minota-action
+    background-color var(--color-fill-red)
+    color var(--color-text-invert)
+    border-bottom-left-radius 0
+    border-bottom-right-radius 0
+    width 100%
+    height 7.5rem
+    align-items flex-start
+    padding-top 3rem
+
+  .minota-cell
+    padding 1rem
+
+  .minota-notebook-note
+    --note-border-radius: 1rem;
+
+  .pending-delete .minota-notebook-note
+    background-color var(--color-red)
+    color var(--color-text-invert)
+    transition all 0.1s ease-out
+    --color-text-muted var(--color-text-muted-invert)
+
+  .pending-organize .minota-notebook-note
+    background-color var(--color-fill-invert)
+    color var(--color-text-invert)
+    transition all 0.1s ease-out
+
+  .pending-get .minota-notebook-note
+    background-color var(--color-fill-green)
+    color var(--color-text-invert)
+    transition all 0.1s ease-out
+
+  .minota-action.create
+    width 100%
+    height 100%
+    box-shadow none
     &:hover
       background-color transparent
-    &:active
-      background-color white
-      box-shadow shadow-note
 
     .minota-action-image
       width 100%
@@ -328,59 +323,24 @@ export default {
       background url('~@/assets/images/signature-pushkin.png') no-repeat center
       background-size contain
 
-  &.pending-delete .minota-action
-    background-color brown
-    color alpha(white, high-emphasis)
-
-    .minota-action-image
-      filter invert(1)
-
-  &.pending-organize .minota-action
-    background-color alpha(black, high-emphasis)
-    color alpha(white, high-emphasis)
-
-    .minota-action-image
-      filter invert(1)
-
-//
-// Top scroll action
-//
-
-.minota-actions.top
-  padding 1rem
-  padding-top 0
-  box-sizing border-box
-  height 25vh;
-
-  .minota-action
-    flex-grow 1
-    // background-color brown
-    border-bottom-left-radius 1rem
-    border-bottom-right-radius 1rem
-
-    border-top-left-radius 0
-    border-top-right-radius 0
-    box-shadow shadow-button
-    // border-top solid darken(brown, 12.5%) 8px
-
-//
-// Bottom scroll action
-//
-
-.minota-actions.bottom
-  padding 1rem
-  padding-bottom 0
-  box-sizing border-box
-  height 25vh;
-
-  .minota-action
-    flex-grow 1
-    // background-color brown
-    border-top-left-radius 1rem
-    border-top-right-radius 1rem
-
-    border-bottom-left-radius 0
-    border-bottom-right-radius 0
-    box-shadow shadow-button
-    // border-top solid darken(brown, 12.5%) 8px
+// .notebook.top
+//   background-color var(--color-fill-invert)
+//   .minota-action
+//     background-color transparent
+//     box-shadow none
+// .notebook.right
+//   background-color var(--color-fill-blue)
+//   .minota-action
+//     background-color transparent
+//     box-shadow none
+// .notebook.bottom
+//   background-color var(--color-fill-red)
+//   .minota-action
+//     background-color transparent
+//     box-shadow none
+// .notebook.left
+//   background-color var(--color-fill-green)
+//   .minota-action
+//     background-color transparent
+//     box-shadow none
 </style>

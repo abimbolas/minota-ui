@@ -9,10 +9,22 @@
   grid-template-areas 'top-left top top-right' 'left main right' 'bottom-left bottom bottom-right'
   scroll-snap-type both mandatory
 
-  .minota-row
+  .minota-grid-main
     grid-area main
     scroll-snap-align center
     scroll-snap-stop always
+
+  .minota-grid-top
+    grid-area top
+
+  .minota-grid-bottom
+    grid-area bottom
+
+  .minota-grid-left
+    grid-area left
+
+  .minota-grid-right
+    grid-area right
 
 .minota-row
   width 100%
